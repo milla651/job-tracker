@@ -5,8 +5,7 @@ import Link from "next/link";
 import { registerUser } from "@/app/actions/auth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { Briefcase, Loader2 } from "lucide-react";
+import { Briefcase, Loader2, ArrowLeft } from "lucide-react";
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
@@ -44,27 +43,58 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
-      {/* Background decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      {/* Animated Mesh Background */}
+      <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark" />
+      <div className="absolute inset-0 bg-aurora" />
 
-      <Card className="w-full max-w-md relative">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 p-3 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 w-fit">
-            <Briefcase className="w-8 h-8 text-white" />
+      {/* Floating Orbs */}
+      <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-accent/20 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-3xl animate-float-delayed" />
+
+      {/* Grid Pattern Overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
+        style={{
+          backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
+                            linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px'
+        }}
+      />
+
+      {/* Back to Home Link */}
+      <Link
+        href="/"
+        className="absolute top-8 left-8 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
+      >
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+        Back to Home
+      </Link>
+
+      {/* Register Card */}
+      <div className="relative w-full max-w-md">
+        <div className="glass-card p-8 md:p-10">
+          {/* Logo */}
+          <div className="flex justify-center mb-8">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-primary to-accent">
+              <Briefcase className="w-10 h-10 text-white" />
+            </div>
           </div>
-          <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>
-            Start tracking your job applications today
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action={handleSubmit} className="space-y-4">
+
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Create an account
+            </h1>
+            <p className="text-muted-foreground">
+              Start tracking your job applications today
+            </p>
+          </div>
+
+          {/* Form */}
+          <form action={handleSubmit} className="space-y-5">
             {error && (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+              <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-sm">
                 {error}
               </div>
             )}
@@ -107,7 +137,12 @@ export default function RegisterPage() {
               autoComplete="new-password"
             />
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white shadow-lg"
+              disabled={isLoading}
+              size="lg"
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -119,17 +154,18 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-400">
+          {/* Footer */}
+          <p className="mt-8 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="text-indigo-400 hover:text-indigo-300 font-medium"
+              className="text-primary hover:text-primary/80 font-semibold transition-colors"
             >
               Sign in
             </Link>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

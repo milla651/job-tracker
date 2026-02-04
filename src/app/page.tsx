@@ -2,266 +2,512 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { 
-  Briefcase, 
-  LineChart, 
-  Calendar, 
-  CheckCircle, 
-  Target, 
-  Bell, 
-  Users,
-  Rocket,
+import {
+  Briefcase,
+  LineChart,
+  Calendar,
+  Bell,
+  Check,
+  ArrowRight,
   Sparkles,
   Zap,
-  ArrowRight,
+  Target,
+  Users,
   TrendingUp,
   Shield,
-  Clock
+  Clock,
+  Star,
+  ChevronRight,
+  Play
 } from "lucide-react";
 
 export default async function HomePage() {
   const session = await auth();
-  
+
   if (session) {
     redirect("/dashboard");
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-24 pb-32 lg:pt-32 lg:pb-40">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-50/50 via-white to-blue-50/30" />
-        <div className="absolute inset-0">
-          <div className="absolute top-20 -left-20 w-96 h-96 bg-gradient-to-br from-amber-200/30 to-orange-200/20 rounded-full blur-3xl" />
-          <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-bl from-blue-200/20 to-cyan-200/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 left-1/3 w-96 h-96 bg-gradient-to-tr from-emerald-200/10 to-green-200/5 rounded-full blur-3xl" />
-        </div>
+    <div className="min-h-screen overflow-hidden">
+      {/* ============================================
+          HERO SECTION
+          ============================================ */}
+      <section className="relative min-h-screen flex items-center justify-center pt-16">
+        {/* Animated Mesh Background */}
+        <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark" />
+        <div className="absolute inset-0 bg-aurora" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-200 mb-8 animate-pulse">
-              <Sparkles className="w-4 h-4 text-amber-600" />
-              <span className="text-sm font-semibold text-amber-800">
-                5,000+ Job Seekers Trust Us
+        {/* Floating Orbs */}
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-float-delayed" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-primary/5 to-transparent rounded-full" />
+
+        {/* Grid Pattern Overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
+          style={{
+            backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
+                              linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }}
+        />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center">
+            {/* Announcement Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-8 fade-in-up">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
+              <span className="text-sm font-medium text-foreground/80">
+                Trusted by <span className="text-primary font-bold">5,000+</span> job seekers worldwide
+              </span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </div>
 
-            {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-              <span className="block text-gray-900">Organize Your</span>
-              <span className="text-gradient block">Job Search Journey</span>
+            {/* Main Headline */}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 fade-in-up fade-in-up-delay-1">
+              <span className="block text-foreground">Land Your</span>
+              <span className="text-gradient">Dream Job</span>
             </h1>
-            
+
             {/* Subtitle */}
-            <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Stop the spreadsheet chaos. Track applications, interviews, and follow-ups 
-              in one beautiful, organized space built for real job seekers.
+            <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed fade-in-up fade-in-up-delay-2">
+              The modern way to track applications, ace interviews, and get hired faster.
+              <span className="block text-foreground/70 mt-2">No spreadsheets. No chaos. Just results.</span>
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+            {/* CTA Section */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 fade-in-up fade-in-up-delay-3">
               <Link href="/register">
-                <Button size="xl" className="group shadow-lg hover:shadow-xl">
-                  <Rocket className="mr-2 w-5 h-5 group-hover:rotate-12 transition-transform" />
-                  Start Free Forever
+                <Button
+                  size="xl"
+                  className="group bg-gradient-brand-animated text-white shadow-xl hover:shadow-2xl hover:shadow-primary/25 transition-all duration-500 rounded-2xl px-8"
+                >
+                  <Sparkles className="mr-2 w-5 h-5" />
+                  Start Free — No Credit Card
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link href="/login">
-                <Button variant="outline" size="xl">
-                  Sign In to Continue
+                <Button
+                  variant="outline"
+                  size="xl"
+                  className="group glass-card border-2 border-border/50 hover:border-primary/50 rounded-2xl px-8"
+                >
+                  <Play className="mr-2 w-4 h-4" />
+                  Watch Demo
                 </Button>
               </Link>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+            {/* Social Proof Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto fade-in-up fade-in-up-delay-4">
               {[
-                { value: "3.2x", label: "More Organized", icon: CheckCircle },
-                { value: "89%", label: "Faster Follow-ups", icon: Zap },
-                { value: "50+", label: "Apps Managed", icon: Target },
-                { value: "100%", label: "Your Data", icon: Shield },
+                { value: "10K+", label: "Jobs Tracked", icon: Briefcase },
+                { value: "89%", label: "Success Rate", icon: TrendingUp },
+                { value: "2.5x", label: "Faster Hiring", icon: Zap },
+                { value: "4.9★", label: "User Rating", icon: Star },
               ].map((stat, i) => (
-                <div key={i} className="p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:border-primary/30 transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100">
-                      <stat.icon className="w-4 h-4 text-amber-600" />
-                    </div>
-                    <div className="text-left">
-                      <div className="text-xl font-bold text-gray-900">{stat.value}</div>
-                      <div className="text-xs text-gray-600">{stat.label}</div>
-                    </div>
+                <div
+                  key={i}
+                  className="group glass-card-hover p-5 rounded-2xl text-center cursor-default"
+                >
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <stat.icon className="w-5 h-5 text-primary" />
+                    <div className="text-2xl sm:text-3xl font-bold text-gradient-static">{stat.value}</div>
                   </div>
+                  <div className="text-sm text-muted-foreground font-medium">{stat.label}</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-60">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Scroll</span>
+          <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center">
+            <div className="w-1.5 h-3 bg-primary rounded-full mt-2 animate-bounce" />
+          </div>
+        </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ============================================
+          FEATURES BENTO GRID
+          ============================================ */}
+      <section className="relative py-24 md:py-32">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Everything You Need, <span className="text-gradient">Nothing You Don't</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <Zap className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">Powerful Features</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-4">
+              Everything you need,
+              <span className="block text-gradient">nothing you don't</span>
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              A simple yet powerful tool designed specifically for modern job seekers
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Built by job seekers who got tired of messy spreadsheets and missed opportunities.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Bento Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            {/* Large Feature Card */}
+            <div className="md:col-span-2 group glass-card-hover p-8 md:p-10 rounded-3xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors duration-500" />
+              <div className="relative">
+                <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-primary to-accent mb-6">
+                  <LineChart className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                  Visual Progress Dashboard
+                </h3>
+                <p className="text-muted-foreground mb-6 max-w-lg">
+                  See your entire job search at a glance. Track applications,
+                  interviews, and offers with beautiful visualizations that actually make sense.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {["Analytics", "Pipeline View", "Statistics"].map((tag) => (
+                    <span key={tag} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Tall Feature Card */}
+            <div className="md:row-span-2 group glass-card-hover p-8 rounded-3xl relative overflow-hidden">
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/10 rounded-full blur-3xl group-hover:bg-accent/20 transition-colors duration-500" />
+              <div className="relative h-full flex flex-col">
+                <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-accent to-primary mb-6 w-fit">
+                  <Calendar className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-3">
+                  Smart Scheduling
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  Never miss an interview again. Sync with your calendar and get intelligent reminders.
+                </p>
+                <div className="mt-auto pt-8">
+                  <div className="space-y-3">
+                    {["Calendar sync", "Smart reminders", "Time zone support"].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                        <span className="text-sm text-foreground/80">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Small Feature Cards */}
+            <div className="group glass-card-hover p-8 rounded-3xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-colors duration-500" />
+              <div className="relative">
+                <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 mb-4">
+                  <Briefcase className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-2">Quick Logging</h3>
+                <p className="text-muted-foreground text-sm">
+                  Add new applications in seconds with smart auto-complete and templates.
+                </p>
+              </div>
+            </div>
+
+            <div className="group glass-card-hover p-8 rounded-3xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-colors duration-500" />
+              <div className="relative">
+                <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-500 mb-4">
+                  <Bell className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-2">Auto Reminders</h3>
+                <p className="text-muted-foreground text-sm">
+                  Get notified when it's time to follow up. Never let an opportunity slip away.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          HOW IT WORKS
+          ============================================ */}
+      <section className="relative py-24 md:py-32">
+        <div className="absolute inset-0 bg-gradient-to-b from-background to-muted/20" />
+
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6">
+              <Target className="w-4 h-4 text-accent" />
+              <span className="text-sm font-semibold text-accent">How It Works</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-4">
+              Three simple steps to
+              <span className="block text-gradient">career success</span>
+            </h2>
+          </div>
+
+          {/* Steps */}
+          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
             {[
               {
-                icon: Briefcase,
-                title: "Smart Tracking",
-                description: "Log jobs in seconds with auto-suggest",
-                color: "from-blue-500 to-cyan-400",
+                step: "01",
+                emoji: "📝",
+                title: "Track Everything",
+                description: "Add your job applications with company details, deadlines, and notes. We keep it all organized.",
+                gradient: "from-primary to-primary/50"
               },
               {
-                icon: LineChart,
-                title: "Progress Dashboard",
-                description: "Visual insights into your search journey",
-                color: "from-emerald-500 to-green-400",
+                step: "02",
+                emoji: "📊",
+                title: "Stay Updated",
+                description: "Update application statuses as you progress. Visual pipeline shows where each opportunity stands.",
+                gradient: "from-accent to-accent/50"
               },
               {
-                icon: Calendar,
-                title: "Interview Calendar",
-                description: "Never miss an interview again",
-                color: "from-violet-500 to-purple-400",
+                step: "03",
+                emoji: "🎯",
+                title: "Land the Job",
+                description: "Focus on interviews, not organization. Get reminders and insights to close the deal.",
+                gradient: "from-emerald-500 to-emerald-500/50"
+              }
+            ].map((item, index) => (
+              <div key={index} className="relative group">
+                {/* Connection Line */}
+                {index < 2 && (
+                  <div className="hidden md:block absolute top-16 left-[calc(100%+12px)] w-[calc(100%-24px)] h-0.5">
+                    <div className="h-full bg-gradient-to-r from-border via-primary/30 to-border" />
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary/50" />
+                  </div>
+                )}
+
+                <div className="glass-card-hover p-8 rounded-3xl h-full">
+                  {/* Step Number */}
+                  <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${item.gradient} mb-6`}>
+                    <span className="text-4xl">{item.emoji}</span>
+                  </div>
+
+                  {/* Content */}
+                  <div className="text-sm font-mono text-primary font-bold mb-2">{item.step}</div>
+                  <h3 className="text-2xl font-bold text-foreground mb-3">{item.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{item.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          TESTIMONIALS
+          ============================================ */}
+      <section className="relative py-24 md:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-muted/20 via-background to-background" />
+
+        {/* Floating Shapes */}
+        <div className="absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl animate-float-delayed" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <Users className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">Success Stories</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+              Loved by job seekers
+              <span className="block text-gradient">around the world</span>
+            </h2>
+          </div>
+
+          {/* Testimonial Cards */}
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            {[
+              {
+                quote: "Finally, a job tracker that doesn't feel like doing extra homework. I landed my dream role at a FAANG company in 3 months!",
+                author: "Sarah Chen",
+                role: "Software Engineer",
+                company: "Meta",
+                avatar: "SC",
+                stars: 5
               },
               {
-                icon: Bell,
-                title: "Smart Reminders",
-                description: "Automated follow-up notifications",
-                color: "from-rose-500 to-pink-400",
+                quote: "The visual pipeline is a game-changer. I could see exactly where I stood with 50+ applications. Highly recommend!",
+                author: "Marcus Johnson",
+                role: "Product Manager",
+                company: "Stripe",
+                avatar: "MJ",
+                stars: 5
               },
-            ].map((feature, index) => (
+              {
+                quote: "Smart reminders saved me twice from missing follow-ups. This tool pays for itself... and it's free!",
+                author: "Emily Rodriguez",
+                role: "UX Designer",
+                company: "Airbnb",
+                avatar: "ER",
+                stars: 5
+              }
+            ].map((testimonial, index) => (
               <div
                 key={index}
-                className="group relative p-6 rounded-2xl bg-white border-2 border-gray-200 hover:border-primary/50 transition-all duration-300 hover:shadow-lg"
+                className="group glass-card-hover p-8 rounded-3xl"
               >
-                <div className="absolute top-4 right-4">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                {/* Stars */}
+                <div className="flex gap-1 mb-4">
+                  {[...Array(testimonial.stars)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                  ))}
                 </div>
-                <div
-                  className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${feature.color} mb-4`}
-                >
-                  <feature.icon className="w-6 h-6 text-white" />
+
+                {/* Quote */}
+                <p className="text-foreground/90 text-lg leading-relaxed mb-6">
+                  "{testimonial.quote}"
+                </p>
+
+                {/* Author */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold">
+                    {testimonial.avatar}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground">{testimonial.author}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {testimonial.role} @ {testimonial.company}
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20">
+      {/* ============================================
+          FINAL CTA
+          ============================================ */}
+      <section className="relative py-24 md:py-32">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Simple, Powerful, <span className="text-primary">Effective</span>
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Get started in minutes, stay organized for months
-            </p>
-          </div>
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-10 md:p-16">
+            {/* Background Effects */}
+            <div className="absolute inset-0 bg-mesh-dark opacity-50" />
+            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-float" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent/15 rounded-full blur-3xl animate-float-delayed" />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { number: "01", title: "Add Jobs", description: "Quickly add job applications with details", icon: "📝" },
-              { number: "02", title: "Track Status", description: "Update progress through each stage", icon: "📈" },
-              { number: "03", title: "Get Reminders", description: "Automated notifications for follow-ups", icon: "🔔" },
-              { number: "04", title: "Land Jobs", description: "Focus on interviews, not organization", icon: "🎯" },
-            ].map((step, index) => (
-              <div key={index} className="relative">
-                <div className="relative p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200/50">
-                  <div className="text-4xl mb-4">{step.icon}</div>
-                  <div className="text-sm font-mono text-primary font-bold mb-2">{step.number}</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
-                  <p className="text-gray-600">{step.description}</p>
-                </div>
-                {index < 3 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-primary/50 to-transparent" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            {/* Grid Pattern */}
+            <div
+              className="absolute inset-0 opacity-5"
+              style={{
+                backgroundImage: `linear-gradient(white 1px, transparent 1px),
+                                  linear-gradient(90deg, white 1px, transparent 1px)`,
+                backgroundSize: '40px 40px'
+              }}
+            />
 
-      {/* Final CTA */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 p-8 md:p-12">
-            {/* Animated background */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-primary/20 to-accent/10 rounded-full blur-3xl" />
-            
             <div className="relative text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 mb-6">
-                <Users className="w-4 h-4 text-amber-300" />
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur mb-8">
+                <Sparkles className="w-4 h-4 text-amber-300" />
                 <span className="text-sm font-medium text-amber-100">
-                  Join Successful Job Seekers
+                  Ready to accelerate your career?
                 </span>
               </div>
-              
-              <h2 className="text-2xl md:text-4xl font-bold text-white mb-6">
-                Ready to <span className="text-gradient">Transform</span> Your Job Search?
+
+              {/* Headline */}
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+                Your dream job is
+                <span className="block text-gradient mt-2">waiting for you</span>
               </h2>
-              
-              <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-                Stop wasting time on spreadsheets. Start tracking your journey to success.
+
+              {/* Description */}
+              <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+                Join thousands of successful job seekers who transformed their search
+                from chaotic to confident.
               </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                 <Link href="/register">
-                  <Button size="lg" className="bg-gradient-brand text-white shadow-lg hover:shadow-xl">
-                    <Sparkles className="mr-2 w-4 h-4" />
+                  <Button
+                    size="xl"
+                    className="group bg-white text-gray-900 hover:bg-gray-100 shadow-2xl rounded-2xl px-10"
+                  >
+                    <Sparkles className="mr-2 w-5 h-5 text-primary" />
                     Get Started Free
-                    <ArrowRight className="ml-2 w-4 h-4" />
+                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
                 <Link href="/login">
-                  <Button variant="outline" className="border-2 border-gray-600 text-gray-200 hover:border-primary hover:text-primary">
-                    Sign In Now
+                  <Button
+                    variant="outline"
+                    size="xl"
+                    className="border-2 border-white/20 text-white hover:bg-white/10 hover:border-white/40 rounded-2xl px-10"
+                  >
+                    Sign In
                   </Button>
                 </Link>
               </div>
-              
-              <p className="text-sm text-gray-400 mt-6">
-                No credit card required • 100% free • Your data is yours forever
-              </p>
+
+              {/* Trust indicators */}
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
+                <span className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400" />
+                  Free forever
+                </span>
+                <span className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-emerald-400" />
+                  No credit card required
+                </span>
+                <span className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-emerald-400" />
+                  Setup in 2 minutes
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 border-t border-gray-200 bg-white">
+      {/* ============================================
+          FOOTER
+          ============================================ */}
+      <footer className="relative py-12 border-t border-border/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-accent">
                 <Briefcase className="w-5 h-5 text-white" />
               </div>
               <div>
-                <span className="font-bold text-gray-900 text-lg">JobTracker</span>
-                <p className="text-xs text-gray-500">Built by job seekers, for job seekers</p>
+                <span className="font-bold text-foreground text-lg">JobTracker</span>
+                <p className="text-xs text-muted-foreground">Your career companion</p>
               </div>
             </div>
-            <div className="flex items-center gap-6 text-sm text-gray-600">
-              <span>Privacy First</span>
-              <span>•</span>
-              <span>No Tracking</span>
-              <span>•</span>
-              <span>© {new Date().getFullYear()}</span>
+
+            {/* Links */}
+            <div className="flex items-center gap-8 text-sm text-muted-foreground">
+              <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+              <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
+            </div>
+
+            {/* Copyright */}
+            <div className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} JobTracker. Made with ❤️
             </div>
           </div>
         </div>

@@ -2,61 +2,66 @@
 
 @layer theme {
   :root {
-    /* Modern Vibrant Color Palette - Warm & Energetic */
-    --background: 48 100% 98%; /* Amber 50 */
-    --foreground: 20 14% 4%; /* Stone 950 */
+    /* Modern Vibrant Color Palette - Indigo/Pink Focus */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 240 10% 4%;
     --card: 0 0% 100%;
-    --card-foreground: 20 14% 4%;
+    --card-foreground: 240 10% 4%;
     --popover: 0 0% 100%;
-    --popover-foreground: 20 14% 4%;
-    --primary: 24 95% 53%; /* Orange 500 */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 60 5% 96%;
-    --secondary-foreground: 24 10% 10%;
-    --muted: 60 5% 96%;
-    --muted-foreground: 25 5% 45%;
-    --accent: 45 93% 47%; /* Amber 500 */
-    --accent-foreground: 24 10% 10%;
+    --popover-foreground: 240 10% 4%;
+    --primary: 239 84% 67%; /* Indigo 500 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 10%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 330 81% 60%; /* Pink 500 */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 20 5% 90%;
-    --input: 20 5% 90%;
-    --ring: 24 95% 53%; /* Orange 500 */
-    --radius: 0.75rem;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 239 84% 67%;
+    --radius: 1rem;
     
     /* Custom Colors */
     --success: 142 76% 36%;
     --warning: 38 92% 50%;
     --info: 199 89% 48%;
+    
+    /* Gradient Colors */
+    --gradient-1: 239 84% 67%;
+    --gradient-2: 270 95% 75%;
+    --gradient-3: 330 81% 60%;
+    --gradient-4: 350 89% 60%;
   }
 
   .dark {
-    --background: 20 14% 4%; /* Stone 950 */
-    --foreground: 60 5% 96%;
-    --card: 20 14% 4%;
-    --card-foreground: 60 5% 96%;
-    --popover: 20 14% 4%;
-    --popover-foreground: 60 5% 96%;
-    --primary: 24 95% 53%; /* Orange 500 */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 12 6% 15%;
-    --secondary-foreground: 60 5% 96%;
-    --muted: 12 6% 15%;
-    --muted-foreground: 24 5% 64%;
-    --accent: 45 93% 47%; /* Amber 500 */
-    --accent-foreground: 60 5% 96%;
+    --background: 240 10% 4%;
+    --foreground: 0 0% 95%;
+    --card: 240 10% 8%;
+    --card-foreground: 0 0% 95%;
+    --popover: 240 10% 8%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 6% 12%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 240 6% 12%;
+    --muted-foreground: 240 5% 64%;
+    --accent: 330 81% 60%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 63% 31%;
-    --destructive-foreground: 60 5% 96%;
-    --border: 12 6% 15%;
-    --input: 12 6% 15%;
-    --ring: 24 95% 53%; /* Orange 500 */
+    --destructive-foreground: 0 0% 95%;
+    --border: 240 6% 15%;
+    --input: 240 6% 15%;
+    --ring: 239 84% 67%;
   }
 }
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
   
-  /* Colors must use hsl() for Tailwind v4 utility generation */
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   
@@ -85,7 +90,6 @@
   --color-warning: hsl(var(--warning));
   --color-info: hsl(var(--info));
   
-  /* These are needed for utilities like border-border, bg-input, ring-ring */
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -94,99 +98,253 @@
   --radius-md: calc(var(--radius) - 0.25rem);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 0.5rem);
+  --radius-2xl: calc(var(--radius) + 1rem);
+  --radius-3xl: calc(var(--radius) + 1.5rem);
 }
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
+  }
+  
+  html {
+    scroll-behavior: smooth;
   }
   
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar - sleeker */
   ::-webkit-scrollbar {
-    @apply w-2;
+    width: 6px;
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-muted;
+    background: transparent;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-border rounded-full;
+    background: hsl(var(--muted-foreground) / 0.2);
+    border-radius: 9999px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+    background: hsl(var(--muted-foreground) / 0.4);
   }
   
   /* Selection */
   ::selection {
-    @apply bg-primary/20 text-foreground;
+    background: hsl(var(--primary) / 0.2);
+    color: hsl(var(--foreground));
   }
 }
 
-@layer utilities {
-  .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgb(from var(--color-primary) r g b / 0.1) 50%,
-      transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
+/* ============================================
+   COMPONENT STYLES - Using direct CSS
+   ============================================ */
+
+/* Glassmorphism */
+.glass {
+  background: hsl(0 0% 100% / 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid hsl(var(--border) / 0.2);
+}
+
+.dark .glass {
+  background: hsl(0 0% 0% / 0.2);
+}
+
+.glass-card {
+  background: hsl(0 0% 100% / 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 1rem;
+  border: 1px solid hsl(var(--border) / 0.3);
+  box-shadow: 
+    0 0 0 1px hsl(var(--border) / 0.1),
+    0 4px 6px -1px rgb(0 0 0 / 0.05),
+    0 2px 4px -2px rgb(0 0 0 / 0.05),
+    inset 0 1px 0 hsl(0 0% 100% / 0.1);
+}
+
+.dark .glass-card {
+  background: hsl(0 0% 100% / 0.05);
+}
+
+.glass-card-hover {
+  background: hsl(0 0% 100% / 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 1rem;
+  border: 1px solid hsl(var(--border) / 0.3);
+  box-shadow: 
+    0 0 0 1px hsl(var(--border) / 0.1),
+    0 4px 6px -1px rgb(0 0 0 / 0.05),
+    0 2px 4px -2px rgb(0 0 0 / 0.05),
+    inset 0 1px 0 hsl(0 0% 100% / 0.1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .glass-card-hover {
+  background: hsl(0 0% 100% / 0.05);
+}
+
+.glass-card-hover:hover {
+  background: hsl(0 0% 100% / 0.9);
+  border-color: hsl(var(--primary) / 0.3);
+  box-shadow: 
+    0 0 0 1px hsl(var(--primary) / 0.1),
+    0 25px 50px -12px hsl(var(--primary) / 0.15),
+    0 12px 24px -8px rgb(0 0 0 / 0.1),
+    inset 0 1px 0 hsl(0 0% 100% / 0.2);
+  transform: translateY(-4px);
+}
+
+.dark .glass-card-hover:hover {
+  background: hsl(0 0% 100% / 0.1);
+}
+
+/* ============================================
+   GRADIENT BACKGROUNDS
+   ============================================ */
+.bg-mesh {
+  background: 
+    radial-gradient(at 40% 20%, hsl(var(--gradient-1) / 0.3) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsl(var(--gradient-2) / 0.25) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsl(var(--gradient-3) / 0.2) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, hsl(var(--gradient-1) / 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsl(var(--gradient-4) / 0.2) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, hsl(var(--gradient-2) / 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, hsl(var(--gradient-3) / 0.1) 0px, transparent 50%);
+}
+
+.bg-mesh-dark {
+  background: 
+    radial-gradient(at 40% 20%, hsl(var(--gradient-1) / 0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsl(var(--gradient-2) / 0.12) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsl(var(--gradient-3) / 0.1) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, hsl(var(--gradient-1) / 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsl(var(--gradient-4) / 0.1) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, hsl(var(--gradient-2) / 0.08) 0px, transparent 50%),
+    hsl(var(--background));
+}
+
+/* Aurora effect background */
+.bg-aurora {
+  background: linear-gradient(
+    125deg,
+    hsl(var(--gradient-1) / 0.05) 0%,
+    hsl(var(--gradient-2) / 0.08) 25%,
+    hsl(var(--gradient-3) / 0.05) 50%,
+    hsl(var(--gradient-1) / 0.08) 75%,
+    hsl(var(--gradient-4) / 0.05) 100%
+  );
+  background-size: 400% 400%;
+  animation: aurora 15s ease infinite;
+}
+
+/* ============================================
+   TEXT EFFECTS
+   ============================================ */
+.text-gradient {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--gradient-2)) 50%,
+    hsl(var(--accent)) 100%
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.text-gradient-static {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--accent)) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   GRADIENT BUTTONS & SURFACES
+   ============================================ */
+.bg-gradient-brand {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--gradient-2)) 50%,
+    hsl(var(--accent)) 100%
+  );
+  background-size: 200% 200%;
+}
+
+.bg-gradient-brand-animated {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--gradient-2)) 50%,
+    hsl(var(--accent)) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fade-in-up 0.8s ease forwards;
+}
+
+.fade-in-up-delay-1 { animation-delay: 0.1s; }
+.fade-in-up-delay-2 { animation-delay: 0.2s; }
+.fade-in-up-delay-3 { animation-delay: 0.3s; }
+.fade-in-up-delay-4 { animation-delay: 0.4s; }
+.fade-in-up-delay-5 { animation-delay: 0.5s; }
+
+/* ============================================
+   KEYFRAME ANIMATIONS
+   ============================================ */
+@keyframes aurora {
+  0%, 100% {
+    background-position: 0% 50%;
   }
-  
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-  
-  .animate-pulse-subtle {
-    animation: pulse-subtle 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  
-  .text-gradient {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--primary)) 0%,
-      hsl(var(--accent)) 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
-  .bg-gradient-brand {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--primary)) 0%,
-      hsl(var(--accent)) 100%
-    );
-  }
-  
-  .border-gradient {
-    border: double 2px transparent;
-    background-image: linear-gradient(white, white), 
-                      linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
-  }
-  
-  .shadow-glow {
-    box-shadow: 0 0 40px rgb(from hsl(var(--primary)) r g b / 0.2);
+  50% {
+    background-position: 100% 50%;
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
   }
-  100% {
-    background-position: 200% 0;
+  50% {
+    background-position: 100% 50%;
   }
 }
 
@@ -195,15 +353,26 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-20px);
   }
 }
 
-@keyframes pulse-subtle {
-  0%, 100% {
+@keyframes fade-in-up {
+  to {
     opacity: 1;
+    transform: translateY(0);
   }
-  50% {
-    opacity: 0.7;
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
