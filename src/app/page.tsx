@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { cn } from "@/lib/utils";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import {
@@ -81,25 +83,26 @@ export default async function HomePage() {
 
             {/* CTA Section */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 fade-in-up fade-in-up-delay-3">
-              <Link href="/register">
-                <Button
-                  size="xl"
-                  className="group bg-gradient-brand-animated text-white shadow-xl hover:shadow-2xl hover:shadow-primary/25 transition-all duration-500 rounded-2xl px-8"
-                >
-                  <Sparkles className="mr-2 w-5 h-5" />
-                  Start Free — No Credit Card
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+              <Link
+                href="/register"
+                className={cn(
+                  buttonVariants({ size: "xl" }),
+                  "group bg-gradient-brand-animated text-white shadow-xl hover:shadow-2xl hover:shadow-primary/25 transition-all duration-500 rounded-2xl px-8"
+                )}
+              >
+                <Sparkles className="mr-2 w-5 h-5" />
+                Start Free — No Credit Card
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link href="/login">
-                <Button
-                  variant="outline"
-                  size="xl"
-                  className="group glass-card border-2 border-border/50 hover:border-primary/50 rounded-2xl px-8"
-                >
-                  <Play className="mr-2 w-4 h-4" />
-                  Watch Demo
-                </Button>
+              <Link
+                href="/login"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "xl" }),
+                  "group glass-card border-2 border-border/50 text-foreground hover:bg-primary/5 hover:border-primary/50 hover:text-primary rounded-2xl px-8 transition-colors"
+                )}
+              >
+                <Play className="mr-2 w-4 h-4" />
+                Watch Demo
               </Link>
             </div>
 
@@ -401,15 +404,15 @@ export default async function HomePage() {
           ============================================ */}
       <section className="relative py-24 md:py-32">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-10 md:p-16">
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-[#020617] p-10 md:p-16">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-mesh-dark opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 opacity-30" />
             <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-float" />
             <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent/15 rounded-full blur-3xl animate-float-delayed" />
 
             {/* Grid Pattern */}
             <div
-              className="absolute inset-0 opacity-5"
+              className="absolute inset-0 opacity-10"
               style={{
                 backgroundImage: `linear-gradient(white 1px, transparent 1px),
                                   linear-gradient(90deg, white 1px, transparent 1px)`,
@@ -419,9 +422,9 @@ export default async function HomePage() {
 
             <div className="relative text-center">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur mb-8">
                 <Sparkles className="w-4 h-4 text-amber-300" />
-                <span className="text-sm font-medium text-amber-100">
+                <span className="text-sm font-medium text-white">
                   Ready to accelerate your career?
                 </span>
               </div>
@@ -429,40 +432,41 @@ export default async function HomePage() {
               {/* Headline */}
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
                 Your dream job is
-                <span className="block text-gradient mt-2">waiting for you</span>
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200 mt-2">waiting for you</span>
               </h2>
 
               {/* Description */}
-              <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-medium">
                 Join thousands of successful job seekers who transformed their search
                 from chaotic to confident.
               </p>
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-                <Link href="/register">
-                  <Button
-                    size="xl"
-                    className="group bg-white text-gray-900 hover:bg-gray-100 shadow-2xl rounded-2xl px-10"
-                  >
-                    <Sparkles className="mr-2 w-5 h-5 text-primary" />
-                    Get Started Free
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
+                <Link
+                  href="/register"
+                  className={cn(
+                    buttonVariants({ size: "xl" }),
+                    "group bg-white text-gray-900 hover:bg-gray-100 shadow-2xl rounded-2xl px-10"
+                  )}
+                >
+                  <Sparkles className="mr-2 w-5 h-5 text-primary" />
+                  Get Started Free
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
-                <Link href="/login">
-                  <Button
-                    variant="outline"
-                    size="xl"
-                    className="border-2 border-white/20 text-white hover:bg-white/10 hover:border-white/40 rounded-2xl px-10"
-                  >
-                    Sign In
-                  </Button>
+                <Link
+                  href="/login"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "xl" }),
+                    "bg-transparent border-2 border-white/20 text-white hover:bg-white/10 hover:border-white/40 rounded-2xl px-10"
+                  )}
+                >
+                  Sign In
                 </Link>
               </div>
 
               {/* Trust indicators */}
-              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-300 font-medium">
                 <span className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-400" />
                   Free forever
