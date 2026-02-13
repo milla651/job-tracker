@@ -6,7 +6,7 @@ import { signIn, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { generateVerificationToken } from "@/lib/tokens";
-import { sendVerificationEmail } from "@/lib/mail";
+import { sendVerificationEmail, sendWelcomeEmail } from "@/lib/mail";
 
 export async function registerUser(formData: FormData) {
   const name = formData.get("name") as string;
@@ -76,7 +76,22 @@ export async function verifyEmail(email: string, code: string) {
     });
 
     if (!verificationToken) {
-      return { error: "Invalid code" };
+      return { error: "Invalid or expired code" };
+    }
+
+    if (verificationToken.attempts >= 3) {
+      await prisma.verificationToken.delete({
+        where: { id: verificationToken.id },
+      });
+      return { error: "Too many failed attempts. Please request a new code." };
+    }
+
+    if (verificationToken.token !== code) {
+      await prisma.verificationToken.update({
+        where: { id: verificationToken.id },
+        data: { attempts: { increment: 1 } },
+      });
+      return { error: `Invalid code. ${2 - verificationToken.attempts} attempts remaining.` };
     }
 
     const hasExpired = new Date(verificationToken.expires) < new Date();
@@ -97,18 +112,75 @@ export async function verifyEmail(email: string, code: string) {
       where: { id: existingUser.id },
       data: {
         emailVerified: new Date(),
-        email: existingUser.email, // updates email if it was changed
+        email: existingUser.email,
       },
     });
+
+    // Auto-login user
+    try {
+      await signIn("credentials", {
+        email,
+        verificationToken: code,
+        redirect: false,
+      });
+    } catch (err) {
+      console.error("Auto-login failed:", err);
+      // Determine if we should fail or just continue
+      // If auto-login fails, user is still verified, just needs to login manually.
+    }
 
     await prisma.verificationToken.delete({
       where: { id: verificationToken.id },
     });
 
+    // Send welcome email
+    if (existingUser.name) {
+      await sendWelcomeEmail(existingUser.email, existingUser.name);
+    }
+
     return { success: true };
   } catch (error) {
     console.error("VERIFICATION ERROR:", error);
     return { error: "Something went wrong" };
+  }
+}
+
+export async function resendVerificationCode(email: string) {
+  try {
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!existingUser) {
+      return { error: "User not found" };
+    }
+
+    if (existingUser.emailVerified) {
+      return { error: "Email already verified" };
+    }
+
+    const existingToken = await prisma.verificationToken.findFirst({
+      where: { email },
+    });
+
+    if (existingToken) {
+      const now = new Date();
+      const lastAttempt = new Date(existingToken.lastAttempt);
+      const difference = now.getTime() - lastAttempt.getTime();
+
+      // Rate limit: 1 minute
+      if (difference < 60000) {
+        return { error: "Please wait 1 minute before requesting a new code" };
+      }
+    }
+
+    const verificationToken = await generateVerificationToken(email);
+    await sendVerificationEmail(verificationToken.email, verificationToken.token);
+
+    return { success: true };
+  } catch (error) {
+    console.error("RESEND ERROR:", error);
+    return { error: "Failed to resend code" };
   }
 }
 

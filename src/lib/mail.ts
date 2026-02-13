@@ -21,7 +21,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "JobTracker <onboarding@resend.dev>",
+      from: "JobTracker <noreply@benardkimani.co.ke>",
       to: email,
       subject: "Your Confirmation Code",
       html: `
@@ -30,6 +30,10 @@ export const sendVerificationEmail = async (email: string, token: string) => {
           <p>Your verification code is:</p>
           <div style="background-color: #f4f4f5; padding: 20px; border-radius: 8px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;">
             ${token}
+          </div>
+          <p>Or click the button below to verify automatically:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${domain}/verify-email?email=${encodeURIComponent(email)}&code=${token}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Verify Email</a>
           </div>
           <p>This code will expire in 1 hour.</p>
         </div>
@@ -54,5 +58,29 @@ export const sendVerificationEmail = async (email: string, token: string) => {
   } catch (err) {
     console.error("Email send error:", err);
     return { error: "Failed to send verification email" };
+  }
+};
+
+export const sendWelcomeEmail = async (email: string, name: string) => {
+  if (!apiKey) return;
+
+  try {
+    await resend.emails.send({
+      from: "JobTracker <noreply@benardkimani.co.ke>",
+      to: email,
+      subject: "Welcome to Job Tracker!",
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Welcome to Job Tracker, ${name}!</h2>
+          <p>We are excited to have you on board.</p>
+          <p>Start tracking your job applications and land your dream job.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${domain}/dashboard" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Go to Dashboard</a>
+          </div>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("Failed to send welcome email:", error);
   }
 };
