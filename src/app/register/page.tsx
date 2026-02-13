@@ -69,11 +69,13 @@ export default function RegisterPage() {
         setError(result.error);
         setIsLoading(false);
       } else if (result?.success) {
-        setSuccess(result.success as string);
-        setIsLoading(false);
+        // Redirect to verify page with email
+        const email = formData.get("email") as string;
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
       }
     } catch (e) {
       setError("Something went wrong. Please try again.");
+      setIsLoading(false);
     }
 
     // Only set loading false if we didn't redirect

@@ -1,0 +1,13 @@
+nohup: ignoring input
+
+> job-tracker@0.1.0 dev
+> next dev -p 3001
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://10.138.19.202:3001
+- Environments: .env
+
+✓ Starting...
+✓ Ready in 2.2s
+ GET /api/test-email 200 in 3.6s (compile: 2.2s, render: 1463ms)

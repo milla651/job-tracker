@@ -1,23 +1,17 @@
 
-import { v4 as uuidv4 } from "uuid";
+
 import { prisma } from "@/lib/prisma";
 
 export const generateVerificationToken = async (email: string) => {
-  const token = uuidv4();
+  // Generate a random 6-digit number
+  const token = Math.floor(100000 + Math.random() * 900000).toString();
   // Token expires in 1 hour
   const expires = new Date(new Date().getTime() + 3600 * 1000);
 
-  const existingToken = await prisma.verificationToken.findFirst({
+  // Delete any existing tokens for this email
+  await prisma.verificationToken.deleteMany({
     where: { email },
   });
-
-  if (existingToken) {
-    await prisma.verificationToken.delete({
-      where: {
-        id: existingToken.id,
-      },
-    });
-  }
 
   const verificationToken = await prisma.verificationToken.create({
     data: {

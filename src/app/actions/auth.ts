@@ -58,10 +58,57 @@ export async function registerUser(formData: FormData) {
     await sendVerificationEmail(verificationToken.email, verificationToken.token);
 
     console.log("Registration successful!");
-    return { success: "Confirmation email sent!" };
+    // Return the email so the client can redirect
+    return { success: true, email };
   } catch (error) {
     console.error("REGISTRATION ERROR:", error);
     return { error: "Something went wrong. Please try again." };
+  }
+}
+
+export async function verifyEmail(email: string, code: string) {
+  try {
+    const verificationToken = await prisma.verificationToken.findFirst({
+      where: {
+        email,
+        token: code,
+      },
+    });
+
+    if (!verificationToken) {
+      return { error: "Invalid code" };
+    }
+
+    const hasExpired = new Date(verificationToken.expires) < new Date();
+
+    if (hasExpired) {
+      return { error: "Code has expired" };
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!existingUser) {
+      return { error: "User does not exist" };
+    }
+
+    await prisma.user.update({
+      where: { id: existingUser.id },
+      data: {
+        emailVerified: new Date(),
+        email: existingUser.email, // updates email if it was changed
+      },
+    });
+
+    await prisma.verificationToken.delete({
+      where: { id: verificationToken.id },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("VERIFICATION ERROR:", error);
+    return { error: "Something went wrong" };
   }
 }
 
