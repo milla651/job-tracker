@@ -1,37 +1,63 @@
 import Link from "next/link";
 import { getJobs, getJobStats } from "@/app/actions/jobs";
-import { JobCard } from "@/components/JobCard";
-import { DashboardEmptyState } from "@/components/DashboardEmptyState";
+import { JobListing } from "@/components/dashboard/JobListing";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
 import { STATUS_CONFIG } from "@/lib/utils";
 import { Plus, Briefcase, TrendingUp, Target, CheckCircle } from "lucide-react";
+import { SmartNudges } from "@/components/dashboard/SmartNudges";
+import { JobStatus } from "@prisma/client";
 
-export default async function DashboardPage() {
-  const [jobs, statsData] = await Promise.all([getJobs(), getJobStats()]);
+export default async function DashboardPage(props: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const searchParams = await props.searchParams;
+  const page = Number(searchParams?.page) || 1;
+  const search = searchParams?.search as string | undefined;
+  const status = (searchParams?.status as JobStatus) || undefined;
+  const sort = searchParams?.sort as string | undefined;
+  const location = searchParams?.location as string | undefined;
+  const minSalary = searchParams?.minSalary ? Number(searchParams.minSalary) : undefined;
+  const maxSalary = searchParams?.maxSalary ? Number(searchParams.maxSalary) : undefined;
 
-  const activeJobs = jobs.filter(
-    (job) =>
-      !["ACCEPTED", "REJECTED", "WITHDRAWN"].includes(job.status)
-  ).length;
+  // Pass options to getJobs
+  // Note: getJobStats doesn't need filters as it shows overall stats
+  const [{ jobs, total, totalPages }, statsData] = await Promise.all([
+    getJobs({ page, search, status, sort, location, minSalary, maxSalary }),
+    getJobStats(),
+  ]);
+
+  const activeJobs = statsData?.total || 0; // Using total from stats for now, or we can use the aggregation
+  // Actually, getJobStats returns { stats, total }. 
+  // Let's recalculate rates based on the statsData, not the filtered `jobs` list.
+
+  const totalApplications = statsData?.total || 0;
+
+  // Calculate stats from the aggregated data to be accurate across all jobs
+  const statusCounts = statsData?.stats.reduce((acc: Record<string, number>, curr: { status: JobStatus, _count: { status: number } }) => {
+    acc[curr.status] = curr._count.status;
+    return acc;
+  }, {} as Record<string, number>) || {};
+
+  const activeCount =
+    totalApplications -
+    (statusCounts.ACCEPTED || 0) -
+    (statusCounts.REJECTED || 0) -
+    (statusCounts.WITHDRAWN || 0);
 
   const successRate =
-    jobs.length > 0
-      ? Math.round(
-        (jobs.filter((job) => job.status === "ACCEPTED").length / jobs.length) *
-        100
-      )
+    totalApplications > 0
+      ? Math.round(((statusCounts["ACCEPTED"] || 0) / totalApplications) * 100)
       : 0;
 
+  const interviewCount =
+    (statusCounts["INTERVIEW"] || 0) +
+    (statusCounts["TECHNICAL"] || 0) +
+    (statusCounts["OFFER"] || 0) +
+    (statusCounts["ACCEPTED"] || 0);
+
   const interviewRate =
-    jobs.length > 0
-      ? Math.round(
-        (jobs.filter((job) =>
-          ["INTERVIEW", "TECHNICAL", "OFFER", "ACCEPTED"].includes(job.status)
-        ).length /
-          jobs.length) *
-        100
-      )
+    totalApplications > 0
+      ? Math.round((interviewCount / totalApplications) * 100)
       : 0;
 
   return (
@@ -69,6 +95,9 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
+        {/* Smart Nudges */}
+        <SmartNudges />
+
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="glass-card-hover p-6">
@@ -78,31 +107,7 @@ export default async function DashboardPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground font-medium">Total Jobs</p>
-                <p className="text-2xl font-bold text-foreground">{jobs.length}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card-hover p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 shadow-md">
-                <Target className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground font-medium">Active</p>
-                <p className="text-2xl font-bold text-foreground">{activeJobs}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card-hover p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-md">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground font-medium">Interview Rate</p>
-                <p className="text-2xl font-bold text-foreground">{interviewRate}%</p>
+                <p className="text-2xl font-bold text-foreground">{totalApplications}</p>
               </div>
             </div>
           </div>
@@ -110,39 +115,32 @@ export default async function DashboardPage() {
           <div className="glass-card-hover p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-green-500 shadow-md">
-                <CheckCircle className="w-6 h-6 text-white" />
+                <Target className="w-6 h-6 text-white" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground font-medium">Success Rate</p>
-                <p className="text-2xl font-bold text-foreground">{successRate}%</p>
+                <p className="text-sm text-muted-foreground font-medium">Active</p>
+                <p className="text-2xl font-bold text-foreground">{activeCount}</p>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Status breakdown */}
-        {statsData && statsData.stats.length > 0 && (
-          <div className="glass-card p-6 mb-8">
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Applications by Status
-            </h2>
-            <div className="flex flex-wrap gap-3">
-              {statsData.stats.map((stat) => (
-                <div
-                  key={stat.status}
-                  className={`px-4 py-2 rounded-lg border ${STATUS_CONFIG[stat.status].color
-                    }`}
-                >
-                  <span className="mr-2">{STATUS_CONFIG[stat.status].icon}</span>
-                  <span className="font-medium">
-                    {STATUS_CONFIG[stat.status].label}
-                  </span>
-                  <span className="ml-2 opacity-75">({stat._count.status})</span>
+          {statsData && statsData.stats.map((stat: { status: JobStatus, _count: { status: number } }) => {
+            const config = STATUS_CONFIG[stat.status];
+            return (
+              <div key={stat.status} className="glass-card-hover p-6">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-xl border ${config.color.replace('text-', 'border-').split(' ')[2]} bg-background shadow-sm`}>
+                    <span className="text-2xl">{config.icon}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground font-medium">{config.label}</p>
+                    <p className="text-2xl font-bold text-foreground">{stat._count.status}</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              </div>
+            );
+          })}
+        </div>
 
         {/* Jobs List */}
         <div>
@@ -151,17 +149,12 @@ export default async function DashboardPage() {
             All Applications
           </h2>
 
-          {jobs.length === 0 ? (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <DashboardEmptyState />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {jobs.map((job) => (
-                <JobCard key={job.id} job={job} />
-              ))}
-            </div>
-          )}
+          <JobListing
+            initialJobs={jobs}
+            total={total}
+            totalPages={totalPages}
+            currentPage={page}
+          />
         </div>
       </div>
     </div>

@@ -48,6 +48,7 @@ model JobApplication {
   userId      String
   user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   timeline    TimelineEvent[]
+  documents   Document[]
 
   @@index([userId])
   @@index([status])
@@ -73,5 +74,18 @@ model TimelineEvent {
   jobApplicationId String
   jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
 
+  @@index([jobApplicationId])
+}
+
+model Document {
+  id               String         @id @default(cuid())
+  name             String
+  mediaType        String
+  content          Bytes
+  size             Int
+  createdAt        DateTime       @default(now())
+  jobApplicationId String
+  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+  
   @@index([jobApplicationId])
 }

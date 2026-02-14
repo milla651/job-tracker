@@ -54,7 +54,7 @@ export function Navbar({ session }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className={`relative flex h-16 items-center justify-between rounded-2xl transition-all duration-500 ${scrolled || isOpen
-            ? 'bg-white/80 dark:bg-black/60 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-lg px-6'
+            ? 'bg-background/80 backdrop-blur-md border border-border/40 shadow-sm px-6 supports-[backdrop-filter]:bg-background/60'
             : 'bg-transparent px-0'
             }`}
         >
@@ -221,7 +221,7 @@ export function Navbar({ session }: NavbarProps) {
           className={`lg:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${isOpen ? 'max-h-[500px] opacity-100 mt-2' : 'max-h-0 opacity-0'
             }`}
         >
-          <div className="bg-white/90 dark:bg-black/80 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-2xl p-4 shadow-2xl">
+          <div className="bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-4 shadow-xl">
             <div className="flex flex-col space-y-1">
               {!session?.user && navItems.map((item) => (
                 <Link

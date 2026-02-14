@@ -11,8 +11,8 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "JobTracker - Your Personal Job Search Command Center",
-  description: "Track job applications, interviews, and follow-ups in one beautiful, organized space designed for actual humans.",
+  title: "JobTracker | Land Your Dream Job",
+  description: "The intelligent job application tracker. Organize applications, get smart nudges, and track your interview success rate. Free and open source.",
 };
 
 export default async function RootLayout({

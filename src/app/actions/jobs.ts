@@ -149,21 +149,92 @@ export async function deleteJob(jobId: string) {
   redirect("/dashboard");
 }
 
-export async function getJobs(status?: JobStatus) {
+export type GetJobsOptions = {
+  status?: JobStatus;
+  search?: string;
+  page?: number;
+  limit?: number;
+  sort?: string;
+  location?: string;
+  minSalary?: number;
+  maxSalary?: number;
+};
+
+export async function getJobs(options: GetJobsOptions = {}) {
   const session = await auth();
   if (!session?.user?.id) {
-    return [];
+    return { jobs: [], total: 0, totalPages: 0 };
   }
 
-  const jobs = await prisma.jobApplication.findMany({
-    where: {
-      userId: session.user.id,
-      ...(status && { status }),
-    },
-    orderBy: { updatedAt: "desc" },
-  });
+  const { status, search, page = 1, limit = 12, sort = "date-desc", location, minSalary, maxSalary } = options;
+  const skip = (page - 1) * limit;
 
-  return jobs;
+  const where: any = {
+    userId: session.user.id,
+    ...(status && { status }),
+    ...(search && {
+      OR: [
+        { company: { contains: search, mode: "insensitive" } },
+        { position: { contains: search, mode: "insensitive" } },
+      ],
+    }),
+    ...(location && {
+      location: { contains: location, mode: "insensitive" },
+    }),
+    ...(minSalary && {
+      salaryMax: { gte: minSalary },
+    }),
+    ...(maxSalary && {
+      salaryMin: { lte: maxSalary },
+    }),
+  };
+
+  let orderBy: any = { updatedAt: "desc" };
+
+  switch (sort) {
+    case "date-asc":
+      orderBy = { updatedAt: "asc" };
+      break;
+    case "company-asc":
+      orderBy = { company: "asc" };
+      break;
+    case "company-desc":
+      orderBy = { company: "desc" };
+      break;
+    case "salary-desc":
+      orderBy = { salaryMax: "desc" }; // prioritizing max salary
+      break;
+    case "salary-asc":
+      orderBy = { salaryMin: "asc" }; // prioritizing min salary
+      break;
+    case "location-asc":
+      orderBy = { location: "asc" };
+      break;
+    case "location-desc":
+      orderBy = { location: "desc" };
+      break;
+
+    case "date-desc":
+    default:
+      orderBy = { updatedAt: "desc" };
+      break;
+  }
+
+  const [jobs, total] = await prisma.$transaction([
+    prisma.jobApplication.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit,
+    }),
+    prisma.jobApplication.count({ where }),
+  ]);
+
+  return {
+    jobs,
+    total,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 
 export async function getJobById(jobId: string) {
