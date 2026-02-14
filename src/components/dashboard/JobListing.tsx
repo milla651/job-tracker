@@ -235,15 +235,16 @@ export function JobListing({
                         <PopoverTrigger asChild>
                             <Button
                                 variant="outline"
-                                className={`gap-2 border-border/50 ${statusFilter !== "ALL" ? "bg-primary/10 border-primary/20 text-primary" : "bg-background/50"
+                                className={`gap-2 border-border/50 ${statusFilter !== "ALL" || locationFilter || minSalaryFilter || maxSalaryFilter ? "bg-primary/10 border-primary/20 text-primary" : "bg-background/50"
                                     }`}
                             >
                                 <Filter className="w-4 h-4" />
-                                <span>
-                                    {statusFilter === "ALL"
-                                        ? "Status"
-                                        : STATUS_CONFIG[statusFilter].label}
-                                </span>
+                                <span>Filters</span>
+                                {(statusFilter !== "ALL" || locationFilter || minSalaryFilter || maxSalaryFilter) && (
+                                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                                        !
+                                    </span>
+                                )}
                                 <ChevronDown className="w-3 h-3 opacity-50" />
                             </Button>
                         </PopoverTrigger>

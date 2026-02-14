@@ -8,6 +8,7 @@ import { auth } from "@/lib/auth";
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-plus-jakarta",
+  display: "swap",
 });
 
 export const metadata: Metadata = {

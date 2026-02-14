@@ -114,6 +114,6 @@ export async function getDocumentContent(docId: string) {
    return {
      name: doc.name,
      mediaType: doc.mediaType,
-     base64: doc.content.toString('base64')
+     base64: Buffer.from(doc.content).toString('base64')
    };
 }
