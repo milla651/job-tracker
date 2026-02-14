@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { generateVerificationToken } from "@/lib/tokens";
 
 export const newVerification = async (token: string) => {
-  const existingToken = await prisma.verificationToken.findUnique({
+  const existingToken = await prisma.verificationToken.findFirst({
     where: { token },
   });
 
