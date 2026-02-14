@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { Menu, X, User, Sun, Moon, Sparkles, LayoutDashboard, Settings, LogOut } from "lucide-react";
+import { Menu, X, User, Sun, Moon, Sparkles, LayoutDashboard, Settings, LogOut, Plus, Rocket } from "lucide-react";
 import { useTheme } from "next-themes";
 import type { Session } from "next-auth";
 import { UserMenu } from "@/components/UserMenu";
@@ -20,6 +21,7 @@ export function Navbar({ session }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
@@ -40,117 +42,121 @@ export function Navbar({ session }: NavbarProps) {
     { label: "Testimonials", href: "/#testimonials" },
   ];
 
+  const isDashboard = pathname?.startsWith("/dashboard");
+
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled || isOpen
         ? 'py-2'
         : 'py-4'
         }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
-          className={`flex h-14 items-center justify-between rounded-2xl transition-all duration-500 ${scrolled
-            ? 'bg-background/80 backdrop-blur-xl border border-border/40 px-6 shadow-md'
+          className={`relative flex h-16 items-center justify-between rounded-2xl transition-all duration-500 ${scrolled || isOpen
+            ? 'bg-white/80 dark:bg-black/60 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-lg px-6'
             : 'bg-transparent px-0'
             }`}
         >
           {/* Logo */}
           <Link
-            href="/"
-            className="flex items-center gap-2.5 group"
+            href={session?.user ? "/dashboard" : "/"}
+            className="flex items-center gap-3 group"
             onClick={() => setIsOpen(false)}
           >
-            <div className="relative p-2 rounded-xl bg-gradient-to-br from-primary to-accent transition-transform duration-300 group-hover:scale-105">
-              <svg
-                className="w-5 h-5 text-white"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              >
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-              </svg>
+            <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-primary to-accent transition-transform duration-300 group-hover:scale-105 shadow-lg shadow-primary/20">
+              <Rocket className="w-5 h-5 text-white fill-white/20" />
               <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-foreground text-lg leading-tight tracking-tight">
+              <span className="font-bold text-foreground text-lg leading-none tracking-tight">
                 JobTracker
               </span>
-              <span className="text-[10px] text-muted-foreground font-medium leading-tight hidden sm:block">
-                Your Career Companion
+              <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-0.5 hidden sm:block">
+                Career Companion
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => (
+            {!session?.user && navItems.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
                 className="relative px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
               >
                 {item.label}
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-primary to-accent group-hover:w-4/5 transition-all duration-300 rounded-full" />
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-primary to-accent group-hover:w-1/2 transition-all duration-300 rounded-full opacity-0 group-hover:opacity-100" />
               </Link>
             ))}
-            <Link
-              href="/dashboard"
-              className={cn(
-                buttonVariants({ size: "sm" }),
-                "bg-gradient-to-r from-primary via-primary to-accent hover:opacity-90 text-white shadow-lg shadow-primary/25 rounded-xl gap-2 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30"
-              )}
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              Dashboard
-            </Link>
+
+            {session?.user && (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+                    isDashboard
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  Dashboard
+                </Link>
+                <div className="w-px h-4 bg-border/50 mx-2" />
+              </div>
+            )}
           </div>
 
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-3">
+            {session?.user && (
+              <Link href="/dashboard/jobs/new">
+                <Button
+                  size="sm"
+                  className="rounded-xl bg-gradient-brand text-white shadow-lg hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 transition-all duration-300 gap-2 h-10 px-5"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="font-semibold">Quick Add</span>
+                </Button>
+              </Link>
+            )}
+
             {/* Theme Toggle */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="rounded-full w-9 h-9 hover:bg-primary/10 hover:text-primary transition-colors"
+              className="rounded-full w-10 h-10 hover:bg-primary/10 hover:text-primary transition-colors"
               aria-label="Toggle theme"
             >
               {mounted ? (
                 <>
-                  <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                  <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500" />
+                  <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-blue-400" />
                 </>
               ) : (
-                <div className="h-4 w-4" />
+                <div className="h-5 w-5" />
               )}
             </Button>
 
-            <div className="w-px h-6 bg-border" />
-
-
+            {!session?.user && <div className="w-px h-6 bg-border mx-1" />}
 
             {session?.user ? (
               <UserMenu user={session.user} />
             ) : (
-              <div className="group flex items-center p-1 bg-background/60 border border-border/40 rounded-full backdrop-blur-md hover:border-primary/20 hover:shadow-md transition-all duration-300">
-                <Link
-                  href="/login"
-                  className="px-6 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Sign In
+              <div className="flex items-center gap-2">
+                <Link href="/login">
+                  <Button variant="ghost" className="rounded-xl hover:bg-primary/5 hover:text-primary">
+                    Sign In
+                  </Button>
                 </Link>
-                <Link
-                  href="/register"
-                  className={cn(
-                    buttonVariants({ size: "sm" }),
-                    "rounded-full bg-gradient-to-r from-primary via-primary to-accent hover:opacity-90 text-white shadow-lg shadow-primary/25 gap-2 px-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30"
-                  )}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Get Started
+                <Link href="/register">
+                  <Button className="rounded-xl bg-primary text-white hover:bg-primary/90 shadow-md">
+                    Get Started
+                  </Button>
                 </Link>
               </div>
             )}
@@ -158,6 +164,17 @@ export function Navbar({ session }: NavbarProps) {
 
           {/* Mobile Controls */}
           <div className="flex lg:hidden items-center gap-2">
+            {session?.user && (
+              <Link href="/dashboard/jobs/new">
+                <Button
+                  size="icon"
+                  className="rounded-full bg-gradient-brand text-white shadow-md w-9 h-9"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </Link>
+            )}
+
             <Button
               variant="ghost"
               size="icon"
@@ -166,8 +183,8 @@ export function Navbar({ session }: NavbarProps) {
             >
               {mounted ? (
                 <>
-                  <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                  <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500" />
+                  <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-blue-400" />
                 </>
               ) : (
                 <div className="h-4 w-4" />
@@ -201,12 +218,12 @@ export function Navbar({ session }: NavbarProps) {
 
         {/* Mobile Navigation */}
         <div
-          className={`lg:hidden overflow-hidden transition-all duration-500 ease-out ${isOpen ? 'max-h-[500px] opacity-100 mt-2' : 'max-h-0 opacity-0'
+          className={`lg:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${isOpen ? 'max-h-[500px] opacity-100 mt-2' : 'max-h-0 opacity-0'
             }`}
         >
-          <div className="bg-background/95 backdrop-blur-2xl border border-border/60 rounded-2xl p-4 shadow-2xl">
+          <div className="bg-white/90 dark:bg-black/80 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-2xl p-4 shadow-2xl">
             <div className="flex flex-col space-y-1">
-              {navItems.map((item) => (
+              {!session?.user && navItems.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
@@ -216,12 +233,13 @@ export function Navbar({ session }: NavbarProps) {
                   {item.label}
                 </Link>
               ))}
+
               <Link
                 href="/dashboard"
                 onClick={() => setIsOpen(false)}
                 className={cn(
-                  buttonVariants({}),
-                  "w-full justify-center bg-gradient-to-r from-primary to-accent text-white rounded-xl gap-2 hover:opacity-90"
+                  "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors",
+                  isDashboard ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
                 <LayoutDashboard className="w-4 h-4" />
@@ -229,31 +247,28 @@ export function Navbar({ session }: NavbarProps) {
               </Link>
             </div>
 
-            <div className="h-px bg-border my-4" />
+            <div className="h-px bg-border/50 my-4" />
 
             <div className="flex flex-col gap-2 ">
-              {session?.user && (
-                <div className="px-4 py-2 flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-xs font-bold shadow-sm">
-                    {session.user.name ? session.user.name[0].toUpperCase() : "U"}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">{session.user.name}</span>
-                    <span className="text-xs text-muted-foreground">{session.user.email}</span>
-                  </div>
-                </div>
-              )}
-
-
-
               {session?.user ? (
                 <>
+                  <Link
+                    href="/dashboard/jobs/new"
+                    onClick={() => setIsOpen(false)}
+                    className={cn(
+                      buttonVariants({}),
+                      "w-full justify-center bg-gradient-brand text-white rounded-xl gap-2 hover:opacity-90 shadow-lg"
+                    )}
+                  >
+                    <Plus className="w-4 h-4" />
+                    Quick Add Job
+                  </Link>
                   <Link
                     href="/dashboard/settings"
                     onClick={() => setIsOpen(false)}
                     className={cn(
                       buttonVariants({ variant: "outline" }),
-                      "w-full justify-center gap-2 rounded-xl"
+                      "w-full justify-center gap-2 rounded-xl border-border/50 hover:bg-muted/50"
                     )}
                   >
                     <Settings className="w-4 h-4" />
@@ -278,7 +293,7 @@ export function Navbar({ session }: NavbarProps) {
                     onClick={() => setIsOpen(false)}
                     className={cn(
                       buttonVariants({ variant: "outline" }),
-                      "w-full justify-center gap-2 rounded-xl"
+                      "w-full justify-center gap-2 rounded-xl border-border/50"
                     )}
                   >
                     <User className="w-4 h-4" />
@@ -290,7 +305,7 @@ export function Navbar({ session }: NavbarProps) {
                     onClick={() => setIsOpen(false)}
                     className={cn(
                       buttonVariants({}),
-                      "w-full justify-center bg-gradient-to-r from-primary to-accent text-white rounded-xl gap-2 hover:opacity-90"
+                      "w-full justify-center bg-gradient-brand text-white rounded-xl gap-2 hover:opacity-90 shadow-lg"
                     )}
                   >
                     <Sparkles className="w-4 h-4" />

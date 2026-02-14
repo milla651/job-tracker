@@ -1,187 +1,70 @@
-# Job Tracker
+# 🚀 JobTracker - Your AI-Powered Career Companion
 
-A modern job application tracking web app built with Next.js 14, Prisma, PostgreSQL, and NextAuth.js.
+JobTracker is a modern, privacy-focused application designed to streamline your job search. Unlike generic spreadsheets or Trello boards, JobTracker is built specifically for the hiring process, featuring a "Premium Glass" aesthetic, gamified progress, and deep analytics.
 
-## Features
+## ✨ Key Features
 
-✨ **User Authentication**
-- Secure registration and login
-- Session-based authentication with JWT
-- Protected dashboard routes
+### 1. **The Dashboard (Mission Control)**
+-   **Visual Analytics**: GitHub-style "Activity Heatmap" and "Pipeline Funnel" to track your momentum.
+-   **Stats at a Glance**: Real-time counters for Active Apps, Interviews, and Success Rate.
+-   **Mission Control Zero State**: An engaging onboarding experience for new users.
 
-📋 **Job Application Tracking**
-- Add, edit, and delete job applications
-- Track company, position, location, salary range, and job URL
-- Add descriptions and personal notes
+### 2. **Bento Grid Job Management**
+-   **Rich Job Profiles**: Every job is a "Bento Grid" page with distinct cards for Role Info, Status, Logistics, and Notes.
+-   **Smart Context**: Dedicated fields for Salary Ranges, Job URLs, and Location.
+-   **Glassmorphism UI**: A beautiful, distraction-free interface with dark mode support.
 
-📊 **Status Tracking**
-- 9 different statuses: Wishlist → Applied → Phone Screen → Interview → Technical → Offer → Accepted/Rejected/Withdrawn
-- Visual status badges with color coding
-- Quick status updates from job detail page
+### 3. **Gamified Success**
+-   **Celebration Mode**: Triggers confetti fireworks when you mark a job as "Offer" or "Accepted".
+-   **Progress Bars**: Visual cues for where you are in the hiring pipeline.
 
-📈 **Dashboard Analytics**
-- Total applications count
-- Active applications count
-- Interview rate percentage
-- Success rate percentage
-- Applications grouped by status
+### 4. **Smart Navigation**
+-   **Cockpit Navbar**: Context-aware navigation with a "Quick Add" button always within reach.
+-   **Responsive Design**: Fully optimized for mobile, allowing you to update status on the go.
 
-⏱️ **Timeline History**
-- Automatic timeline events for status changes
-- Track the progression of each application
-- Timestamp for every update
+### 5. **Secure & Private**
+-   **NextAuth Authentication**: Secure login/signup flow.
+-   **Private Data**: Your job search is your business. Data is isolated per user.
 
-## Tech Stack
+## 🛠️ Tech Stack
+-   **Framework**: Next.js 14+ (App Router)
+-   **Language**: TypeScript
+-   **Styling**: Tailwind CSS + ShadCN UI + Framer Motion
+-   **Database**: PostgreSQL (via Prisma ORM)
+-   **Auth**: NextAuth.js
+-   **Visuals**: Lucide Icons, Canvas Confetti
 
-- **Framework**: Next.js 14 (App Router)
-- **Database**: PostgreSQL
-- **ORM**: Prisma
-- **Authentication**: NextAuth.js v5
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
+## 🚀 Getting Started
 
-## Getting Started
+1.  **Clone the repo**
+    ```bash
+    git clone https://github.com/yourusername/job-tracker.git
+    cd job-tracker
+    ```
 
-### Prerequisites
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
 
-- Node.js 18+
-- PostgreSQL database (local or cloud - Supabase, Neon, Railway, etc.)
+3.  **Setup Environment**
+    Create a `.env` file with:
+    ```env
+    DATABASE_URL="postgresql://..."
+    NEXTAUTH_SECRET="your-secret"
+    ```
 
-### Installation
+4.  **Run Database Migrations**
+    ```bash
+    npx prisma db push
+    ```
 
-1. **Clone the repository**
-   ```bash
-   cd job-tracker
-   ```
+5.  **Start the Server**
+    ```bash
+    npm run dev
+    ```
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   
-   Create a `.env` file in the root directory:
-   ```env
-   # Database URL - PostgreSQL connection string
-   DATABASE_URL="postgresql://user:password@localhost:5432/job_tracker"
-
-   # NextAuth Secret - Generate with: openssl rand -base64 32
-   NEXTAUTH_SECRET="your-super-secret-key-here"
-
-   # NextAuth URL (your app's base URL)
-   NEXTAUTH_URL="http://localhost:3000"
-   ```
-
-4. **Push database schema**
-   ```bash
-   npx prisma db push
-   ```
-
-5. **Generate Prisma client**
-   ```bash
-   npx prisma generate
-   ```
-
-6. **Run the development server**
-   ```bash
-   npm run dev
-   ```
-
-7. **Open your browser**
-   
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## Project Structure
-
-```
-src/
-├── app/
-│   ├── actions/          # Server actions
-│   │   ├── auth.ts       # Authentication actions
-│   │   └── jobs.ts       # Job CRUD actions
-│   ├── api/auth/         # NextAuth API routes
-│   ├── dashboard/        # Protected dashboard pages
-│   │   ├── jobs/
-│   │   │   ├── [id]/     # Job detail & edit pages
-│   │   │   └── new/      # New job form
-│   │   └── page.tsx      # Dashboard home
-│   ├── login/            # Login page
-│   ├── register/         # Registration page
-│   └── page.tsx          # Landing page
-├── components/
-│   ├── ui/               # Reusable UI components
-│   ├── JobCard.tsx       # Job card component
-│   ├── JobForm.tsx       # Job create/edit form
-│   ├── Navbar.tsx        # Navigation bar
-│   ├── StatusBadge.tsx   # Status indicator
-│   ├── StatusSelector.tsx # Status dropdown
-│   └── Timeline.tsx      # Event timeline
-├── lib/
-│   ├── auth.ts           # NextAuth configuration
-│   ├── prisma.ts         # Prisma client
-│   └── utils.ts          # Utility functions
-└── middleware.ts         # Route protection
-```
-
-## Database Schema
-
-```prisma
-model User {
-  id              String           @id @default(cuid())
-  email           String           @unique
-  name            String?
-  password        String
-  jobApplications JobApplication[]
-}
-
-model JobApplication {
-  id          String          @id @default(cuid())
-  company     String
-  position    String
-  location    String?
-  salaryMin   Int?
-  salaryMax   Int?
-  jobUrl      String?
-  description String?
-  notes       String?
-  status      JobStatus       @default(APPLIED)
-  appliedAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  userId      String
-  timeline    TimelineEvent[]
-}
-
-enum JobStatus {
-  WISHLIST
-  APPLIED
-  PHONE_SCREEN
-  INTERVIEW
-  TECHNICAL
-  OFFER
-  ACCEPTED
-  REJECTED
-  WITHDRAWN
-}
-
-model TimelineEvent {
-  id               String @id @default(cuid())
-  eventType        String
-  description      String?
-  eventDate        DateTime @default(now())
-  jobApplicationId String
-}
-```
-
-## Scripts
-
-```bash
-npm run dev       # Start development server
-npm run build     # Build for production
-npm run start     # Start production server
-npm run lint      # Run ESLint
-```
-
-## License
-
-MIT
+## 🔮 Future Roadmap
+-   **AI Career Copilot**: Auto-generate cover letters.
+-   **Smart Nudges**: Reminders to follow up on stale applications.
+-   **Document Hub**: Store resumes and contracts.

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getJobs, getJobStats } from "@/app/actions/jobs";
 import { JobCard } from "@/components/JobCard";
+import { DashboardEmptyState } from "@/components/DashboardEmptyState";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { STATUS_CONFIG } from "@/lib/utils";
@@ -151,22 +152,8 @@ export default async function DashboardPage() {
           </h2>
 
           {jobs.length === 0 ? (
-            <div className="glass-card p-12 text-center">
-              <div className="mx-auto mb-4 p-4 rounded-full bg-primary/10 w-fit">
-                <Briefcase className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                No job applications yet
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                Start tracking your job search by adding your first application
-              </p>
-              <Link href="/dashboard/jobs/new">
-                <Button className="bg-gradient-brand shadow-lg hover:opacity-90 transition-opacity">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Your First Job
-                </Button>
-              </Link>
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <DashboardEmptyState />
             </div>
           ) : (
             <div className="space-y-4">

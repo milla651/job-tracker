@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { createJob, updateJob } from "@/app/actions/jobs";
+import { useConfetti } from "@/hooks/useConfetti";
 import { JobApplication } from "@prisma/client";
 import {
   Loader2,
@@ -51,10 +52,14 @@ export function JobForm({ job, mode }: JobFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const { triggerFireworks } = useConfetti();
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
     setError(null);
+
+    const status = formData.get("status") as string;
+    const isWin = ["OFFER", "ACCEPTED"].includes(status);
 
     try {
       if (mode === "create") {
@@ -62,6 +67,7 @@ export function JobForm({ job, mode }: JobFormProps) {
         if (result?.error) {
           setError(result.error);
         } else {
+          if (isWin) triggerFireworks();
           router.push("/jobs");
         }
       } else if (job) {
@@ -69,6 +75,7 @@ export function JobForm({ job, mode }: JobFormProps) {
         if (result?.error) {
           setError(result.error);
         } else {
+          if (isWin) triggerFireworks();
           router.push(`/jobs/${job.id}`);
         }
       }
