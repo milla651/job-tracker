@@ -21,17 +21,45 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your account settings and profile information.
-        </p>
-      </div>
+    <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden pt-24">
+      {/* Background Elements */}
+      <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark" />
+      <div className="absolute inset-0 bg-aurora" />
+      <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-accent/20 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-3xl animate-float-delayed" />
+      <div
+        className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
+        style={{
+          backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
+                              linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px'
+        }}
+      />
 
-      <div className="p-6 rounded-xl border bg-card text-card-foreground shadow-sm">
-        <h2 className="text-xl font-semibold mb-6">Profile</h2>
-        <ProfileForm initialData={user} />
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold">
+            <span className="text-gradient">Settings</span>
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your account settings and profile information.
+          </p>
+        </div>
+
+        <div className="glass-card p-8 rounded-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+          <div className="relative">
+            <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+              <span className="p-2 rounded-lg bg-primary/10">
+                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </span>
+              Profile Information
+            </h2>
+            <ProfileForm initialData={user} />
+          </div>
+        </div>
       </div>
     </div>
   );

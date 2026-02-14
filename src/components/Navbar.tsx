@@ -35,9 +35,9 @@ export function Navbar({ session }: NavbarProps) {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const navItems = [
-    { label: "Features", href: "#features" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Testimonials", href: "#testimonials" },
+    { label: "Features", href: "/#features" },
+    { label: "How It Works", href: "/#how-it-works" },
+    { label: "Testimonials", href: "/#testimonials" },
   ];
 
   return (

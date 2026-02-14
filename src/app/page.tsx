@@ -24,18 +24,14 @@ import {
 } from "lucide-react";
 
 export default async function HomePage() {
-  const session = await auth();
 
-  if (session) {
-    redirect("/dashboard");
-  }
 
   return (
     <div className="min-h-screen overflow-hidden">
       {/* ============================================
           HERO SECTION
           ============================================ */}
-      <section className="relative min-h-screen flex items-center justify-center pt-16">
+      <section className="relative min-h-screen flex items-center justify-center pt-28">
         {/* Animated Mesh Background */}
         <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark" />
         <div className="absolute inset-0 bg-aurora" />
@@ -141,7 +137,7 @@ export default async function HomePage() {
       {/* ============================================
           FEATURES BENTO GRID
           ============================================ */}
-      <section className="relative py-24 md:py-32">
+      <section id="features" className="relative py-24 md:py-32">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -247,7 +243,7 @@ export default async function HomePage() {
       {/* ============================================
           HOW IT WORKS
           ============================================ */}
-      <section className="relative py-24 md:py-32">
+      <section id="how-it-works" className="relative py-24 md:py-32">
         <div className="absolute inset-0 bg-gradient-to-b from-background to-muted/20" />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -317,7 +313,7 @@ export default async function HomePage() {
       {/* ============================================
           TESTIMONIALS
           ============================================ */}
-      <section className="relative py-24 md:py-32 overflow-hidden">
+      <section id="testimonials" className="relative py-24 md:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-muted/20 via-background to-background" />
 
         {/* Floating Shapes */}
