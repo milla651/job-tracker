@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
-import { Menu, X, User, Sun, Moon, Sparkles, LayoutDashboard, Settings, LogOut, Plus, Rocket } from "lucide-react";
+import { Menu, X, User, Sun, Moon, Sparkles, LayoutDashboard, Settings, LogOut, Plus, Rocket, Heart, Briefcase } from "lucide-react";
 import { useTheme } from "next-themes";
 import type { Session } from "next-auth";
 import { UserMenu } from "@/components/UserMenu";
@@ -40,6 +40,7 @@ export function Navbar({ session }: NavbarProps) {
     { label: "Features", href: "/#features" },
     { label: "How It Works", href: "/#how-it-works" },
     { label: "Testimonials", href: "/#testimonials" },
+    { label: "Jobs", href: "/jobs" },
   ];
 
   const isDashboard = pathname?.startsWith("/dashboard");
@@ -93,6 +94,18 @@ export function Navbar({ session }: NavbarProps) {
 
             {session?.user && (
               <div className="flex items-center gap-2">
+                <Link
+                  href="/jobs"
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+                >
+                  Jobs
+                </Link>
+                <Link
+                  href="/dashboard?status=WISHLIST"
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+                >
+                  Wishlist
+                </Link>
                 <Link
                   href="/dashboard"
                   className={cn(
@@ -234,6 +247,22 @@ export function Navbar({ session }: NavbarProps) {
                 </Link>
               ))}
 
+              <Link
+                href="/jobs"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl transition-colors"
+              >
+                <Briefcase className="w-4 h-4" />
+                Jobs
+              </Link>
+              <Link
+                href="/dashboard?status=WISHLIST"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl transition-colors"
+              >
+                <Heart className="w-4 h-4" />
+                Wishlist
+              </Link>
               <Link
                 href="/dashboard"
                 onClick={() => setIsOpen(false)}

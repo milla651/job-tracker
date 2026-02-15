@@ -1,4 +1,5 @@
 import Link from "next/link";
+import JsonLd from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,14 +21,60 @@ import {
   Clock,
   Star,
   ChevronRight,
-  Play
+  Play,
+  HelpCircle,
+  ChevronDown
 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default async function HomePage() {
-
+  const faqData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is JobTracker free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, JobTracker is completely free for individual job seekers. You can track unlimited applications, manage interviews, and use our AI features without any cost."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the AI job tracking work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our AI helps you organize your search by automatically categorizing applications, suggesting follow-up times, and providing intelligent nudges based on your pipeline status."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I import jobs from LinkedIn or Indeed?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! You can easily log jobs from any platform using our Quick Add feature. We are also working on a browser extension to one-click save jobs from major boards."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my data secure?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely. Your data is encrypted and stored securely. We do not sell your personal information to recruiters or third parties."
+        }
+      }
+    ]
+  };
 
   return (
     <div className="min-h-screen overflow-hidden">
+      <JsonLd data={faqData} />
       {/* ============================================
           HERO SECTION
           ============================================ */}
@@ -392,6 +439,61 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          FAQ SECTION (PAA OPTIMIZED)
+          ============================================ */}
+      <section className="relative py-24 md:py-32 bg-muted/30">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <HelpCircle className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">Common Questions</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
+              Frequently Asked <span className="text-gradient">Questions</span>
+            </h2>
+            <p className="text-muted-foreground">
+              Everything you need to know about tracking your career progress.
+            </p>
+          </div>
+
+          <Accordion type="single" collapsible className="w-full space-y-4">
+            <AccordionItem value="item-1" className="glass-card px-6 rounded-2xl border-none">
+              <AccordionTrigger className="text-lg font-medium hover:text-primary transition-colors py-6">
+                Is JobTracker free to use?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
+                Yes, JobTracker is completely free for individual job seekers. You can track unlimited applications, manage interviews, and use our AI features without any cost.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2" className="glass-card px-6 rounded-2xl border-none">
+              <AccordionTrigger className="text-lg font-medium hover:text-primary transition-colors py-6">
+                How does the AI job tracking work?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
+                Our AI helps you organize your search by automatically categorizing applications, suggesting follow-up times, and providing intelligent nudges based on your pipeline status.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3" className="glass-card px-6 rounded-2xl border-none">
+              <AccordionTrigger className="text-lg font-medium hover:text-primary transition-colors py-6">
+                Can I import jobs from LinkedIn or Indeed?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
+                Yes! You can easily log jobs from any platform using our Quick Add feature. We are also working on a browser extension to one-click save jobs from major boards.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-4" className="glass-card px-6 rounded-2xl border-none">
+              <AccordionTrigger className="text-lg font-medium hover:text-primary transition-colors py-6">
+                Is my data secure?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
+                Absolutely. Your data is encrypted and stored securely. We do not sell your personal information to recruiters or third parties.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </section>
 
