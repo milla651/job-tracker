@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getJobs, getJobStats } from "@/app/actions/jobs";
 import { JobListing } from "@/components/dashboard/JobListing";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { STATUS_CONFIG } from "@/lib/utils";
 import { Plus, Briefcase, TrendingUp, Target, CheckCircle } from "lucide-react";
 import { SmartNudges } from "@/components/dashboard/SmartNudges";

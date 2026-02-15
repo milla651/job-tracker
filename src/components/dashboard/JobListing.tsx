@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { JobApplication, JobStatus } from "@prisma/client";
 import { JobCard } from "@/components/JobCard";
 import { DashboardEmptyState } from "@/components/DashboardEmptyState";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import {
     LayoutGrid,

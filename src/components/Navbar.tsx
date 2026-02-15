@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { buttonVariants } from "@/components/ui/button-variants";
+import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Menu, X, User, Sun, Moon, Sparkles, LayoutDashboard, Settings, LogOut, Plus, Rocket } from "lucide-react";
 import { useTheme } from "next-themes";
 import type { Session } from "next-auth";

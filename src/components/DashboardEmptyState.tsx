@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Plus, Rocket, Sparkles, Target, Map, ArrowRight } from "lucide-react";
 
 export function DashboardEmptyState() {

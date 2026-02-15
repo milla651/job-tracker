@@ -4,7 +4,7 @@ import { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { verifyEmail, resendVerificationCode } from "@/app/actions/auth";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Briefcase, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 

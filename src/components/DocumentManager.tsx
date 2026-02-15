@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { Upload, FileText, Trash2, Download, Loader2 } from "lucide-react";
 import { uploadDocument, deleteDocument, getDocuments } from "@/app/actions/documents";
 import { formatBytes } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner"; // Assuming sonner is set up, or standard alert
 

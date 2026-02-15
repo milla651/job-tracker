@@ -88,6 +88,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
                                         <TooltipContent>
                                             <p className="text-xs font-medium">
                                                 {count} applications on {format(day, "MMM d, yyyy")}
+                                            </p>
                                         </TooltipContent>
                                     </Tooltip>
                                 </TooltipProvider>
