@@ -15,12 +15,13 @@ import { cn } from "@/lib/utils";
 
 interface PublicJobCardProps {
     job: ScrapedJob;
+    initialStatus?: 'IDLE' | 'WISHLIST' | 'APPLIED';
 }
 
-export function PublicJobCard({ job }: PublicJobCardProps) {
+export function PublicJobCard({ job, initialStatus = 'IDLE' }: PublicJobCardProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
-    const [savedStatus, setSavedStatus] = useState<'IDLE' | 'WISHLIST' | 'APPLIED'>('IDLE');
+    const [savedStatus, setSavedStatus] = useState<'IDLE' | 'WISHLIST' | 'APPLIED'>(initialStatus);
 
     const handleAction = async (type: 'WISHLIST' | 'APPLIED') => {
         startTransition(async () => {
