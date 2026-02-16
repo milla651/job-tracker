@@ -99,4 +99,9 @@ export const STATUS_CONFIG = {
     color: "bg-gray-500/20 text-gray-400 border-gray-500/30",
     icon: "↩️",
   },
+  DISCARDED: {
+    label: "Discarded",
+    color: "bg-gray-500/10 text-gray-500 border-gray-500/20",
+    icon: "🗑️",
+  },
 } as const;

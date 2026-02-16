@@ -1,29 +1,29 @@
-"use strict";
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { MapPin, Building2, Timer, Coins, ArrowUpRight, Sparkles, Check, X } from "lucide-react";
+import { ScrapedJob } from "@/lib/mock-jobs";
+import { formatSalary } from "@/lib/utils";
+import { savePublicJob } from "@/app/actions/public-jobs";
+import { toast } from "sonner";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ScrapedJob } from "@/lib/mock-jobs";
-import { savePublicJob } from "@/app/actions/public-jobs";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/Card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, DollarSign, Clock, Building2, Heart, Plus, Loader2, Check } from "lucide-react";
-import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns"; // fallback if postedAt is not a date
 import { cn } from "@/lib/utils";
 
 interface PublicJobCardProps {
     job: ScrapedJob;
-    initialStatus?: 'IDLE' | 'WISHLIST' | 'APPLIED';
+    initialStatus?: 'IDLE' | 'WISHLIST' | 'APPLIED' | 'DISCARDED';
+    onDiscard?: () => void;
 }
 
-export function PublicJobCard({ job, initialStatus = 'IDLE' }: PublicJobCardProps) {
-    const router = useRouter();
+export function PublicJobCard({ job, initialStatus = 'IDLE', onDiscard }: PublicJobCardProps) {
+    const [status, setStatus] = useState(initialStatus);
     const [isPending, startTransition] = useTransition();
-    const [savedStatus, setSavedStatus] = useState<'IDLE' | 'WISHLIST' | 'APPLIED'>(initialStatus);
+    const router = useRouter();
+    const [isVisible, setIsVisible] = useState(true);
 
-    const handleAction = async (type: 'WISHLIST' | 'APPLIED') => {
+    const handleAction = async (type: 'WISHLIST' | 'APPLIED' | 'DISCARDED') => {
         startTransition(async () => {
             const result = await savePublicJob(job, type);
 
@@ -37,113 +37,124 @@ export function PublicJobCard({ job, initialStatus = 'IDLE' }: PublicJobCardProp
                 return;
             }
 
-            setSavedStatus(type);
-            toast.success(
-                type === 'WISHLIST'
-                    ? "Added to Wishlist"
-                    : "Application Tracked"
-            );
+            setStatus(type);
+
+            if (type === 'DISCARDED') {
+                toast.success("Job discarded");
+                setIsVisible(false);
+                if (onDiscard) onDiscard();
+                router.refresh();
+            } else {
+                toast.success(
+                    type === 'WISHLIST'
+                        ? "Added to Wishlist"
+                        : "Application Tracked"
+                );
+            }
         });
     };
 
-    return (
-        <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg dark:hover:shadow-primary/5 hover:-translate-y-1 border-border/50 bg-card/50 backdrop-blur-sm">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+    if (!isVisible) return null;
 
-            <CardHeader className="p-6 pb-4 relative">
-                <div className="flex justify-between items-start gap-4">
-                    <div className="flex gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xl font-bold text-primary shadow-inner">
-                            {job.logo}
+    return (
+        <Card className="group relative overflow-hidden border-border/50 bg-background/50 backdrop-blur-sm transition-all hover:shadow-lg hover:border-primary/20">
+            {/* Discard Button */}
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full"
+                    onClick={() => handleAction('DISCARDED')}
+                    disabled={status !== 'IDLE' || isPending}
+                    title="Discard job"
+                >
+                    <X className="w-4 h-4" />
+                </Button>
+            </div>
+
+            <div className="p-6 flex flex-col h-full gap-4">
+                {/* Header */}
+                <div className="flex justify-between items-start gap-4 pr-6">
+                    <div className="space-y-1">
+                        <h3 className="font-semibold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                            {job.title}
+                        </h3>
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                            <Building2 className="w-4 h-4" />
+                            <span className="font-medium text-sm">{job.company}</span>
                         </div>
-                        <div>
-                            <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors">
-                                {job.title}
-                            </h3>
-                            <div className="flex items-center gap-2 text-muted-foreground mt-1 text-sm font-medium">
-                                <Building2 className="w-3.5 h-3.5" />
-                                {job.company}
+                    </div>
+                </div>
+
+                {/* Details */}
+                <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="w-4 h-4 shrink-0" />
+                        <span className="line-clamp-1">{job.location || "Remote"}</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 pt-2">
+                        <div className="space-y-1">
+                            <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Workload</span>
+                            <div className="flex items-center gap-2 font-medium text-sm">
+                                <Timer className="w-4 h-4 text-primary" />
+                                {job.type}
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Salary</span>
+                            <div className="flex items-center gap-2 font-medium text-sm">
+                                <Coins className="w-4 h-4 text-primary" />
+                                {job.salary}
                             </div>
                         </div>
                     </div>
-                    {/* Posted time badge */}
-                    <Badge variant="secondary" className="bg-muted/50 text-xs font-normal">
-                        {job.postedAt}
-                    </Badge>
-                </div>
-            </CardHeader>
-
-            <CardContent className="p-6 py-2 relative">
-                <div className="flex flex-wrap gap-y-2 gap-x-4 text-sm text-muted-foreground mb-4">
-                    <div className="flex items-center gap-1.5 bg-muted/30 px-2 py-1 rounded-md">
-                        <MapPin className="w-3.5 h-3.5 text-primary/70" />
-                        {job.location}
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-muted/30 px-2 py-1 rounded-md">
-                        <DollarSign className="w-3.5 h-3.5 text-green-500/70" />
-                        {job.salary}
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-muted/30 px-2 py-1 rounded-md">
-                        <Clock className="w-3.5 h-3.5 text-amber-500/70" />
-                        {job.type}
-                    </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 mb-2">
-                    {job.tags.map((tag) => (
-                        <Badge key={tag} variant="outline" className="text-xs border-primary/20 text-primary/80 bg-primary/5">
-                            {tag}
-                        </Badge>
-                    ))}
+                {/* Actions */}
+                <div className="mt-auto pt-4 flex gap-3">
+                    <Button
+                        className={cn(
+                            "flex-1 bg-primary/10 hover:bg-primary/20 text-primary border-0 shadow-none transition-colors",
+                            status === 'WISHLIST' && "bg-primary/20"
+                        )}
+                        variant="outline"
+                        onClick={() => handleAction('WISHLIST')}
+                        disabled={status !== 'IDLE' || isPending}
+                    >
+                        {status === 'WISHLIST' ? (
+                            <>
+                                <Sparkles className="w-4 h-4 mr-2" />
+                                Saved
+                            </>
+                        ) : status === 'APPLIED' ? (
+                            "Applied"
+                        ) : (
+                            "Save for Later"
+                        )}
+                    </Button>
+                    <Button
+                        className={cn(
+                            "flex-1 gap-2 bg-gradient-brand shadow-md hover:shadow-lg transition-all",
+                            status === 'APPLIED' && "bg-green-600 hover:bg-green-700"
+                        )}
+                        onClick={() => handleAction('APPLIED')}
+                        disabled={status !== 'IDLE' || isPending}
+                    >
+                        {status === 'APPLIED' ? (
+                            <>
+                                <Check className="w-4 h-4" />
+                                Applied
+                            </>
+                        ) : (
+                            <>
+                                Apply Now
+                                <ArrowUpRight className="w-4 h-4" />
+                            </>
+                        )}
+                    </Button>
                 </div>
-
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-3 leading-relaxed">
-                    {job.description}
-                </p>
-            </CardContent>
-
-            <CardFooter className="p-6 pt-4 flex gap-3 relative">
-                <Button
-                    variant="outline"
-                    className={cn(
-                        "flex-1 gap-2 transition-all",
-                        savedStatus === 'WISHLIST' && "border-primary/50 bg-primary/10 text-primary hover:bg-primary/20"
-                    )}
-                    onClick={() => handleAction('WISHLIST')}
-                    disabled={isPending || savedStatus !== 'IDLE'}
-                >
-                    {savedStatus === 'WISHLIST' ? (
-                        <>
-                            <Check className="w-4 h-4" /> Saved
-                        </>
-                    ) : (
-                        <>
-                            <Heart className={cn("w-4 h-4", isPending && "animate-pulse")} />
-                            {isPending ? "Saving..." : "Wishlist"}
-                        </>
-                    )}
-                </Button>
-
-                <Button
-                    className={cn(
-                        "flex-1 gap-2 bg-gradient-brand shadow-md hover:shadow-lg transition-all",
-                        savedStatus === 'APPLIED' && "bg-green-600 hover:bg-green-700"
-                    )}
-                    onClick={() => handleAction('APPLIED')}
-                    disabled={isPending || savedStatus !== 'IDLE'}
-                >
-                    {savedStatus === 'APPLIED' ? (
-                        <>
-                            <Check className="w-4 h-4" /> Tracked
-                        </>
-                    ) : (
-                        <>
-                            {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                            {isPending ? "Adding..." : "Track Job"}
-                        </>
-                    )}
-                </Button>
-            </CardFooter>
+            </div>
         </Card>
     );
 }

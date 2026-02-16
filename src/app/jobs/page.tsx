@@ -13,12 +13,18 @@ export const metadata = {
     description: "Find your next dream job and track it instantly.",
 };
 
-export default async function JobsPage() {
-    const jobs = await getMockJobs();
+export default async function JobsPage(props: {
+    searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+    const searchParams = await props.searchParams;
+    const query = searchParams?.query as string || "";
+    const showDiscarded = searchParams?.discarded === "true";
+
+    const allJobs = await getMockJobs();
     const session = await auth();
 
-    // Create a map of user's existing applications for quick lookup
-    const userJobStatus = new Map<string, 'WISHLIST' | 'APPLIED'>();
+    // Create a map of user's existing applications
+    const userJobStatus = new Map<string, 'WISHLIST' | 'APPLIED' | 'DISCARDED'>();
 
     if (session?.user?.id) {
         const userApplications = await prisma.jobApplication.findMany({
@@ -33,15 +39,37 @@ export default async function JobsPage() {
         });
 
         userApplications.forEach(app => {
-            // Create a unique key based on company and position (mock matching strategy)
             const key = `${app.company}-${app.position}`;
+            let uiStatus: 'WISHLIST' | 'APPLIED' | 'DISCARDED' = 'APPLIED';
 
-            // Map Prisma status to our simplified UI status
-            // If it's WISHLIST, it's 'WISHLIST'. Anything else is considered 'APPLIED' (tracked)
-            const uiStatus = app.status === JobStatus.WISHLIST ? 'WISHLIST' : 'APPLIED';
+            if (app.status === JobStatus.WISHLIST) uiStatus = 'WISHLIST';
+            else if (app.status === JobStatus.DISCARDED) uiStatus = 'DISCARDED';
+
             userJobStatus.set(key, uiStatus);
         });
     }
+
+    // Filter jobs
+    const filteredJobs = allJobs.filter(job => {
+        // 1. Search Filter
+        const matchesSearch = !query ||
+            job.title.toLowerCase().includes(query.toLowerCase()) ||
+            job.company.toLowerCase().includes(query.toLowerCase()) ||
+            job.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()));
+
+        if (!matchesSearch) return false;
+
+        // 2. Discarded Filter
+        const key = `${job.company}-${job.title}`;
+        const status = userJobStatus.get(key);
+        const isDiscarded = status === 'DISCARDED';
+
+        if (showDiscarded) {
+            return isDiscarded;
+        } else {
+            return !isDiscarded;
+        }
+    });
 
     return (
         <div className="min-h-screen pt-24 pb-12 relative overflow-hidden">
@@ -68,44 +96,77 @@ export default async function JobsPage() {
                         Save them to your dashboard with a single click.
                     </p>
 
-                    {/* Search Bar Placeholder */}
-                    <div className="relative max-w-lg mx-auto flex gap-2">
+                    {/* Search Bar */}
+                    <form action="/jobs" className="relative max-w-lg mx-auto flex gap-2">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                             <Input
+                                name="query"
+                                defaultValue={query}
                                 placeholder="Search for roles, companies, or keywords..."
                                 className="pl-10 h-12 rounded-xl bg-background/50 backdrop-blur border-border/50 focus:bg-background transition-all"
                             />
                         </div>
-                        <Button size="lg" className="h-12 rounded-xl px-6 bg-gradient-brand shadow-lg hover:shadow-primary/25">
+                        <Button type="submit" size="lg" className="h-12 rounded-xl px-6 bg-gradient-brand shadow-lg hover:shadow-primary/25">
                             Search
                         </Button>
+                    </form>
+
+                    {/* Filter Toggles */}
+                    <div className="mt-8 flex justify-center gap-4">
+                        <form action="/jobs">
+                            {query && <input type="hidden" name="query" value={query} />}
+                            {showDiscarded ? (
+                                <Button variant="outline" className="rounded-xl gap-2 border-primary/20 bg-primary/5 text-primary">
+                                    <Briefcase className="w-4 h-4" />
+                                    Job Search
+                                </Button>
+                            ) : (
+                                <button type="submit" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                                    View All Jobs
+                                </button>
+                            )}
+                        </form>
+
+                        <div className="w-px h-6 bg-border/50" />
+
+                        <form action="/jobs">
+                            {query && <input type="hidden" name="query" value={query} />}
+                            <input type="hidden" name="discarded" value="true" />
+                            {showDiscarded ? (
+                                <span className="text-sm font-medium text-foreground">Evaluating Discarded</span>
+                            ) : (
+                                <Button variant="ghost" type="submit" className="text-sm font-medium text-muted-foreground hover:text-destructive transition-colors">
+                                    Discarded Jobs
+                                </Button>
+                            )}
+                        </form>
                     </div>
                 </div>
 
                 {/* Jobs Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 fade-in-up fade-in-up-delay-2">
-                    {jobs.map((job) => {
-                        const key = `${job.company}-${job.title}`;
-                        const initialStatus = userJobStatus.get(key) || 'IDLE';
+                    {filteredJobs.length > 0 ? (
+                        filteredJobs.map((job) => {
+                            const key = `${job.company}-${job.title}`;
+                            const initialStatus = userJobStatus.get(key) || 'IDLE';
 
-                        return (
-                            <PublicJobCard
-                                key={job.id}
-                                job={job}
-                                initialStatus={initialStatus}
-                            />
-                        );
-                    })}
+                            return (
+                                <PublicJobCard
+                                    key={job.id}
+                                    job={job}
+                                    initialStatus={initialStatus}
+                                />
+                            );
+                        })
+                    ) : (
+                        <div className="col-span-full text-center py-20 text-muted-foreground">
+                            <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                            <p>No jobs found.</p>
+                            {showDiscarded && <p className="text-sm mt-2">Your trash is empty!</p>}
+                        </div>
+                    )}
                 </div>
-
-                {/* Empty State / Loading State could go here */}
-                {jobs.length === 0 && (
-                    <div className="text-center py-20 text-muted-foreground">
-                        <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                        <p>No jobs found at the moment. Check back soon!</p>
-                    </div>
-                )}
             </div>
         </div>
     );

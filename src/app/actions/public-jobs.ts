@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { ScrapedJob } from "@/lib/mock-jobs";
 import { JobStatus } from "@prisma/client";
 
-export async function savePublicJob(job: ScrapedJob, type: 'WISHLIST' | 'APPLIED') {
+export async function savePublicJob(job: ScrapedJob, type: 'WISHLIST' | 'APPLIED' | 'DISCARDED') {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -25,7 +25,7 @@ export async function savePublicJob(job: ScrapedJob, type: 'WISHLIST' | 'APPLIED
     });
 
     if (existingJob) {
-        return { error: "You have already saved this job." };
+        return { error: "You have already interaction with this job." };
     }
 
     // Parse salary to min/max if possible, otherwise store raw string in notes
@@ -48,7 +48,7 @@ export async function savePublicJob(job: ScrapedJob, type: 'WISHLIST' | 'APPLIED
         location: job.location,
         jobUrl: job.url,
         description: job.description,
-        status: type === 'WISHLIST' ? JobStatus.WISHLIST : JobStatus.APPLIED,
+        status: type === 'WISHLIST' ? JobStatus.WISHLIST : type === 'APPLIED' ? JobStatus.APPLIED : JobStatus.DISCARDED,
         salaryMin,
         salaryMax,
         notes: `Saved from Public Jobs Board. Original Salary: ${job.salary}`,

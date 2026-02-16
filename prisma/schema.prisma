@@ -64,6 +64,7 @@ enum JobStatus {
   ACCEPTED
   REJECTED
   WITHDRAWN
+  DISCARDED
 }
 
 model TimelineEvent {

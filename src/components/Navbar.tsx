@@ -95,27 +95,49 @@ export function Navbar({ session }: NavbarProps) {
             {session?.user && (
               <div className="flex items-center gap-2">
                 <Link
-                  href="/jobs"
-                  className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
-                >
-                  Jobs
-                </Link>
-                <Link
-                  href="/dashboard?status=WISHLIST"
-                  className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
-                >
-                  Wishlist
-                </Link>
-                <Link
-                  href="/dashboard"
+                  href="/dashboard/tracker"
                   className={cn(
                     "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
-                    isDashboard
+                    pathname?.startsWith("/dashboard/tracker")
                       ? "bg-primary/10 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                 >
-                  Dashboard
+                  Tracker
+                </Link>
+                <Link
+                  href="/jobs"
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+                    pathname === "/jobs"
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  Jobs
+                </Link>
+                <Link
+                  href="/dashboard/profile"
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+                >
+                  Profile
+                </Link>
+                <Link
+                  href="/docs"
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+                >
+                  Docs
+                </Link>
+                <Link
+                  href="/dashboard/settings"
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+                    pathname === "/dashboard/settings"
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  Settings
                 </Link>
                 <div className="w-px h-4 bg-border/50 mx-2" />
               </div>
@@ -248,6 +270,17 @@ export function Navbar({ session }: NavbarProps) {
               ))}
 
               <Link
+                href="/dashboard/tracker"
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors",
+                  pathname?.startsWith("/dashboard/tracker") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                )}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Tracker
+              </Link>
+              <Link
                 href="/jobs"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl transition-colors"
@@ -256,23 +289,28 @@ export function Navbar({ session }: NavbarProps) {
                 Jobs
               </Link>
               <Link
-                href="/dashboard?status=WISHLIST"
+                href="/dashboard/profile"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl transition-colors"
               >
-                <Heart className="w-4 h-4" />
-                Wishlist
+                <User className="w-4 h-4" />
+                Profile
               </Link>
               <Link
-                href="/dashboard"
+                href="/docs"
                 onClick={() => setIsOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors",
-                  isDashboard ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                )}
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl transition-colors"
               >
-                <LayoutDashboard className="w-4 h-4" />
-                {session?.user ? "Dashboard" : "Go to Dashboard"}
+                <Briefcase className="w-4 h-4" />
+                Docs
+              </Link>
+              <Link
+                href="/dashboard/settings"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                Settings
               </Link>
             </div>
 

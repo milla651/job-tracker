@@ -30,6 +30,7 @@ const STATUS_LABELS: Record<JobStatus, string> = {
     ACCEPTED: "Accepted",
     REJECTED: "Rejected",
     WITHDRAWN: "Withdrawn",
+    DISCARDED: "Discarded",
 };
 
 export function PipelineFunnel({ data }: PipelineFunnelProps) {
