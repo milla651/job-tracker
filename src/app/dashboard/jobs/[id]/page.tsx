@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getJobById, deleteJob } from "@/app/actions/jobs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusSelector } from "@/components/StatusSelector";
 import { Timeline } from "@/components/Timeline";
 import { formatDate, formatSalary } from "@/lib/utils";

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getSmartNudges, Nudge } from "@/app/actions/nudges";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bell, Clock, RefreshCw, ChevronRight, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
