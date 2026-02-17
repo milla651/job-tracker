@@ -84,3 +84,36 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
     console.error("Failed to send welcome email:", error);
   }
 };
+
+export const sendPasswordResetEmail = async (email: string, token: string) => {
+  const resetLink = `${domain}/reset-password?token=${token}`;
+
+  // Log link for development
+  if (!apiKey || process.env.NODE_ENV === "development") {
+    console.log("-----------------------------------------");
+    console.log(`🔐 PWM Reset for ${email}: ${resetLink}`);
+    console.log("-----------------------------------------");
+  }
+
+  if (!apiKey) return;
+
+  try {
+    await resend.emails.send({
+      from: "JobTracker <noreply@benardkimani.co.ke>",
+      to: email,
+      subject: "Reset your password",
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Reset your password</h2>
+          <p>Click the link below to reset your password:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetLink}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Reset Password</a>
+          </div>
+          <p>If you didn't request this, ignore this email.</p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("Failed to send password reset email:", error);
+  }
+};

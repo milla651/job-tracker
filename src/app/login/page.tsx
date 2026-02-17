@@ -5,11 +5,12 @@ import Link from "next/link";
 import { loginUser } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
-import { Briefcase, Loader2, ArrowLeft } from "lucide-react";
+import { Briefcase, Loader2, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -94,15 +95,38 @@ export default function LoginPage() {
               autoComplete="email"
             />
 
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              label="Password"
-              placeholder="••••••••"
-              required
-              autoComplete="current-password"
-            />
+            <div className="space-y-2">
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  label="Password"
+                  placeholder="••••••••"
+                  required
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              <div className="flex justify-end">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
 
             <Button
               type="submit"
