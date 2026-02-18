@@ -119,8 +119,25 @@ export const MOCK_JOBS: ScrapedJob[] = [
   }
 ];
 
+import fs from "fs";
+import path from "path";
+
 export async function getMockJobs(): Promise<ScrapedJob[]> {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 500));
+
+  try {
+    const dataPath = path.join(process.cwd(), "src", "data", "scraped_jobs.json");
+    if (fs.existsSync(dataPath)) {
+      const jsonData = fs.readFileSync(dataPath, "utf-8");
+      const scrapedJobs = JSON.parse(jsonData);
+      if (Array.isArray(scrapedJobs) && scrapedJobs.length > 0) {
+        return scrapedJobs;
+      }
+    }
+  } catch (error) {
+    console.error("Error reading scraped jobs:", error);
+  }
+
   return MOCK_JOBS;
 }
