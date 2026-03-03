@@ -5,7 +5,8 @@ import Link from "next/link";
 import { loginUser } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
-import { Briefcase, Loader2, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { OnboardingLayout } from "@/components/OnboardingLayout";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -29,134 +30,102 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      {/* Animated Mesh Background */}
-      <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark" />
-      <div className="absolute inset-0 bg-aurora" />
-
-      {/* Floating Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-float-delayed" />
-
-      {/* Grid Pattern Overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
-        style={{
-          backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
-                            linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px'
-        }}
-      />
-
-      {/* Back to Home Link */}
-      <Link
-        href="/"
-        className="absolute top-8 left-8 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
-      >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-        Back to Home
-      </Link>
-
-      {/* Login Card */}
-      <div className="relative w-full max-w-md">
-        <div className="glass-card p-8 md:p-10">
-          {/* Logo */}
-          <div className="flex justify-center mb-8">
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-primary to-accent">
-              <Briefcase className="w-10 h-10 text-white" />
-            </div>
+    <OnboardingLayout
+      step={1}
+      totalSteps={2}
+      title="Sign In"
+      description="Access your job tracking dashboard">
+      <form action={handleSubmit} className="space-y-6 w-full max-w-sm">
+        {error && (
+          <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm font-medium">
+            {error}
           </div>
+        )}
 
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Welcome back
-            </h1>
-            <p className="text-muted-foreground">
-              Sign in to continue tracking your applications
-            </p>
-          </div>
-
-          {/* Form */}
-          <form action={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-sm">
-                {error}
-              </div>
-            )}
-
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              placeholder="john@example.com"
-              required
-              autoComplete="email"
-            />
-
-            <div className="space-y-2">
-              <div className="relative">
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  label="Password"
-                  placeholder="••••••••"
-                  required
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-              <div className="flex justify-end">
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white shadow-lg"
-              disabled={isLoading}
-              size="lg"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </Button>
-          </form>
-
-          {/* Footer */}
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/register"
-              className="text-primary hover:text-primary/80 font-semibold transition-colors"
-            >
-              Create one
-            </Link>
+        {/* Email Input */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Email Address</label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            required
+            autoComplete="email"
+            disabled={isLoading}
+            className="h-11"
+          />
+          <p className="text-xs text-muted-foreground">
+            The email you used to create your account
           </p>
         </div>
-      </div>
-    </div>
+
+        {/* Password Input */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Password</label>
+          <div className="relative">
+            <Input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              required
+              autoComplete="current-password"
+              disabled={isLoading}
+              className="h-11 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              tabIndex={-1}>
+              {showPassword ? (
+                <EyeOff className="w-4 h-4" />
+              ) : (
+                <Eye className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+          <Link
+            href="/forgot-password"
+            className="text-xs text-primary hover:underline">
+            Forgot password?
+          </Link>
+        </div>
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="w-full h-11 bg-gradient-brand text-white font-semibold gap-2">
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Signing in...
+            </>
+          ) : (
+            <>
+              Sign In
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
+        </Button>
+
+        {/* Divider */}
+        <div className="relative h-px bg-border my-6">
+          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-background px-2 text-xs text-muted-foreground">
+            New to JobTracker?
+          </span>
+        </div>
+
+        {/* Sign Up Link */}
+        <Button asChild variant="outline" className="w-full h-11 border-2">
+          <Link href="/register">
+            Create a Free Account
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Link>
+        </Button>
+      </form>
+    </OnboardingLayout>
   );
 }
