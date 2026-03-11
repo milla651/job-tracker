@@ -1,43 +1,28 @@
+/**
+ * Landing page — JobTracker
+ *
+ * Palette:
+ *   Light → stone-50 bg · stone-900 text · teal-600 accent
+ *   Dark  → stone-950 bg · stone-100 text · teal-400 accent
+ *
+ * All colours use Tailwind dark: classes so the theme toggle
+ * affects the ENTIRE page, not just the nav.
+ */
+
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
-import { Button } from "@/components/ui/button";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
+// import { cn } from "@/lib/utils";
 import {
   Briefcase,
   LineChart,
-  Calendar,
   Bell,
-  Check,
   ArrowRight,
-  Sparkles,
-  Zap,
-  Target,
-  Users,
-  TrendingUp,
+  Check,
   Shield,
-  Star,
-  ChevronRight,
-  Play,
-  HelpCircle,
   Clock,
-  Rocket,
-  Award,
-  Gauge,
-  PieChart,
-  TrendingDown,
-  Lightbulb,
-  Heart,
-  Lock,
+  Zap,
+  ArrowUpRight,
 } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 export default async function HomePage() {
   const faqData = {
@@ -46,438 +31,236 @@ export default async function HomePage() {
     mainEntity: [
       {
         "@type": "Question",
-        name: "Is JobTracker free to use?",
+        name: "Is JobTracker free?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes, JobTracker is completely free for individual job seekers. You can track unlimited applications, manage interviews, and use our AI features without any cost.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "How does the AI job tracking work?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Our AI helps you organize your search by automatically categorizing applications, suggesting follow-up times, and providing intelligent nudges based on your pipeline status.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Can I import jobs from LinkedIn or Indeed?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Yes! You can easily log jobs from any platform using our Quick Add feature. We are also working on a browser extension to one-click save jobs from major boards.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Is my data secure?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Absolutely. Your data is encrypted and stored securely. We do not sell your personal information to recruiters or third parties.",
+          text: "Yes — free for every job seeker, unlimited applications, no card needed.",
         },
       },
     ],
   };
 
   return (
-    <div className="min-h-screen overflow-hidden">
+    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 transition-colors duration-300">
       <JsonLd data={faqData} />
-      {/* ============================================
-          HERO SECTION - KENYA FOCUSED
-          ============================================ */}
-      <section className="relative min-h-screen flex items-center justify-center pt-28">
-        {/* Animated Mesh Background */}
-        <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark" />
-        <div className="absolute inset-0 bg-aurora" />
 
-        {/* Floating Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-green-500/15 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-float-delayed" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-primary/5 to-transparent rounded-full" />
-
-        {/* Grid Pattern Overlay */}
+      {/* ─── HERO ─────────────────────────────────── */}
+      <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center overflow-hidden">
+        {/* Light mode warm dot texture */}
         <div
-          className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
+          className="absolute inset-0 opacity-25 dark:opacity-0 transition-opacity duration-500 pointer-events-none"
           style={{
-            backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
-                              linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
+            backgroundImage: `radial-gradient(circle, #d6d3d1 1px, transparent 1px)`,
+            backgroundSize: "28px 28px",
           }}
         />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            {/* Announcement Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-8 fade-in-up border border-green-500/30">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-              </span>
-              <span className="text-sm font-medium text-foreground/80">
-                Join{" "}
-                <span className="text-green-600 dark:text-green-400 font-bold">
-                  3,500+ Kenyans
-                </span>{" "}
-                building their dream careers
-              </span>
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            </div>
+        {/* Light mode warm top wash */}
+        <div className="absolute inset-0 bg-gradient-to-b from-teal-50/70 via-stone-50/30 to-transparent dark:from-transparent pointer-events-none transition-colors duration-300" />
 
-            {/* Main Headline */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 fade-in-up fade-in-up-delay-1">
-              <span className="block text-foreground">
-                Master Your Job Search
-              </span>
-              <span className="text-gradient bg-gradient-to-r from-green-600 via-primary to-orange-500">
-                The Smart Way
-              </span>
-            </h1>
+        {/* Dark mode teal glow */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-teal-600/10 blur-[140px] opacity-0 dark:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-            {/* Subtitle */}
-            <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed fade-in-up fade-in-up-delay-2">
-              Stop juggling LinkedIn, WhatsApp, and spreadsheets. Track
-              applications, manage interviews, and never miss an opportunity.
-              <span className="block text-foreground/70 mt-3">
-                Built for Kenya's job market. Used by everyone from fresh grads
-                to seasoned professionals.
+        <div className="relative max-w-3xl mx-auto pt-24">
+          {/* Badge */}
+          <div
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-10 text-sm font-medium
+            bg-teal-50 text-teal-700 border border-teal-200/80
+            dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800/60
+            transition-colors duration-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+            Automated job tracking — built for serious seekers
+          </div>
+
+          {/* Headline — serif creates warmth, memorability, editorial feel */}
+          <h1
+            className="text-5xl sm:text-6xl md:text-7xl font-serif font-bold tracking-tight leading-[1.07] mb-6
+            text-stone-900 dark:text-stone-50 transition-colors duration-300">
+            Your job search,
+            <br />
+            <span className="text-teal-600 dark:text-teal-400 transition-colors duration-300">
+              finally in order.
+            </span>
+          </h1>
+
+          <p className="text-lg sm:text-xl text-stone-500 dark:text-stone-400 max-w-xl mx-auto mb-10 leading-relaxed transition-colors duration-300">
+            Stop losing track. JobTracker organises every application, sends
+            smart follow-up reminders, and shows your full pipeline —
+            automatically.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-10">
+            {/* Primary */}
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                text-base font-semibold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0
+                bg-teal-600 text-white hover:bg-teal-700 shadow-lg shadow-teal-600/25
+                dark:bg-teal-500 dark:text-stone-950 dark:hover:bg-teal-400 dark:shadow-teal-500/20">
+              Start Tracking Free
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            {/* Secondary */}
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                text-base font-semibold transition-all duration-200
+                border-2 border-stone-300 text-stone-700 hover:bg-stone-100 hover:border-stone-400
+                dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600">
+              Sign In
+            </Link>
+          </div>
+
+          {/* Trust strip */}
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-stone-400 dark:text-stone-600 transition-colors duration-300">
+            {[
+              { icon: Check, label: "Free forever" },
+              { icon: Shield, label: "No card required" },
+              { icon: Clock, label: "Setup in 2 min" },
+            ].map(({ icon: Icon, label }) => (
+              <span key={label} className="flex items-center gap-1.5">
+                <Icon className="w-3.5 h-3.5 text-teal-500 dark:text-teal-600" />
+                {label}
               </span>
-            </p>
-
-            {/* CTA Section */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 fade-in-up fade-in-up-delay-3">
-              <Link
-                href="/register"
-                className={cn(
-                  buttonVariants({ size: "xl" }),
-                  "group bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-xl hover:shadow-2xl hover:shadow-green-600/25 transition-all duration-500 rounded-2xl px-8",
-                )}>
-                <Rocket className="mr-2 w-5 h-5" />
-                Start Free Today
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                href="/login"
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "xl" }),
-                  "group glass-card border-2 border-border/50 text-foreground hover:bg-primary/5 hover:border-primary/50 hover:text-primary rounded-2xl px-8 transition-colors",
-                )}>
-                Watch Demo
-                <Play className="ml-2 w-4 h-4 group-hover:scale-110 transition-transform" />
-              </Link>
-            </div>
-
-            {/* Social Proof Stats - Kenya Specific */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto fade-in-up fade-in-up-delay-4">
-              {[
-                { value: "3,500+", label: "Kenyans Hired", icon: Users },
-                { value: "15K+", label: "Jobs Tracked", icon: Briefcase },
-                { value: "83%", label: "Success Rate", icon: TrendingUp },
-                { value: "2.3x", label: "Faster Offers", icon: Zap },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className="group glass-card-hover p-5 rounded-2xl text-center cursor-default border border-green-500/20">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <stat.icon className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    <div className="text-2xl sm:text-3xl font-bold">
-                      {stat.value}
-                    </div>
-                  </div>
-                  <div className="text-sm text-muted-foreground font-medium">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-60">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
-            Scroll to explore
-          </span>
-          <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center">
-            <div className="w-1.5 h-3 bg-primary rounded-full mt-2 animate-bounce" />
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+          <div className="w-5 h-8 rounded-full border-2 border-stone-300 dark:border-stone-700 flex justify-center transition-colors duration-300">
+            <div className="w-1 h-2 rounded-full bg-teal-500 mt-1.5 animate-bounce" />
           </div>
         </div>
       </section>
-      {/* ============================================
-          FEATURES SECTION - KENYA BENEFITS
-          ============================================ */}
-      <section id="features" className="relative py-24 md:py-32">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-green-500/5 to-background" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
-              <Lightbulb className="w-4 h-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                Why JobTracker
-              </span>
-            </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-4">
-              Built for the Kenya job market
-              <span className="block text-gradient bg-gradient-to-r from-green-600 to-emerald-600">
-                you know
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              From Nairobi startups to multinational corporations. From tech
-              roles to traditional sectors. We've got everyone covered.
-            </p>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Feature 1 */}
-            <div className="group glass-card-hover p-8 rounded-3xl relative overflow-hidden border border-green-500/20">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/10 rounded-full blur-3xl group-hover:bg-green-500/20 transition-colors duration-500" />
-              <div className="relative">
-                <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-green-600 to-emerald-600 mb-6">
-                  <Briefcase className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">
-                  Track Every Application
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  From your first Email to HR to the final offer. Never lose
-                  track of a single application across different platforms and
-                  companies.
-                </p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                    Store in one place
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                    Add custom notes
-                  </li>
-                </ul>
+      {/* ─── STATS ────────────────────────────────── */}
+      <div className="border-y border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 transition-colors duration-300">
+        <div className="max-w-4xl mx-auto px-6 py-10 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+          {[
+            { value: "10K+", label: "Jobs tracked" },
+            { value: "87%", label: "Fewer missed follow-ups" },
+            { value: "3×", label: "Faster than spreadsheets" },
+            { value: "Free", label: "No strings attached" },
+          ].map(({ value, label }) => (
+            <div key={label}>
+              <div className="text-2xl sm:text-3xl font-serif font-bold text-teal-600 dark:text-teal-400 transition-colors duration-300">
+                {value}
+              </div>
+              <div className="text-xs text-stone-500 dark:text-stone-500 mt-1">
+                {label}
               </div>
             </div>
-
-            {/* Feature 2 */}
-            <div className="group glass-card-hover p-8 rounded-3xl relative overflow-hidden border border-orange-500/20">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl group-hover:bg-orange-500/20 transition-colors duration-500" />
-              <div className="relative">
-                <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 mb-6">
-                  <Calendar className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">
-                  Smart Interview Calendar
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  Sync interviews with your Google Calendar. Get reminders so
-                  you never miss that important call with an employer.
-                </p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-orange-600 flex-shrink-0" />
-                    Calendar integration
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-orange-600 flex-shrink-0" />
-                    Push reminders
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="group glass-card-hover p-8 rounded-3xl relative overflow-hidden border border-blue-500/20">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors duration-500" />
-              <div className="relative">
-                <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 mb-6">
-                  <LineChart className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">
-                  Visualize Your Progress
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  See where you stand with beautiful dashboards. Track
-                  conversion rates, interview success, and more.
-                </p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                    Real-time analytics
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                    Pipeline tracking
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="group glass-card-hover p-8 rounded-3xl relative overflow-hidden border border-purple-500/20">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors duration-500" />
-              <div className="relative">
-                <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 mb-6">
-                  <Bell className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">
-                  AI-Powered Follow-ups
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  Get smart reminders for when to follow up. Our AI knows the
-                  perfect timing to maximize your response rate.
-                </p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
-                    Intelligent timing
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
-                    Follow-up templates
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="group glass-card-hover p-8 rounded-3xl relative overflow-hidden border border-cyan-500/20">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-colors duration-500" />
-              <div className="relative">
-                <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-cyan-600 to-teal-600 mb-6">
-                  <Lock className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">
-                  100% Private & Secure
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  Your data is yours. Encrypted and never shared with recruiters
-                  or third parties. Trust matters.
-                </p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-cyan-600 flex-shrink-0" />
-                    Bank-level encryption
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-cyan-600 flex-shrink-0" />
-                    No ads, no selling data
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="group glass-card-hover p-8 rounded-3xl relative overflow-hidden border border-rose-500/20">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl group-hover:bg-rose-500/20 transition-colors duration-500" />
-              <div className="relative">
-                <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-rose-600 to-pink-600 mb-6">
-                  <Heart className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">
-                  By Kenyans, For Kenyans
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  We understand the Kenya job market. From tech hubs in Nairobi
-                  to opportunities countrywide.
-                </p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-rose-600 flex-shrink-0" />
-                    Local support
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-foreground/70">
-                    <Check className="w-4 h-4 text-rose-600 flex-shrink-0" />
-                    Always free tier
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
-      </section>
-      {/* ============================================
-          HOW IT WORKS - SIMPLE 3 STEP PROCESS
-          ============================================ */}
-      <section id="how-it-works" className="relative py-24 md:py-32">
-        <div className="absolute inset-0 bg-gradient-to-b from-background to-green-500/5" />
+      </div>
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
-              <Target className="w-4 h-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                The Simple Process
-              </span>
-            </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-4">
-              Get started in minutes
-              <span className="block text-gradient bg-gradient-to-r from-green-600 to-emerald-600">
-                not hours
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Three simple steps to take control of your job search.
+      {/* ─── FEATURES ─────────────────────────────── */}
+      <section id="features" className="py-28 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-14">
+            <p className="text-teal-600 dark:text-teal-400 text-xs font-bold uppercase tracking-widest mb-3 transition-colors duration-300">
+              What you get
             </p>
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-stone-900 dark:text-stone-100 transition-colors duration-300">
+              Built for the job search
+            </h2>
           </div>
 
-          {/* Steps */}
-          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+          <div className="grid sm:grid-cols-3 gap-5">
             {[
               {
-                step: "01",
-                icon: Briefcase,
-                title: "Log Your Apps",
-                description:
-                  "Add any job you've applied to. Company name, role, link, contact person. Takes 30 seconds. We'll organize it all.",
-                color: "from-green-600 to-emerald-600",
-                lightColor: "green",
+                Icon: LineChart,
+                title: "Visual Pipeline",
+                desc: "One clean board — Applied, Interview, Offer, Closed. Every application visible, nothing forgotten.",
               },
               {
-                step: "02",
-                icon: Calendar,
-                title: "Track Progress",
-                description:
-                  "Update statuses as things move forward. Got an interview? Update it. Rejected? Mark it. Watch your pipeline grow.",
-                color: "from-orange-500 to-red-500",
-                lightColor: "orange",
+                Icon: Bell,
+                title: "Follow-up Reminders",
+                desc: "Automated nudges when it's time to reach back out. Silence never means rejection again.",
               },
               {
-                step: "03",
-                icon: TrendingUp,
-                title: "Land Offers",
-                description:
-                  "Get smart reminders for follow-ups and interviews. Visualize your success. Close the deal and celebrate!",
-                color: "from-emerald-500 to-teal-600",
-                lightColor: "emerald",
+                Icon: Zap,
+                title: "Quick Add",
+                desc: "Log a new job in under 30 seconds. Company, role, deadline, notes — before the tab even closes.",
               },
-            ].map((item, index) => (
-              <div key={index} className="relative group">
-                {/* Connection Line */}
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-12 left-[calc(100%+12px)] w-[calc(100%-24px)] h-0.5">
-                    <div className="h-full bg-gradient-to-r from-border via-green-500/30 to-border" />
-                  </div>
-                )}
-
+            ].map(({ Icon, title, desc }) => (
+              <div
+                key={title}
+                className="group p-7 rounded-2xl border transition-all duration-300
+                  border-stone-200 bg-white hover:border-teal-200 hover:shadow-lg hover:shadow-teal-500/5
+                  dark:border-stone-800 dark:bg-stone-900 dark:hover:border-teal-800 dark:hover:shadow-teal-500/5">
+                {/* Accent top bar */}
+                <div className="w-8 h-0.5 rounded-full mb-6 bg-stone-200 group-hover:bg-teal-500 dark:bg-stone-700 dark:group-hover:bg-teal-500 transition-colors duration-300" />
                 <div
-                  className={`glass-card-hover p-8 rounded-3xl h-full border border-${item.lightColor}-500/20`}>
-                  {/* Step Number & Icon */}
-                  <div
-                    className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} mb-6`}>
-                    <item.icon className="w-8 h-8 text-white" />
-                  </div>
+                  className="w-10 h-10 rounded-xl flex items-center justify-center mb-5
+                  bg-stone-100 dark:bg-stone-800 group-hover:bg-teal-50 dark:group-hover:bg-teal-950/50
+                  transition-colors duration-300">
+                  <Icon className="w-5 h-5 text-stone-500 dark:text-stone-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors duration-300" />
+                </div>
+                <h3 className="font-semibold text-stone-900 dark:text-stone-100 mb-2 transition-colors duration-300">
+                  {title}
+                </h3>
+                <p className="text-sm text-stone-500 dark:text-stone-500 leading-relaxed">
+                  {desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                  {/* Content */}
-                  <div className="text-sm font-mono text-green-600 dark:text-green-400 font-bold mb-2">
-                    {item.step}
-                  </div>
-                  <h3 className="text-2xl font-bold text-foreground mb-3">
-                    {item.title}
+      {/* ─── HOW IT WORKS ─────────────────────────── */}
+      <section
+        id="how-it-works"
+        className="py-28 px-6 bg-stone-100/60 dark:bg-stone-900/40 transition-colors duration-300">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-teal-600 dark:text-teal-400 text-xs font-bold uppercase tracking-widest mb-3 transition-colors duration-300">
+              How it works
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-stone-900 dark:text-stone-100 transition-colors duration-300">
+              Simple by design
+            </h2>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              {
+                n: "1",
+                title: "Log as you apply",
+                desc: "Add the company, role, and deadline while the tab is still open. Thirty seconds, done.",
+              },
+              {
+                n: "2",
+                title: "Get timely nudges",
+                desc: "JobTracker watches the clock. When it's time to follow up, you'll know exactly what to do.",
+              },
+              {
+                n: "3",
+                title: "Focus on getting hired",
+                desc: "Drag cards through your pipeline, not your brain. Your full search, visible in one glance.",
+              },
+            ].map(({ n, title, desc }) => (
+              <div
+                key={n}
+                className="flex gap-6 items-start p-7 rounded-2xl border transition-all duration-300
+                  bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800
+                  hover:border-teal-200 dark:hover:border-teal-900">
+                <div
+                  className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm
+                  bg-teal-600 text-white shadow-md shadow-teal-600/20
+                  dark:bg-teal-500 dark:text-stone-950 dark:shadow-teal-500/15
+                  transition-colors duration-300">
+                  {n}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-stone-900 dark:text-stone-100 mb-1 transition-colors duration-300">
+                    {title}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {item.description}
+                  <p className="text-sm text-stone-500 dark:text-stone-500 leading-relaxed">
+                    {desc}
                   </p>
                 </div>
               </div>
@@ -485,476 +268,115 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-      {/* ============================================
-          KENYA TESTIMONIALS & SUCCESS STORIES
-          ============================================ */}
-      <section
-        id="testimonials"
-        className="relative py-24 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-green-500/5 via-background to-background" />
 
-        {/* Floating Shapes */}
-        <div className="absolute top-20 left-10 w-64 h-64 bg-green-600/5 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-10 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl animate-float-delayed" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
-              <Users className="w-4 h-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                Success Stories
-              </span>
-            </div>
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
-              Real Kenyans Landing Jobs
-              <span className="block text-gradient bg-gradient-to-r from-green-600 to-emerald-600">
-                every single day
-              </span>
-            </h2>
-          </div>
-
-          {/* Testimonial Cards */}
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {[
-              {
-                quote:
-                  "I was applying to jobs randomly on LinkedIn and WhatsApp. JobTracker helped me organize everything. Got 3 job offers in 2 months!",
-                author: "Amina Hassan",
-                role: "Software Engineer",
-                company: "Safaricom",
-                avatar: "AH",
-                stars: 5,
-                location: "Nairobi",
-              },
-              {
-                quote:
-                  "As someone who wasn't tech-savvy, this made job hunting stress-free. The calendar reminders saved me from missing interviews!",
-                author: "David Kipchoge",
-                role: "Marketing Manager",
-                company: "Co-operative Bank",
-                avatar: "DK",
-                stars: 5,
-                location: "Nairobi",
-              },
-              {
-                quote:
-                  "Best free tool for job hunting in Kenya. I tracked 30+ applications and landed my dream role at a Nairobi tech startup.",
-                author: "Grace Wanjiru",
-                role: "Product Manager",
-                company: "Andela",
-                avatar: "GW",
-                stars: 5,
-                location: "Nairobi",
-              },
-            ].map((testimonial, index) => (
-              <div
-                key={index}
-                className="group glass-card-hover p-8 rounded-3xl border border-green-500/20">
-                {/* Stars */}
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.stars)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-5 h-5 fill-amber-400 text-amber-400"
-                    />
-                  ))}
-                </div>
-
-                {/* Quote */}
-                <p className="text-foreground/90 text-lg leading-relaxed mb-6">
-                  "{testimonial.quote}"
-                </p>
-
-                {/* Author */}
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center text-white font-bold text-sm">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-foreground">
-                      {testimonial.author}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {testimonial.role} @ {testimonial.company}
-                    </div>
-                    <div className="text-xs text-green-600 dark:text-green-400 font-medium mt-1">
-                      📍 {testimonial.location}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* ============================================
-          KENYA STATS SECTION
-          ============================================ */}
-      <section className="relative py-24 md:py-32 bg-gradient-to-r from-green-500/10 via-emerald-500/10 to-transparent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
-              By The Numbers
-              <span className="block text-gradient bg-gradient-to-r from-green-600 to-emerald-600">
-                Kenya's Job Market
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Real statistics from job seekers just like you
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              {
-                value: "3,500+",
-                label: "Kenyans Hired",
-                subtext: "Last 12 months",
-              },
-              {
-                value: "15K+",
-                label: "Jobs Tracked",
-                subtext: "Across all sectors",
-              },
-              {
-                value: "83%",
-                label: "Success Rate",
-                subtext: "Interview to offer",
-              },
-              {
-                value: "2.3x",
-                label: "Faster Hiring",
-                subtext: "vs. traditional methods",
-              },
-            ].map((stat, i) => (
-              <div
-                key={i}
-                className="text-center p-6 rounded-2xl bg-card border border-green-500/20">
-                <div className="text-3xl md:text-4xl font-bold text-gradient bg-gradient-to-r from-green-600 to-emerald-600 mb-2">
-                  {stat.value}
-                </div>
-                <div className="font-semibold text-foreground mb-1">
-                  {stat.label}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {stat.subtext}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* ============================================
-          FAQ SECTION (KENYA-FOCUSED)
-          ============================================ */}
-      <section className="relative py-24 md:py-32">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
-              <HelpCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                Got Questions?
-              </span>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
-              Frequently Asked{" "}
-              <span className="text-gradient bg-gradient-to-r from-green-600 to-emerald-600">
-                Questions
-              </span>
-            </h2>
-            <p className="text-muted-foreground">
-              Everything Kenyans need to know about job hunting with JobTracker.
-            </p>
-          </div>
-
-          <Accordion type="single" collapsible className="w-full space-y-4">
-            <AccordionItem
-              value="item-1"
-              className="glass-card px-6 rounded-2xl border border-green-500/20">
-              <AccordionTrigger className="text-lg font-medium hover:text-green-600 dark:hover:text-green-400 transition-colors py-6">
-                Is JobTracker really free? Will you charge later?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
-                Yes, completely free. Forever. We believe job hunting shouldn't
-                cost money. We're building premium features for teams, but the
-                core features you need will always be free for individual job
-                seekers.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem
-              value="item-2"
-              className="glass-card px-6 rounded-2xl border border-green-500/20">
-              <AccordionTrigger className="text-lg font-medium hover:text-green-600 dark:hover:text-green-400 transition-colors py-6">
-                How long does setup take?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
-                About 2-3 minutes. Create an account, add your first job, and
-                you're ready. Your password resets, you sync your calendar, and
-                you're off to the races.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem
-              value="item-3"
-              className="glass-card px-6 rounded-2xl border border-green-500/20">
-              <AccordionTrigger className="text-lg font-medium hover:text-green-600 dark:hover:text-green-400 transition-colors py-6">
-                Can I use this for jobs outside Kenya?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
-                Absolutely! While we built this for Kenya's job market, you can
-                track applications for any company, anywhere. From Nairobi
-                startups to international roles, we've got you covered.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem
-              value="item-4"
-              className="glass-card px-6 rounded-2xl border border-green-500/20">
-              <AccordionTrigger className="text-lg font-medium hover:text-green-600 dark:hover:text-green-400 transition-colors py-6">
-                What about my privacy and data?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
-                Your data is yours. Encrypted, secure, and never sold. We don't
-                share your information with recruiters or anyone else. No ads,
-                no tracking, no nonsense.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem
-              value="item-5"
-              className="glass-card px-6 rounded-2xl border border-green-500/20">
-              <AccordionTrigger className="text-lg font-medium hover:text-green-600 dark:hover:text-green-400 transition-colors py-6">
-                Do you support M-Pesa or local payment methods?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
-                Since JobTracker is free, no payment needed! But when we launch
-                premium features, we'll definitely support M-Pesa, Airtel Money,
-                and other local payment methods.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
-      </section>{" "}
-      {/* ============================================
-          FINAL CTA - KENYA FOCUSED
-          ============================================ */}
-      <section className="relative py-24 md:py-32 overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700 p-10 md:p-20">
-            {/* Background Effects */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-transparent opacity-30" />
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/20 rounded-full blur-3xl animate-float" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-orange-300/10 rounded-full blur-3xl animate-float-delayed" />
-
-            {/* Grid Pattern */}
+      {/* ─── FINAL CTA ────────────────────────────── */}
+      <section className="py-28 px-6">
+        <div className="max-w-2xl mx-auto">
+          <div
+            className="relative overflow-hidden rounded-3xl p-10 md:p-14 text-center
+            bg-teal-600 dark:bg-stone-900 border-0 dark:border dark:border-teal-800/50
+            transition-colors duration-300">
+            {/* Dot texture overlay */}
             <div
-              className="absolute inset-0 opacity-5"
+              className="absolute inset-0 opacity-[0.06] dark:opacity-[0.04] pointer-events-none"
               style={{
-                backgroundImage: `linear-gradient(white 1px, transparent 1px),
-                                  linear-gradient(90deg, white 1px, transparent 1px)`,
-                backgroundSize: "40px 40px",
+                backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
+                backgroundSize: "20px 20px",
               }}
             />
 
-            <div className="relative text-center">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 border border-white/30 backdrop-blur mb-8">
-                <Rocket className="w-4 h-4 text-white" />
-                <span className="text-sm font-medium text-white">
-                  Ready to transform your job search?
-                </span>
-              </div>
+            {/* Dark mode teal ambient glow */}
+            <div className="absolute inset-0 opacity-0 dark:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-teal-600/15 rounded-full blur-3xl" />
+            </div>
 
-              {/* Headline */}
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-                Your dream job is
-                <span className="block text-emerald-100 mt-2">
-                  just a few applications away
+            <div className="relative">
+              <h2
+                className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-5 leading-tight
+                text-white dark:text-stone-100 transition-colors duration-300">
+                Your next role is
+                <br />
+                <span className="text-teal-100 dark:text-teal-400 transition-colors duration-300">
+                  already out there.
                 </span>
               </h2>
 
-              {/* Description */}
-              <p className="text-lg md:text-xl text-emerald-50 mb-10 max-w-2xl mx-auto font-medium">
-                Join 3,500+ Kenyans who've already found success. Stop losing
-                track of applications and start landing interviews.
+              <p
+                className="mb-8 leading-relaxed max-w-md mx-auto
+                text-teal-100 dark:text-stone-400 transition-colors duration-300">
+                Stop letting opportunities slip through the cracks. Start
+                tracking with a system that actually works.
               </p>
 
-              {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                {/* Primary — inverted in light, teal in dark */}
                 <Link
                   href="/register"
-                  className={cn(
-                    buttonVariants({ size: "xl" }),
-                    "group bg-white text-green-600 hover:bg-emerald-50 shadow-2xl hover:shadow-green-600/30 rounded-2xl px-10 font-semibold transition-all",
-                  )}>
-                  <Rocket className="mr-2 w-5 h-5" />
-                  Start Tracking Free
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                    text-base font-semibold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0
+                    bg-white text-teal-700 hover:bg-teal-50 shadow-lg shadow-black/10
+                    dark:bg-teal-600 dark:text-white dark:hover:bg-teal-500 dark:shadow-teal-600/20">
+                  Get Started Free
+                  <ArrowUpRight className="w-4 h-4" />
                 </Link>
+                {/* Ghost */}
                 <Link
                   href="/login"
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "xl" }),
-                    "bg-transparent border-2 border-white/40 text-white hover:bg-white/10 hover:border-white/60 rounded-2xl px-10 font-semibold transition-all",
-                  )}>
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                    text-base font-semibold transition-all duration-200
+                    border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50
+                    dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600">
                   Sign In
                 </Link>
               </div>
 
-              {/* Trust indicators */}
-              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-emerald-50 font-medium">
-                <span className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-200" />
+              <div
+                className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 text-sm
+                text-teal-200/80 dark:text-stone-600 transition-colors duration-300">
+                <span className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5" />
                   Free forever
                 </span>
-                <span className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-emerald-200" />
-                  No credit card needed
+                <span className="flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5" />
+                  No card required
                 </span>
-                <span className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-emerald-200" />
-                  Setup in 2 minutes
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" />
+                  2-minute setup
                 </span>
               </div>
             </div>
           </div>
         </div>
       </section>
-      {/* ============================================
-          FOOTER - KENYA BRANDING
-          ============================================ */}
-      <footer className="relative py-16 border-t border-border/50 bg-gradient-to-b from-background to-green-500/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-            {/* Brand */}
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2.5 rounded-xl bg-gradient-to-br from-green-600 to-emerald-600">
-                  <Briefcase className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <span className="font-bold text-foreground text-lg block">
-                    JobTracker
-                  </span>
-                  <p className="text-xs text-muted-foreground">
-                    Your career companion
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Built for Kenya's job market. Forever free.
-              </p>
-            </div>
 
-            {/* Product */}
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Product</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li>
-                  <Link
-                    href="/dashboard"
-                    className="hover:text-foreground transition-colors">
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/features"
-                    className="hover:text-foreground transition-colors">
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/pricing"
-                    className="hover:text-foreground transition-colors">
-                    Pricing
-                  </Link>
-                </li>
-              </ul>
+      {/* ─── FOOTER ───────────────────────────────── */}
+      <footer className="border-t border-stone-200 dark:border-stone-800 py-10 px-6 transition-colors duration-300">
+        <div
+          className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4
+          text-sm text-stone-400 dark:text-stone-600 transition-colors duration-300">
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center
+              bg-teal-600 dark:bg-teal-500 transition-colors duration-300">
+              <Briefcase className="w-3.5 h-3.5 text-white dark:text-stone-950" />
             </div>
-
-            {/* Company */}
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Company</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li>
-                  <Link
-                    href="/about"
-                    className="hover:text-foreground transition-colors">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/contact"
-                    className="hover:text-foreground transition-colors">
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/blog"
-                    className="hover:text-foreground transition-colors">
-                    Blog
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Legal</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li>
-                  <Link
-                    href="/privacy"
-                    className="hover:text-foreground transition-colors">
-                    Privacy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/terms"
-                    className="hover:text-foreground transition-colors">
-                    Terms
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/cookies"
-                    className="hover:text-foreground transition-colors">
-                    Cookies
-                  </Link>
-                </li>
-              </ul>
-            </div>
+            <span className="font-semibold text-stone-600 dark:text-stone-400 transition-colors duration-300">
+              JobTracker
+            </span>
           </div>
-
-          {/* Bottom */}
-          <div className="border-t border-border/50 pt-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} JobTracker Kenya. Made with{" "}
-                <span className="text-red-500">❤️</span> for your career
-              </div>
-              <div className="flex items-center gap-6">
-                <Link
-                  href="https://twitter.com"
-                  className="text-muted-foreground hover:text-foreground transition-colors">
-                  Twitter
-                </Link>
-                <Link
-                  href="https://linkedin.com"
-                  className="text-muted-foreground hover:text-foreground transition-colors">
-                  LinkedIn
-                </Link>
-                <Link
-                  href="https://github.com"
-                  className="text-muted-foreground hover:text-foreground transition-colors">
-                  GitHub
-                </Link>
-              </div>
-            </div>
+          <div className="flex gap-6">
+            {["Privacy", "Terms", "Contact"].map((item) => (
+              <Link
+                key={item}
+                href={`/${item.toLowerCase()}`}
+                className="hover:text-stone-700 dark:hover:text-stone-300 transition-colors duration-200">
+                {item}
+              </Link>
+            ))}
           </div>
+          <span>© {new Date().getFullYear()} JobTracker</span>
         </div>
       </footer>
     </div>

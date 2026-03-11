@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/actions/auth";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Loader2, Eye, EyeOff, Check, ArrowRight } from "lucide-react";
 import { OnboardingLayout } from "@/components/OnboardingLayout";
@@ -27,20 +26,47 @@ export default function RegisterPage() {
     return score;
   })();
 
+  const strengthLabel =
+    strength <= 1
+      ? "Weak"
+      : strength <= 2
+        ? "Fair"
+        : strength <= 3
+          ? "Good"
+          : "Strong";
+
+  const strengthColor =
+    strength <= 1
+      ? "text-red-500"
+      : strength <= 2
+        ? "text-orange-500"
+        : strength <= 3
+          ? "text-teal-500"
+          : "text-teal-600 dark:text-teal-400";
+
+  const barColor = (level: number) =>
+    strength >= level
+      ? strength <= 1
+        ? "bg-red-400"
+        : strength <= 2
+          ? "bg-orange-400"
+          : "bg-teal-500"
+      : "bg-stone-200 dark:bg-stone-700";
+
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
     setError(null);
 
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirmPassword") as string;
+    const pw = formData.get("password") as string;
+    const confirm = formData.get("confirmPassword") as string;
 
-    if (password !== confirmPassword) {
+    if (pw !== confirm) {
       setError("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
-    if (password.length < 8) {
+    if (pw.length < 8) {
       setError("Password must be at least 8 characters");
       setIsLoading(false);
       return;
@@ -59,61 +85,76 @@ export default function RegisterPage() {
           1000,
         );
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       setError("Something went wrong. Please try again.");
       setIsLoading(false);
     }
   }
 
+  // ── SUCCESS STATE ──────────────────────────────
   if (success) {
     return (
       <OnboardingLayout
         step={2}
         totalSteps={2}
         title="Account Created!"
-        description="Verify your email to get started">
-        <div className="flex flex-col items-center justify-center gap-4 w-full max-w-sm">
-          <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
-            <Check className="w-8 h-8 text-green-500" />
+        description="One last step — verify your email">
+        <div className="flex flex-col items-center gap-5 w-full max-w-sm text-center">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center
+            bg-teal-50 dark:bg-teal-950/50">
+            <Check className="w-8 h-8 text-teal-600 dark:text-teal-400" />
           </div>
-          <p className="text-center text-muted-foreground">
-            We've sent you a verification email. Click the link to activate your
-            account.
+          <p className="text-stone-500 dark:text-stone-400 leading-relaxed">
+            We&apos;ve sent a verification link to your email. Click it to activate
+            your account and start tracking.
           </p>
         </div>
       </OnboardingLayout>
     );
   }
 
+  // ── REGISTER FORM ──────────────────────────────
   return (
     <OnboardingLayout
       step={1}
       totalSteps={2}
       title="Create Your Account"
-      description="Start organizing your job search in 2 minutes">
+      description="Start organising your job search in 2 minutes">
       <form action={handleSubmit} className="space-y-5 w-full max-w-sm">
+        {/* Error */}
         {error && (
-          <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm font-medium">
+          <div
+            className="p-4 rounded-xl border text-sm font-medium
+            bg-red-50 border-red-200 text-red-700
+            dark:bg-red-950/30 dark:border-red-800/50 dark:text-red-400">
             {error}
           </div>
         )}
 
         {/* Full Name */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Full Name</label>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-stone-700 dark:text-stone-300">
+            Full Name
+          </label>
           <Input
             id="name"
             name="name"
-            placeholder="John Doe"
+            placeholder="Jane Doe"
             required
             disabled={isLoading}
-            className="h-11"
+            className="h-11 rounded-xl border-stone-200 dark:border-stone-700
+              bg-white dark:bg-stone-900
+              focus:ring-teal-500 focus:border-teal-500"
           />
         </div>
 
         {/* Email */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Email Address</label>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-stone-700 dark:text-stone-300">
+            Email Address
+          </label>
           <Input
             id="email"
             name="email"
@@ -121,16 +162,20 @@ export default function RegisterPage() {
             placeholder="you@example.com"
             required
             disabled={isLoading}
-            className="h-11"
+            className="h-11 rounded-xl border-stone-200 dark:border-stone-700
+              bg-white dark:bg-stone-900
+              focus:ring-teal-500 focus:border-teal-500"
           />
-          <p className="text-xs text-muted-foreground">
-            We'll send a verification link to this email
+          <p className="text-xs text-stone-400 dark:text-stone-600">
+            We&apos;ll send a verification link to this address
           </p>
         </div>
 
         {/* Password */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Password</label>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-stone-700 dark:text-stone-300">
+            Password
+          </label>
           <div className="relative">
             <Input
               id="password"
@@ -141,12 +186,15 @@ export default function RegisterPage() {
               disabled={isLoading}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-11 pr-10"
+              className="h-11 pr-10 rounded-xl border-stone-200 dark:border-stone-700
+                bg-white dark:bg-stone-900
+                focus:ring-teal-500 focus:border-teal-500"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors
+                text-stone-400 hover:text-stone-700 dark:hover:text-stone-200"
               tabIndex={-1}>
               {showPassword ? (
                 <EyeOff className="w-4 h-4" />
@@ -156,38 +204,21 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {/* Password Strength */}
+          {/* Strength meter */}
           {password && (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex gap-1 h-1">
                 {[1, 2, 3, 4].map((level) => (
                   <div
                     key={level}
-                    className={`flex-1 rounded-full transition-all ${
-                      strength >= level ? "bg-green-500" : "bg-muted"
-                    }`}
+                    className={`flex-1 rounded-full transition-all duration-300 ${barColor(level)}`}
                   />
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-stone-400 dark:text-stone-600">
                 Strength:{" "}
-                <span
-                  className={
-                    strength >= 4
-                      ? "text-green-500 font-medium"
-                      : strength >= 3
-                        ? "text-blue-500 font-medium"
-                        : strength >= 2
-                          ? "text-yellow-500 font-medium"
-                          : "text-red-500 font-medium"
-                  }>
-                  {strength <= 1
-                    ? "Weak"
-                    : strength <= 2
-                      ? "Fair"
-                      : strength <= 3
-                        ? "Good"
-                        : "Strong"}
+                <span className={`font-semibold ${strengthColor}`}>
+                  {strengthLabel}
                 </span>
               </p>
             </div>
@@ -195,8 +226,10 @@ export default function RegisterPage() {
         </div>
 
         {/* Confirm Password */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Confirm Password</label>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-stone-700 dark:text-stone-300">
+            Confirm Password
+          </label>
           <div className="relative">
             <Input
               id="confirmPassword"
@@ -205,12 +238,15 @@ export default function RegisterPage() {
               placeholder="••••••••"
               required
               disabled={isLoading}
-              className="h-11 pr-10"
+              className="h-11 pr-10 rounded-xl border-stone-200 dark:border-stone-700
+                bg-white dark:bg-stone-900
+                focus:ring-teal-500 focus:border-teal-500"
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors
+                text-stone-400 hover:text-stone-700 dark:hover:text-stone-200"
               tabIndex={-1}>
               {showConfirmPassword ? (
                 <EyeOff className="w-4 h-4" />
@@ -221,11 +257,15 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Submit Button */}
-        <Button
+        {/* Submit */}
+        <button
           type="submit"
           disabled={isLoading}
-          className="w-full h-11 bg-gradient-brand text-white font-semibold gap-2 mt-6">
+          className="w-full h-11 rounded-xl flex items-center justify-center gap-2
+            text-sm font-semibold transition-all duration-200 mt-2
+            bg-teal-600 text-white hover:bg-teal-700 shadow-md shadow-teal-600/20
+            dark:bg-teal-500 dark:text-stone-950 dark:hover:bg-teal-400 dark:shadow-teal-500/15
+            disabled:opacity-60 disabled:cursor-not-allowed">
           {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -237,22 +277,27 @@ export default function RegisterPage() {
               <ArrowRight className="w-4 h-4" />
             </>
           )}
-        </Button>
+        </button>
 
         {/* Divider */}
-        <div className="relative h-px bg-border my-6">
-          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-background px-2 text-xs text-muted-foreground">
+        <div className="relative flex items-center gap-3 py-2">
+          <div className="flex-1 h-px bg-stone-200 dark:bg-stone-800" />
+          <span className="text-xs text-stone-400 dark:text-stone-600 shrink-0">
             Already have an account?
           </span>
+          <div className="flex-1 h-px bg-stone-200 dark:bg-stone-800" />
         </div>
 
-        {/* Sign In Link */}
-        <Button asChild variant="outline" className="w-full h-11 border-2">
-          <Link href="/login">
-            Sign In Instead
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Link>
-        </Button>
+        {/* Login link */}
+        <Link
+          href="/login"
+          className="w-full h-11 rounded-xl flex items-center justify-center gap-2
+            text-sm font-semibold transition-all duration-200 border-2
+            border-stone-200 text-stone-700 hover:bg-stone-50 hover:border-stone-300
+            dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600">
+          Sign In Instead
+          <ArrowRight className="w-4 h-4" />
+        </Link>
       </form>
     </OnboardingLayout>
   );
