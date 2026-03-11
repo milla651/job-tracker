@@ -172,8 +172,9 @@ export function NavigationHeader({ session }: NavigationHeaderProps) {
   // ── DASHBOARD ─────────────────────────────────
   if (isDashboard && session) {
     const dashNav = [
-      { label: "Pipeline", href: "/dashboard" },
-      { label: "Activity", href: "/dashboard/tracker" },
+      { label: "Explore", href: "/dashboard/explore" },
+      { label: "Activity", href: "/dashboard/activity" },
+      { label: "Pipeline", href: "/dashboard/pipeline" },
       { label: "Settings", href: "/dashboard/settings" },
     ];
 
@@ -200,13 +201,6 @@ export function NavigationHeader({ session }: NavigationHeaderProps) {
             </nav>
 
             <div className="flex items-center gap-1">
-              <Link
-                href="/jobs"
-                className="hidden sm:flex px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors duration-200
-                  border-stone-200 text-stone-600 hover:bg-stone-50
-                  dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800">
-                Explore Jobs
-              </Link>
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
                 className="md:hidden p-2 rounded-lg transition-colors duration-200

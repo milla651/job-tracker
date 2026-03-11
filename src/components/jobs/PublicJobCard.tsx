@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Building2, Timer, Coins, ArrowUpRight, Sparkles, Check, X } from "lucide-react";
 import { ScrapedJob } from "@/lib/mock-jobs";
-import { formatSalary } from "@/lib/utils";
+// import { formatSalary } from "@/lib/utils";
 import { savePublicJob } from "@/app/actions/public-jobs";
 import { toast } from "sonner";
 import { useState, useTransition } from "react";
