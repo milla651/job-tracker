@@ -27,7 +27,8 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
+import { Loader2 } from "lucide-react";
 
 // Simple debounce hook if not exists
 function useDebounceValue<T>(value: T, delay: number): T {
@@ -192,131 +193,39 @@ export function JobListing({
                     )}
                 </div>
 
-                <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
-                    {/* Sort Toggle */}
-                    <Popover open={isSortOpen} onOpenChange={setIsSortOpen}>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className={`gap-2 border-border/50 ${sortOrder !== "date-desc" ? "bg-primary/10 border-primary/20 text-primary" : "bg-background/50"
-                                    }`}
-                            >
-                                <ArrowUpDown className="w-4 h-4" />
-                                <span className="hidden sm:inline">
-                                    {sortOptions.find((o) => o.value === sortOrder)?.label}
-                                </span>
-                                <ChevronDown className="w-3 h-3 opacity-50" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent align="end" className="w-48 p-1">
-                            <div className="grid grid-cols-1 gap-0.5">
-                                {sortOptions.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        onClick={() => {
-                                            setSortOrder(option.value);
-                                            setIsSortOpen(false);
-                                        }}
-                                        className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${sortOrder === option.value
-                                            ? "bg-primary/10 text-primary font-medium"
-                                            : "hover:bg-muted"
-                                            }`}
-                                    >
-                                        {option.label}
-                                        {sortOrder === option.value && <Check className="w-3 h-3" />}
-                                    </button>
-                                ))}
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                    {/* Status Select */}
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => {
+                            setStatusFilter(e.target.value as JobStatus | "ALL");
+                        }}
+                        className="h-10 px-3 rounded-lg bg-background border border-border/50 focus:border-primary text-sm focus:outline-none focus:ring-1 focus:ring-primary shadow-sm appearance-none cursor-pointer text-foreground min-w-[140px]"
+                    >
+                        <option value="ALL">All Statuses</option>
+                        {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+                            <option key={key} value={key}>
+                                {config.label}
+                            </option>
+                        ))}
+                    </select>
 
-                    {/* Status Filter Toggle */}
-                    <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className={`gap-2 border-border/50 ${statusFilter !== "ALL" || locationFilter || minSalaryFilter || maxSalaryFilter ? "bg-primary/10 border-primary/20 text-primary" : "bg-background/50"
-                                    }`}
-                            >
-                                <Filter className="w-4 h-4" />
-                                <span>Filters</span>
-                                {(statusFilter !== "ALL" || locationFilter || minSalaryFilter || maxSalaryFilter) && (
-                                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                                        !
-                                    </span>
-                                )}
-                                <ChevronDown className="w-3 h-3 opacity-50" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent align="end" className="w-72 p-4 flex flex-col gap-4">
-                            <div className="space-y-2">
-                                <h4 className="font-medium text-sm text-foreground">Location</h4>
-                                <Input
-                                    placeholder="Filter by location..."
-                                    value={locationFilter}
-                                    onChange={(e) => setLocationFilter(e.target.value)}
-                                    className="h-8 bg-background/50"
-                                />
-                            </div>
+                    {/* Sort Select */}
+                    <select
+                        value={sortOrder}
+                        onChange={(e) => {
+                            setSortOrder(e.target.value);
+                        }}
+                        className="h-10 px-3 rounded-lg bg-background border border-border/50 focus:border-primary text-sm focus:outline-none focus:ring-1 focus:ring-primary shadow-sm appearance-none cursor-pointer text-foreground min-w-[150px]"
+                    >
+                        {sortOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
 
-                            <div className="space-y-2">
-                                <h4 className="font-medium text-sm text-foreground">Salary Range</h4>
-                                <div className="flex gap-2">
-                                    <Input
-                                        placeholder="Min"
-                                        type="number"
-                                        value={minSalaryFilter}
-                                        onChange={(e) => setMinSalaryFilter(e.target.value)}
-                                        className="h-8 bg-background/50"
-                                    />
-                                    <Input
-                                        placeholder="Max"
-                                        type="number"
-                                        value={maxSalaryFilter}
-                                        onChange={(e) => setMaxSalaryFilter(e.target.value)}
-                                        className="h-8 bg-background/50"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <h4 className="font-medium text-sm text-foreground">Status</h4>
-                                <div className="grid grid-cols-1 gap-1 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
-                                    <button
-                                        onClick={() => {
-                                            setStatusFilter("ALL");
-                                        }}
-                                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${statusFilter === "ALL"
-                                            ? "bg-primary/10 text-primary"
-                                            : "hover:bg-muted"
-                                            }`}
-                                    >
-                                        <LayoutGrid className="w-4 h-4 opacity-70" />
-                                        All Statuses
-                                        {statusFilter === "ALL" && <Check className="w-3 h-3 ml-auto" />}
-                                    </button>
-                                    {Object.entries(STATUS_CONFIG).map(([key, config]) => (
-                                        <button
-                                            key={key}
-                                            onClick={() => {
-                                                setStatusFilter(key as JobStatus);
-                                            }}
-                                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${statusFilter === key
-                                                ? "bg-primary/10 text-primary"
-                                                : "hover:bg-muted"
-                                                }`}
-                                        >
-                                            <span className="text-base">{config.icon}</span>
-                                            {config.label}
-                                            {statusFilter === key && <Check className="w-3 h-3 ml-auto" />}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-
-                    <div className="h-8 w-px bg-border/50 mx-2 hidden md:block" />
+                    <div className="h-8 w-px bg-border/50 mx-2 hidden md:block self-center" />
 
                     {/* View Toggle */}
                     <div className="flex bg-muted/50 p-1 rounded-lg border border-border/50">
@@ -342,20 +251,19 @@ export function JobListing({
                 </div>
             </div>
 
-            {/* Results Count & Active Filters */}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground px-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground px-1 fade-in">
                 <span>
                     Showing <strong>{initialJobs.length}</strong> of <strong>{total}</strong> jobs
                 </span>
                 {(statusFilter !== "ALL" || searchValue) && (
                     <button
                         onClick={clearFilters}
-                        className="text-primary hover:underline ml-2 text-xs"
+                        className="text-destructive hover:bg-destructive/10 px-2 py-1 flex items-center gap-1 rounded-md transition-colors text-xs font-semibold ml-2 border border-transparent hover:border-destructive/20"
                     >
-                        Clear filters
+                        <X className="w-3 h-3" /> Clear filters
                     </button>
                 )}
-                {isPending && <span className="animate-pulse ml-auto text-xs">Updating...</span>}
+                {isPending && <span className="flex items-center gap-2 ml-auto text-xs font-medium text-primary"><Loader2 className="w-3 h-3 animate-spin"/> Updating...</span>}
             </div>
 
             {/* Grid / List View */}

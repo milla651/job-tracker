@@ -12,6 +12,7 @@ import {
   Filter,
 } from "lucide-react";
 import { SmartNudges } from "@/components/dashboard/SmartNudges";
+import { ActivitySidebar } from "./components/ActivitySidebar";
 import { JobStatus } from "@prisma/client";
 
 export default async function ActivityPage(props: {
@@ -119,128 +120,15 @@ export default async function ActivityPage(props: {
           </div>
         </div>
 
-        {/* Smart Nudges */}
-        <SmartNudges />
+        {/* Layout Grid (Sidebar + Main Content) */}
+        <div className="flex flex-col md:flex-row gap-6 mt-8">
+          {/* Left Sidebar (Stats + Nudges) */}
+          <aside className="w-full md:w-64 lg:w-72 shrink-0 md:sticky md:top-24 md:self-start md:max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar pb-4 space-y-6">
+             <ActivitySidebar total={total} statsData={statsData} />
+          </aside>
 
-        {/* Enhanced Stats Grid with better spacing and hierarchy */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          {/* Primary Stats */}
-          <div className="glass-card-hover p-6 lg:col-span-2 bg-gradient-to-br from-blue-500/5 to-transparent border border-blue-200 dark:border-blue-800">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground font-medium mb-1">
-                  Total Applications
-                </p>
-                <p className="text-4xl font-bold text-foreground">
-                  {totalApplications}
-                </p>
-                <div className="flex gap-4 mt-4">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Active</p>
-                    <p className="text-lg font-semibold text-emerald-600 dark:text-emerald-400">
-                      {activeCount}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Archived</p>
-                    <p className="text-lg font-semibold text-slate-500 dark:text-slate-400">
-                      {archivedCount}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-200 dark:border-blue-800">
-                <Briefcase className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-          </div>
-
-          {/* Success Rate */}
-          <div className="glass-card-hover p-6 bg-gradient-to-br from-emerald-500/5 to-transparent border border-emerald-200 dark:border-emerald-800">
-            <div className="flex flex-col h-full justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground font-medium mb-1">
-                  Success Rate
-                </p>
-                <p className="text-3xl font-bold text-foreground">
-                  {successRate}%
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {statusCounts.ACCEPTED || 0} accepted
-                </p>
-              </div>
-              <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400 mt-auto" />
-            </div>
-          </div>
-
-          {/* Interview Progress */}
-          <div className="glass-card-hover p-6 bg-gradient-to-br from-orange-500/5 to-transparent border border-orange-200 dark:border-orange-800">
-            <div className="flex flex-col h-full justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground font-medium mb-1">
-                  Interview Rate
-                </p>
-                <p className="text-3xl font-bold text-foreground">
-                  {interviewRate}%
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {interviewCount} interviews
-                </p>
-              </div>
-              <TrendingUp className="w-6 h-6 text-orange-600 dark:text-orange-400 mt-auto" />
-            </div>
-          </div>
-
-          {/* Active */}
-          <div className="glass-card-hover p-6 bg-gradient-to-br from-teal-500/5 to-transparent border border-teal-200 dark:border-teal-800">
-            <div className="flex flex-col h-full justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground font-medium mb-1">
-                  In Progress
-                </p>
-                <p className="text-3xl font-bold text-foreground">
-                  {activeCount}
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Awaiting updates
-                </p>
-              </div>
-              <Clock className="w-6 h-6 text-teal-600 dark:text-teal-400 mt-auto" />
-            </div>
-          </div>
-        </div>
-
-        {/* Status Breakdown */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">
-              Pipeline Status
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              {total} applications found
-            </p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {statsData &&
-              statsData.stats.map(
-                (stat: { status: JobStatus; _count: { status: number } }) => {
-                  const config = STATUS_CONFIG[stat.status];
-                  return (
-                    <div
-                      key={stat.status}
-                      className="glass-card-hover p-4 text-center hover:shadow-md transition-shadow rounded-xl border border-border/50">
-                      <p className="text-2xl font-bold text-foreground">
-                        {stat._count.status}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
-                        {config.label}
-                      </p>
-                    </div>
-                  );
-                },
-              )}
-          </div>
-        </div>
+          {/* Main Content (Job Listing) */}
+          <main className="flex-1 min-w-0">
 
         {/* Jobs Listing with Advanced Filters */}
         <div>
@@ -258,6 +146,9 @@ export default async function ActivityPage(props: {
               currentPage={page}
             />
           </div>
+        </div>
+
+          </main>
         </div>
       </div>
     </div>
