@@ -1,19 +1,21 @@
-// import { Suspense } from "react";
 import { getPaginatedJobs } from "@/lib/mock-jobs";
 import { PublicJobCard } from "@/components/jobs/PublicJobCard";
 import {
-  Sparkles,
   Search,
   Briefcase,
   ChevronRight,
+  ChevronLeft,
   Filter,
   X,
+  MapPin,
 } from "lucide-react";
+import { ExploreFilters } from "./components/ExploreFilters";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { JobStatus } from "@prisma/client";
+import Link from "next/link";
 
 export const metadata = {
   title: "Explore Jobs | JobTracker",
@@ -25,6 +27,10 @@ export default async function ExplorePage(props: {
 }) {
   const searchParams = await props.searchParams;
   const query = (searchParams?.query as string) || "";
+  const location = (searchParams?.location as string) || "";
+  const time = (searchParams?.time as string) || "any";
+  const category = (searchParams?.category as string) || "any";
+  const source = (searchParams?.source as string) || "any";
   const page = parseInt(searchParams?.page as string) || 1;
   const pageSize = 20; // Jobs per page
   const showDiscarded = searchParams?.discarded === "true";
@@ -34,7 +40,7 @@ export default async function ExplorePage(props: {
     jobs: allJobs,
     total,
     totalPages,
-  } = await getPaginatedJobs(page, pageSize, query);
+  } = await getPaginatedJobs(page, pageSize, query, category, time, location, source);
   const session = await auth();
 
   // Create a map of user's existing applications
@@ -85,196 +91,138 @@ export default async function ExplorePage(props: {
   ).length;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 relative overflow-hidden">
+    <div className="min-h-screen pt-24 pb-12 relative overflow-hidden flex flex-col">
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark opacity-50" />
-      <div className="absolute inset-0 bg-aurora opacity-30" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float-delayed" />
+      <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark opacity-50 pointer-events-none" />
+      <div className="absolute inset-0 bg-aurora opacity-30 pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float-delayed pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-12 fade-in-up">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-6 border border-primary/20">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-muted-foreground">
-              {total} matching opportunities
-            </span>
-          </div>
-
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Explore <span className="text-gradient">Job Opportunities</span>
-          </h1>
-
-          <p className="text-lg text-muted-foreground mb-8">
-            Browse hand-picked opportunities from top tech companies. Save them
-            to your dashboard and track your progress.
-          </p>
-
-          {/* Enhanced Search Bar */}
-          <form
-            action="/dashboard/explore"
-            className="relative max-w-lg mx-auto flex gap-2 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                name="query"
-                defaultValue={query}
-                placeholder="Search roles, companies, keywords..."
-                className="pl-10 h-12 rounded-xl bg-background/50 backdrop-blur border-border/50 focus:bg-background transition-all"
-              />
-            </div>
-            <Button
-              type="submit"
-              size="lg"
-              className="h-12 rounded-xl px-6 bg-gradient-brand shadow-lg hover:shadow-primary/25">
-              Search
-            </Button>
-          </form>
-
-          {/* Filter Status Bar */}
-          <div className="flex flex-wrap justify-center items-center gap-2 text-sm">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 border border-border/50">
-              <Filter className="w-4 h-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Filters:</span>
-            </div>
-
-            <form action="/dashboard/explore" className="inline">
-              {query && <input type="hidden" name="query" value={query} />}
-              {showDiscarded ? (
-                <Button
-                  variant="outline"
-                  className="rounded-lg gap-2 border-primary/20 bg-primary/5 text-primary h-8 px-3 text-sm">
-                  <Briefcase className="w-4 h-4" />
-                  Active Jobs
-                </Button>
-              ) : (
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded-lg hover:bg-muted/50">
-                  All Jobs
-                </button>
-              )}
-            </form>
-
-            <div className="w-px h-5 bg-border/50" />
-
-            <form action="/dashboard/explore" className="inline">
-              {query && <input type="hidden" name="query" value={query} />}
-              <input type="hidden" name="discarded" value="true" />
-              {showDiscarded ? (
-                <Button
-                  variant="outline"
-                  className="rounded-lg gap-1.5 border-destructive/20 bg-destructive/5 text-destructive h-8 px-3 text-sm">
-                  <X className="w-4 h-4" />
-                  Discarded ({total})
-                </Button>
-              ) : (
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-destructive transition-colors px-2 py-1 rounded-lg hover:bg-muted/50">
-                  Show Discarded
-                </button>
-              )}
-            </form>
-          </div>
-        </div>
-
-        {/* Quick Stats Bar */}
-        {session && (
-          <div className="grid grid-cols-3 gap-3 mb-8 md:grid-cols-3">
-            <div className="glass-card p-4 rounded-lg text-center border border-border/50">
-              <p className="text-2xl font-bold text-foreground">{total}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Available Jobs
-              </p>
-            </div>
-            <div className="glass-card p-4 rounded-lg text-center border border-border/50">
-              <p className="text-2xl font-bold text-foreground">{savedCount}</p>
-              <p className="text-xs text-muted-foreground mt-1">Saved</p>
-            </div>
-            <div className="glass-card p-4 rounded-lg text-center border border-border/50">
-              <p className="text-2xl font-bold text-foreground">
-                {appliedCount}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">Applied</p>
-            </div>
-          </div>
-        )}
-
-        {/* Jobs Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 fade-in-up fade-in-up-delay-2">
-          {filteredJobs.length > 0 ? (
-            filteredJobs.map((job) => {
-              const key = `${job.company}-${job.title}`;
-              const initialStatus = userJobStatus.get(key) || "IDLE";
-
-              return (
-                <PublicJobCard
-                  key={job.id}
-                  job={job}
-                  initialStatus={initialStatus}
-                />
-              );
-            })
-          ) : (
-            <div className="col-span-full text-center py-20">
-              <div className="inline-flex p-4 rounded-full bg-muted/50 mb-4">
-                <Briefcase className="w-8 h-8" />
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-grow flex flex-col md:flex-row gap-8">
+        
+        {/* Sidebar / Aside Filters & Stats */}
+        <aside className="w-full md:w-64 lg:w-72 flex-shrink-0 space-y-6 fade-in-up md:sticky md:top-24 md:self-start md:max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar pb-4">
+          {session && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="glass-card flex flex-col justify-center items-center py-4 rounded-xl border border-border/50 bg-background/50 shadow-sm">
+                <p className="text-2xl font-bold tracking-tight text-foreground">{total}</p>
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-1 text-center">Found Jobs</p>
               </div>
-              <p className="text-lg font-medium text-foreground mb-1">
-                No jobs found
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {showDiscarded
-                  ? "Your discarded list is empty!"
-                  : "Try adjusting your search or filters"}
-              </p>
+              <div className="glass-card flex flex-col justify-center items-center py-4 rounded-xl border border-border/50 bg-background/50 shadow-sm">
+                <p className="text-2xl font-bold tracking-tight text-foreground">{savedCount}</p>
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-1 text-center">Saved</p>
+              </div>
+              <div className="glass-card flex flex-col justify-center items-center py-4 rounded-xl border border-border/50 bg-background/50 shadow-sm col-span-2">
+                <p className="text-2xl font-bold tracking-tight text-foreground">{appliedCount}</p>
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-1 text-center">Applied Apps</p>
+              </div>
             </div>
           )}
-        </div>
 
-        {/* Pagination Controls */}
-        {filteredJobs.length > 0 && totalPages > 1 && (
-          <div className="flex items-center justify-center gap-4 mt-12 fade-in-up fade-in-up-delay-3">
-            <form action="/dashboard/explore" className="contents">
-              {query && <input type="hidden" name="query" value={query} />}
-              {showDiscarded && (
-                <input type="hidden" name="discarded" value="true" />
-              )}
-              <input type="hidden" name="page" value={Math.max(1, page - 1)} />
-              <Button
-                type="submit"
-                variant="outline"
-                disabled={page <= 1}
-                className="px-4 py-2 rounded-lg">
-                ← Previous
-              </Button>
-            </form>
+          <ExploreFilters />
+        </aside>
 
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">{page}</span>
-              <span>/</span>
-              <span>{totalPages}</span>
-              <span className="text-xs ml-2">({total} total)</span>
+        {/* Main Content (Jobs list) */}
+        <main className="flex-1 space-y-6 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 fade-in-up">
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                Opportunities
+                <span className="inline-flex items-center justify-center px-2.5 py-0.5 text-sm font-semibold rounded-full bg-primary/10 text-primary border border-primary/20">
+                  {total}
+                </span>
+              </h1>
+              <p className="text-muted-foreground text-sm lg:text-base mt-1.5 flex items-center gap-2">
+                <Briefcase className="w-4 h-4" /> Keep track of your job pipeline from anywhere.
+              </p>
             </div>
-
-            <form action="/dashboard/explore" className="contents">
-              {query && <input type="hidden" name="query" value={query} />}
-              {showDiscarded && (
-                <input type="hidden" name="discarded" value="true" />
-              )}
-              <input type="hidden" name="page" value={page + 1} />
-              <Button
-                type="submit"
-                variant="outline"
-                disabled={page >= totalPages}
-                className="px-4 py-2 rounded-lg gap-2">
-                Next <ChevronRight className="w-4 h-4" />
-              </Button>
-            </form>
+            {(query || location || time !== "any" || category !== "any" || source !== "any" || showDiscarded) ? (
+              <Link href="/dashboard/explore" className="text-sm text-destructive hover:bg-destructive/10 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 font-medium border border-transparent hover:border-destructive/20" prefetch={false}>
+                <X className="w-3.5 h-3.5" /> Clear filters
+              </Link>
+            ) : null}
           </div>
-        )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 fade-in-up fade-in-up-delay-2">
+            {filteredJobs.length > 0 ? (
+              filteredJobs.map((job) => {
+                const key = `${job.company}-${job.title}`;
+                const initialStatus = userJobStatus.get(key) || "IDLE";
+                return (
+                  <PublicJobCard
+                    key={job.id}
+                    job={job}
+                    initialStatus={initialStatus}
+                  />
+                );
+              })
+            ) : (
+              <div className="col-span-full text-center py-24 glass-card rounded-2xl border border-border/50 shadow-sm flex flex-col items-center justify-center">
+                <div className="inline-flex p-5 rounded-full bg-muted/50 mb-4 ring-1 ring-border">
+                  <Search className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <p className="text-xl font-semibold text-foreground mb-1">
+                  No jobs found
+                </p>
+                <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                  {showDiscarded
+                    ? "Your discarded list is empty. You haven't hidden any jobs yet."
+                    : "Try adjusting your search query, or checking a different category or time posted."}
+                </p>
+                {(query || location || category !== "any" || time !== "any" || source !== "any" || showDiscarded) ? (
+                  <Button variant="outline" className="mt-6 shadow-sm rounded-lg" asChild>
+                    <Link href="/dashboard/explore" prefetch={false}>Clear all filters</Link>
+                  </Button>
+                ) : null}
+              </div>
+            )}
+          </div>
+
+          {/* Pagination Controls */}
+          {filteredJobs.length > 0 && totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 py-8 fade-in-up fade-in-up-delay-3">
+              <form action="/dashboard/explore" className="contents">
+                {query && <input type="hidden" name="query" value={query} />}
+                {location && <input type="hidden" name="location" value={location} />}
+                {time !== "any" && <input type="hidden" name="time" value={time} />}
+                {category !== "any" && <input type="hidden" name="category" value={category} />}
+                {source !== "any" && <input type="hidden" name="source" value={source} />}
+                {showDiscarded && <input type="hidden" name="discarded" value="true" />}
+                <input type="hidden" name="page" value={Math.max(1, page - 1)} />
+                <Button
+                  type="submit"
+                  variant="outline"
+                  disabled={page <= 1}
+                  className="px-4 py-2 rounded-xl gap-2 font-medium shadow-sm hover:bg-muted/50">
+                  <ChevronLeft className="w-4 h-4" /> Previous
+                </Button>
+              </form>
+
+              <div className="flex items-center gap-2 text-sm text-muted-foreground px-4 py-2 bg-background/50 backdrop-blur rounded-xl border border-border/50 shadow-sm">
+                <span className="font-semibold text-foreground">{page}</span>
+                <span>of</span>
+                <span className="font-semibold text-foreground">{totalPages}</span>
+              </div>
+
+              <form action="/dashboard/explore" className="contents">
+                {query && <input type="hidden" name="query" value={query} />}
+                {location && <input type="hidden" name="location" value={location} />}
+                {time !== "any" && <input type="hidden" name="time" value={time} />}
+                {category !== "any" && <input type="hidden" name="category" value={category} />}
+                {source !== "any" && <input type="hidden" name="source" value={source} />}
+                {showDiscarded && <input type="hidden" name="discarded" value="true" />}
+                <input type="hidden" name="page" value={page + 1} />
+                <Button
+                  type="submit"
+                  variant="outline"
+                  disabled={page >= totalPages}
+                  className="px-4 py-2 rounded-xl gap-2 font-medium shadow-sm hover:bg-muted/50">
+                  Next <ChevronRight className="w-4 h-4" />
+                </Button>
+              </form>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );

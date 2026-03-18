@@ -81,6 +81,10 @@ async function getPaginatedJobs(
   page: number = 1,
   pageSize: number = 20,
   query?: string,
+  category?: string,
+  time?: string,
+  location?: string,
+  source?: string
 ): Promise<{
   jobs: ScrapedJob[];
   total: number;
@@ -90,11 +94,53 @@ async function getPaginatedJobs(
 }> {
   const allJobs = await loadAllJobs();
 
-  // Filter by search query
   let filtered = allJobs;
+
+  // Filter by time
+  if (time && time !== "any") {
+    const now = new Date();
+    filtered = filtered.filter((job) => {
+      const jobDate = new Date(job.postedAt);
+      if (isNaN(jobDate.getTime())) return true;
+      const diffDays = (now.getTime() - jobDate.getTime()) / (1000 * 3600 * 24);
+      if (time === "today") return diffDays <= 1;
+      if (time === "week") return diffDays <= 7;
+      if (time === "month") return diffDays <= 30;
+      return true;
+    });
+  }
+
+  // Filter by location
+  if (location && location.trim() !== "") {
+    const lowerLocation = location.toLowerCase();
+    filtered = filtered.filter((job) =>
+      job.location.toLowerCase().includes(lowerLocation)
+    );
+  }
+
+  // Filter by source
+  if (source && source !== "any") {
+    const lowerSource = source.toLowerCase();
+    filtered = filtered.filter((job) => {
+      const jobSource = (job.source || "Direct").toLowerCase();
+      return jobSource.includes(lowerSource);
+    });
+  }
+
+  // Filter by category
+  if (category && category !== "any") {
+    filtered = filtered.filter(
+      (job) =>
+        job.type.toLowerCase() === category.toLowerCase() ||
+        job.tags?.some((tag) => tag.toLowerCase() === category.toLowerCase()) ||
+        job.source?.toLowerCase() === category.toLowerCase()
+    );
+  }
+
+  // Filter by search query
   if (query) {
     const lowerQuery = query.toLowerCase();
-    filtered = allJobs.filter(
+    filtered = filtered.filter(
       (job) =>
         job.title.toLowerCase().includes(lowerQuery) ||
         job.company.toLowerCase().includes(lowerQuery) ||

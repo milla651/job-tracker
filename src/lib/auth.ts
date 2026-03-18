@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+const nextAuthResult = NextAuth({
   secret: process.env.NEXTAUTH_SECRET || "development-secret-please-change-in-production",
   providers: [
     Credentials({
@@ -99,3 +99,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
+
+export const { handlers, signIn, signOut } = nextAuthResult;
+
+export const auth: typeof nextAuthResult.auth = (...args: any[]) => {
+  const result = (nextAuthResult.auth as any)(...args);
+  if (result && typeof result.catch === "function") {
+    return result.catch((error: any) => {
+      if (error?.name === "JWTSessionError" || error?.message?.includes("JWTSessionError")) {
+        console.warn("JWTSessionError caught, returning null session");
+        return null;
+      }
+      throw error;
+    });
+  }
+  return result;
+};

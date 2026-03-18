@@ -72,40 +72,46 @@ export function PublicJobCard({ job, initialStatus = 'IDLE', onDiscard }: Public
                 </Button>
             </div>
 
-            <div className="p-6 flex flex-col h-full gap-4">
+            <div className="p-6 flex flex-col h-full gap-4 max-w-full">
                 {/* Header */}
-                <div className="flex justify-between items-start gap-4 pr-6">
-                    <div className="space-y-1">
-                        <h3 className="font-semibold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                <div className="flex justify-between items-start gap-4 pr-6 w-full relative">
+                    <div className="space-y-1 min-w-0 flex-1 pr-16">
+                        <h3 className="font-semibold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2 break-all text-wrap">
                             {job.title}
                         </h3>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                            <Building2 className="w-4 h-4" />
-                            <span className="font-medium text-sm">{job.company}</span>
+                        <div className="flex items-center gap-2 text-muted-foreground w-full">
+                            <Building2 className="w-4 h-4 shrink-0" />
+                            <span className="font-medium text-sm truncate">{job.company}</span>
                         </div>
+                    </div>
+                    {/* Date Badge */}
+                    <div className="absolute top-0 right-0 h-full hidden sm:block">
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 bg-muted/40 px-2 py-1 rounded-md whitespace-nowrap">
+                            {new Date(job.postedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        </span>
                     </div>
                 </div>
 
                 {/* Details */}
-                <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="space-y-3 min-w-0 w-full overflow-hidden">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground w-full">
                         <MapPin className="w-4 h-4 shrink-0" />
-                        <span className="line-clamp-1">{job.location || "Remote"}</span>
+                        <span className="truncate">{job.location || "Remote"}</span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 pt-2">
-                        <div className="space-y-1">
+                    <div className="grid grid-cols-2 gap-4 pt-2 min-w-0 w-full">
+                        <div className="space-y-1 min-w-0">
                             <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Workload</span>
-                            <div className="flex items-center gap-2 font-medium text-sm">
-                                <Timer className="w-4 h-4 text-primary" />
-                                {job.type}
+                            <div className="flex items-center gap-2 font-medium text-sm w-full">
+                                <Timer className="w-4 h-4 text-primary shrink-0" />
+                                <span className="truncate">{job.type}</span>
                             </div>
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 min-w-0">
                             <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Salary</span>
-                            <div className="flex items-center gap-2 font-medium text-sm">
-                                <Coins className="w-4 h-4 text-primary" />
-                                {job.salary}
+                            <div className="flex items-center gap-2 font-medium text-sm w-full">
+                                <Coins className="w-4 h-4 text-primary shrink-0" />
+                                <span className="truncate">{job.salary}</span>
                             </div>
                         </div>
                     </div>
@@ -130,28 +136,15 @@ export function PublicJobCard({ job, initialStatus = 'IDLE', onDiscard }: Public
                         ) : status === 'APPLIED' ? (
                             "Applied"
                         ) : (
-                            "Save for Later"
+                            "Save"
                         )}
                     </Button>
                     <Button
-                        className={cn(
-                            "flex-1 gap-2 bg-gradient-brand shadow-md hover:shadow-lg transition-all",
-                            status === 'APPLIED' && "bg-green-600 hover:bg-green-700"
-                        )}
-                        onClick={() => handleAction('APPLIED')}
-                        disabled={status !== 'IDLE' || isPending}
+                        className="flex-[1.5] gap-2 bg-gradient-brand shadow-md hover:shadow-lg transition-all"
+                        onClick={() => router.push(`/dashboard/explore/${job.id}`)}
                     >
-                        {status === 'APPLIED' ? (
-                            <>
-                                <Check className="w-4 h-4" />
-                                Applied
-                            </>
-                        ) : (
-                            <>
-                                Apply Now
-                                <ArrowUpRight className="w-4 h-4" />
-                            </>
-                        )}
+                        View Details
+                        <ArrowUpRight className="w-4 h-4" />
                     </Button>
                 </div>
             </div>
