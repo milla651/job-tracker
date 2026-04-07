@@ -17,7 +17,7 @@ export default async function DashboardLayout({
   }).catch(() => null);
 
   return (
-    <div className="flex min-h-screen bg-stone-50 dark:bg-stone-950">
+    <div className="flex min-h-screen bg-background">
       <DashboardSidebar
         user={{ name: session.user.name, email: session.user.email }}
         profilePct={profile?.completionPct ?? 0}

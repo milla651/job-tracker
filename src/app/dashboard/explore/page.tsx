@@ -75,32 +75,32 @@ export default async function ExplorePage(props: {
 
             {/* Page title */}
             <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center">
-                <Telescope className="h-4 w-4 text-indigo-500" />
+              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Telescope className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <h1 className="text-base font-bold text-stone-900 dark:text-stone-50">Discover</h1>
-                <p className="text-xs text-stone-400">{total.toLocaleString()} opportunities</p>
+                <h1 className="text-base font-bold text-foreground">Discover</h1>
+                <p className="text-xs text-muted-foreground">{total.toLocaleString()} opportunities</p>
               </div>
             </div>
 
             {/* Your stats (logged in) */}
             {session && (
-              <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4 space-y-3">
-                <p className="text-xs font-bold text-stone-400 dark:text-stone-600 uppercase tracking-widest">Your activity</p>
+              <div className="bg-card rounded-lg border border-border p-4 space-y-3">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Your activity</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-stone-50 dark:bg-stone-800/60">
-                    <Bookmark className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-muted">
+                    <Bookmark className="h-3.5 w-3.5 text-primary shrink-0" />
                     <div>
-                      <p className="text-sm font-bold text-stone-800 dark:text-stone-100">{savedCount}</p>
-                      <p className="text-[10px] text-stone-400 leading-none">Saved</p>
+                      <p className="text-sm font-bold text-foreground">{savedCount}</p>
+                      <p className="text-[10px] text-muted-foreground leading-none">Saved</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-stone-50 dark:bg-stone-800/60">
-                    <SendHorizonal className="h-3.5 w-3.5 text-teal-500 shrink-0" />
+                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-muted">
+                    <SendHorizonal className="h-3.5 w-3.5 text-success shrink-0" />
                     <div>
-                      <p className="text-sm font-bold text-stone-800 dark:text-stone-100">{appliedCount}</p>
-                      <p className="text-[10px] text-stone-400 leading-none">Applied</p>
+                      <p className="text-sm font-bold text-foreground">{appliedCount}</p>
+                      <p className="text-[10px] text-muted-foreground leading-none">Applied</p>
                     </div>
                   </div>
                 </div>
@@ -108,9 +108,9 @@ export default async function ExplorePage(props: {
             )}
 
             {/* Filters */}
-            <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4">
+            <div className="bg-card rounded-lg border border-border p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-bold text-stone-400 dark:text-stone-600 uppercase tracking-widest">Filters</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Filters</p>
                 {hasFilters && (
                   <Link href="/dashboard/explore" className="text-[10px] font-semibold text-red-500 hover:underline flex items-center gap-1">
                     <X className="h-3 w-3" /> Clear
@@ -125,13 +125,13 @@ export default async function ExplorePage(props: {
           <main className="flex-1 min-w-0 space-y-5">
             {/* Result header */}
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-stone-700 dark:text-stone-300">
+              <h2 className="text-sm font-semibold text-foreground">
                 {filteredJobs.length > 0
                   ? `${filteredJobs.length} jobs${hasFilters ? " matching filters" : ""}`
                   : "No results"}
               </h2>
               {hasFilters && (
-                <Link href="/dashboard/explore" className="text-xs text-stone-400 hover:text-red-500 flex items-center gap-1 transition-colors">
+                <Link href="/dashboard/explore" className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors">
                   <X className="h-3 w-3" /> Clear filters
                 </Link>
               )}
@@ -151,12 +151,12 @@ export default async function ExplorePage(props: {
                 })}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800">
-                <div className="h-12 w-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center mb-4">
-                  <Search className="h-6 w-6 text-stone-400" />
+              <div className="flex flex-col items-center justify-center py-20 text-center bg-card rounded-lg border border-border">
+                <div className="h-12 w-12 rounded-2xl bg-muted flex items-center justify-center mb-4">
+                  <Search className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <p className="text-base font-semibold text-stone-700 dark:text-stone-200 mb-1">No jobs found</p>
-                <p className="text-sm text-stone-400 max-w-xs mx-auto mb-4">
+                <p className="text-base font-semibold text-foreground mb-1">No jobs found</p>
+                <p className="text-sm text-muted-foreground max-w-xs mx-auto mb-4">
                   {showDiscarded
                     ? "Your discarded list is empty."
                     : "Try adjusting your filters or search query."}

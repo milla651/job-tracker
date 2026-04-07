@@ -51,12 +51,7 @@ export function Navbar({ session }: NavbarProps) {
           className={cn(
             "flex h-14 items-center justify-between rounded-2xl px-5 transition-all duration-300",
             scrolled || isOpen
-              ? [
-                  "border shadow-lg",
-                  "bg-white/90 border-stone-200 shadow-stone-200/60",
-                  "dark:bg-stone-900/90 dark:border-stone-800 dark:shadow-black/30",
-                  "backdrop-blur-xl",
-                ].join(" ")
+              ? "border shadow-lg bg-card/90 border-border shadow-foreground/5 backdrop-blur-xl"
               : "bg-transparent",
           )}>
           {/* Logo */}
@@ -66,13 +61,11 @@ export function Navbar({ session }: NavbarProps) {
             onClick={() => setIsOpen(false)}>
             <div
               className="w-8 h-8 rounded-xl flex items-center justify-center shadow-sm
-              bg-teal-600 dark:bg-teal-500
-              group-hover:bg-teal-700 dark:group-hover:bg-teal-400
-              transition-colors duration-200">
-              <Briefcase className="w-4 h-4 text-white dark:text-stone-950" />
+              bg-primary group-hover:bg-primary-hover transition-colors duration-200">
+              <Briefcase className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-bold text-stone-900 dark:text-stone-100 text-base tracking-tight transition-colors duration-300">
-              JobTracker
+            <span className="font-bold text-foreground text-base tracking-tight transition-colors duration-300">
+              CareerOS
             </span>
           </Link>
 
@@ -86,8 +79,8 @@ export function Navbar({ session }: NavbarProps) {
                   "px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200",
                   pathname === item.href ||
                     pathname?.startsWith(item.href + "/")
-                    ? "bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300"
-                    : "text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800/60",
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted",
                 )}>
                 {item.label}
               </Link>
@@ -100,9 +93,7 @@ export function Navbar({ session }: NavbarProps) {
               <Link href="/dashboard/jobs/new">
                 <Button
                   size="sm"
-                  className="rounded-lg gap-1.5 font-medium border-0 shadow-md transition-all duration-200
-                    bg-teal-600 text-white hover:bg-teal-700 shadow-teal-600/20
-                    dark:bg-teal-500 dark:text-stone-950 dark:hover:bg-teal-400 dark:shadow-teal-500/15">
+                  className="gap-1.5 font-medium shadow-md shadow-primary/20 transition-all duration-200">
                   <Plus className="w-4 h-4" />
                   Quick Add
                 </Button>
@@ -113,9 +104,7 @@ export function Navbar({ session }: NavbarProps) {
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200
-                text-stone-500 dark:text-stone-400
-                hover:text-stone-900 dark:hover:text-stone-100
-                hover:bg-stone-100 dark:hover:bg-stone-800"
+                text-muted-foreground hover:text-foreground hover:bg-muted"
               aria-label="Toggle theme">
               <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 absolute" />
               <Moon className="h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 absolute" />
@@ -129,19 +118,14 @@ export function Navbar({ session }: NavbarProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="rounded-lg font-medium transition-all duration-200
-                      text-stone-600 dark:text-stone-300
-                      hover:text-stone-900 dark:hover:text-stone-100
-                      hover:bg-stone-100 dark:hover:bg-stone-800">
+                    className="rounded-xl font-medium">
                     Sign In
                   </Button>
                 </Link>
                 <Link href="/register">
                   <Button
                     size="sm"
-                    className="rounded-lg font-medium border-0 shadow-md transition-all duration-200
-                      bg-teal-600 text-white hover:bg-teal-700 shadow-teal-600/20
-                      dark:bg-teal-500 dark:text-stone-950 dark:hover:bg-teal-400 dark:shadow-teal-500/15">
+                    className="rounded-xl font-medium shadow-md shadow-primary/20">
                     Get Started
                   </Button>
                 </Link>
@@ -153,11 +137,7 @@ export function Navbar({ session }: NavbarProps) {
           <div className="flex lg:hidden items-center gap-1.5">
             {session?.user && (
               <Link href="/dashboard/jobs/new">
-                <Button
-                  size="icon"
-                  className="w-8 h-8 rounded-lg border-0
-                  bg-teal-600 text-white hover:bg-teal-700
-                  dark:bg-teal-500 dark:text-stone-950 dark:hover:bg-teal-400">
+                <Button size="icon" className="w-8 h-8 rounded-lg">
                   <Plus className="w-4 h-4" />
                 </Button>
               </Link>
@@ -166,7 +146,7 @@ export function Navbar({ session }: NavbarProps) {
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200
-                text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
+                text-muted-foreground hover:bg-muted"
               aria-label="Toggle theme">
               <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 absolute" />
               <Moon className="h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 absolute" />
@@ -177,9 +157,7 @@ export function Navbar({ session }: NavbarProps) {
             {/* Hamburger */}
             <button
               className="p-1.5 rounded-lg transition-colors duration-200
-                text-stone-500 dark:text-stone-400
-                hover:text-stone-900 dark:hover:text-stone-100
-                hover:bg-stone-100 dark:hover:bg-stone-800"
+                text-muted-foreground hover:text-foreground hover:bg-muted"
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? "Close menu" : "Open menu"}>
               <div className="relative w-5 h-4">
@@ -214,8 +192,7 @@ export function Navbar({ session }: NavbarProps) {
           )}>
           <div
             className="rounded-2xl p-3 border shadow-lg backdrop-blur-xl
-            bg-white/95 border-stone-200 shadow-stone-200/60
-            dark:bg-stone-900/95 dark:border-stone-800 dark:shadow-black/30">
+            bg-card/95 border-border shadow-foreground/5">
             <div className="space-y-0.5">
               {(!session?.user ? publicNav : appNav).map((item) => (
                 <Link
@@ -225,8 +202,8 @@ export function Navbar({ session }: NavbarProps) {
                     "block px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
                     pathname === item.href ||
                       pathname?.startsWith(item.href + "/")
-                      ? "bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300"
-                      : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-800",
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
                   )}
                   onClick={() => setIsOpen(false)}>
                   {item.label}
@@ -234,13 +211,13 @@ export function Navbar({ session }: NavbarProps) {
               ))}
             </div>
 
-            <div className="h-px bg-stone-100 dark:bg-stone-800 my-3" />
+            <div className="h-px bg-border my-3" />
 
             <div className="space-y-1.5">
               {session?.user ? (
                 <button
                   className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
-                    text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                    text-destructive hover:bg-destructive/10"
                   onClick={async () => {
                     await logoutUser();
                     setIsOpen(false);
@@ -253,16 +230,14 @@ export function Navbar({ session }: NavbarProps) {
                   <Link
                     href="/login"
                     className="flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-xl border transition-all duration-200
-                      border-stone-200 text-stone-700 hover:bg-stone-50
-                      dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
+                      border-border text-foreground hover:bg-muted"
                     onClick={() => setIsOpen(false)}>
                     Sign In
                   </Link>
                   <Link
                     href="/register"
                     className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200
-                      bg-teal-600 text-white hover:bg-teal-700 shadow-md shadow-teal-600/20
-                      dark:bg-teal-500 dark:text-stone-950 dark:hover:bg-teal-400"
+                      bg-primary text-primary-foreground hover:bg-primary-hover shadow-md shadow-primary/20"
                     onClick={() => setIsOpen(false)}>
                     Get Started Free
                   </Link>

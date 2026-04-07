@@ -31,22 +31,22 @@ export function JourneyStep({
             className={cn(
               "h-1 rounded-full transition-all duration-500",
               i < current
-                ? "bg-teal-500 w-7"
-                : "bg-stone-200 dark:bg-stone-800 w-3",
+                ? "bg-primary w-7"
+                : "bg-border w-3",
             )}
           />
         ))}
-        <span className="ml-1 text-xs font-bold text-stone-400 dark:text-stone-600">
+        <span className="ml-1 text-xs font-bold text-muted-foreground">
           {current}/{total}
         </span>
       </div>
 
-      <h1 className="text-2xl sm:text-3xl font-serif font-bold text-stone-900 dark:text-stone-100 transition-colors duration-300">
+      <h1 className="text-2xl sm:text-3xl font-bold text-foreground transition-colors duration-300">
         {title}
       </h1>
 
       {description && (
-        <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           {description}
         </p>
       )}
@@ -76,7 +76,7 @@ export function OnboardingLayout({
   showBenefits = true,
 }: OnboardingLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-stone-50 dark:bg-stone-950 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-background transition-colors duration-300">
       {/* ────────────────────────────────────────────
           LEFT PANEL — Branding + feature highlights
           Dark always, independent of theme toggle
@@ -86,7 +86,8 @@ export function OnboardingLayout({
       {showBenefits && (
         <div
           className="hidden lg:flex lg:w-[42%] xl:w-[40%] flex-col justify-between
-          p-12 xl:p-16 relative overflow-hidden bg-stone-900">
+          p-12 xl:p-16 relative overflow-hidden bg-card dark:bg-surface-raised"
+          style={{ background: "linear-gradient(160deg, hsl(239 84% 12%) 0%, hsl(240 8% 6%) 100%)" }}>
           {/* Dot texture */}
           <div
             className="absolute inset-0 opacity-[0.045] pointer-events-none"
@@ -96,40 +97,40 @@ export function OnboardingLayout({
             }}
           />
 
-          {/* Teal ambient glow */}
+          {/* Brand ambient glow */}
           <div
             className="absolute -top-32 -left-32 w-[480px] h-[480px] rounded-full
-            bg-teal-600/10 blur-[110px] pointer-events-none"
+            bg-primary/8 blur-[110px] pointer-events-none"
           />
           <div
             className="absolute bottom-0 right-0 w-72 h-72 rounded-full
-            bg-teal-500/6 blur-[80px] pointer-events-none"
+            bg-gradient-2/6 blur-[80px] pointer-events-none"
           />
 
           {/* Logo */}
           <div className="relative flex items-center gap-3">
             <div
-              className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center
-              shadow-md shadow-teal-700/40">
-              <Briefcase className="w-4 h-4 text-white" />
+              className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center
+              shadow-md shadow-primary/40">
+              <Briefcase className="w-4 h-4 text-primary-foreground" />
             </div>
             <span className="font-bold text-white text-lg tracking-tight">
-              JobTracker
+              CareerOS
             </span>
           </div>
 
           {/* Hero copy + features */}
           <div className="relative space-y-10">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-teal-400 mb-4">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-4">
                 Built for your success
               </p>
-              <h2 className="text-3xl xl:text-4xl font-serif font-bold text-white leading-snug">
-                Your job search,
+              <h2 className="text-3xl xl:text-4xl font-bold text-white leading-snug">
+                Your career,
                 <br />
-                <span className="text-teal-400">finally in order.</span>
+                <span className="text-ai-gradient">finally organised.</span>
               </h2>
-              <p className="mt-4 text-sm text-stone-500 leading-relaxed max-w-xs">
+              <p className="mt-4 text-sm text-white/40 leading-relaxed max-w-xs">
                 Stop juggling spreadsheets. Track every application, follow up
                 at the right time, and land your next role faster.
               </p>
@@ -156,15 +157,15 @@ export function OnboardingLayout({
                 <div key={title} className="flex items-start gap-4">
                   <div
                     className="shrink-0 w-9 h-9 rounded-lg
-                    bg-teal-600/15 border border-teal-600/20
+                    bg-primary/15 border border-primary/20
                     flex items-center justify-center mt-0.5">
-                    <Icon className="w-4 h-4 text-teal-400" />
+                    <Icon className="w-4 h-4 text-primary" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-white mb-0.5">
                       {title}
                     </p>
-                    <p className="text-xs text-stone-500 leading-relaxed">
+                    <p className="text-xs text-white/40 leading-relaxed">
                       {desc}
                     </p>
                   </div>
@@ -174,11 +175,11 @@ export function OnboardingLayout({
           </div>
 
           {/* Testimonial */}
-          <div className="relative border-t border-stone-800 pt-7">
-            <p className="text-sm text-stone-400 italic leading-relaxed">
+          <div className="relative border-t border-white/10 pt-7">
+            <p className="text-sm text-white/40 italic leading-relaxed">
               &quot;Finally a tracker that doesn&lsquo;t feel like doing extra homework.&quot;
             </p>
-            <p className="text-xs text-stone-600 mt-2 font-semibold">
+            <p className="text-xs text-white/25 mt-2 font-semibold">
               — Wanjiku M., hired at Safaricom
             </p>
           </div>
@@ -195,12 +196,11 @@ export function OnboardingLayout({
         {/* Mobile-only logo */}
         <div className="flex lg:hidden items-center gap-2.5 mb-10">
           <div
-            className="w-8 h-8 rounded-xl bg-teal-600 dark:bg-teal-500
-            flex items-center justify-center shadow-sm">
-            <Briefcase className="w-4 h-4 text-white dark:text-stone-950" />
+            className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shadow-sm shadow-primary/30">
+            <Briefcase className="w-4 h-4 text-primary-foreground" />
           </div>
-          <span className="font-bold text-stone-900 dark:text-stone-100 text-base transition-colors duration-300">
-            JobTracker
+          <span className="font-bold text-foreground text-base transition-colors duration-300">
+            CareerOS
           </span>
         </div>
 

@@ -1,17 +1,14 @@
 /**
- * Landing page — JobTracker
+ * Landing page — CareerOS
  *
- * Palette:
- *   Light → stone-50 bg · stone-900 text · teal-600 accent
- *   Dark  → stone-950 bg · stone-100 text · teal-400 accent
- *
- * All colours use Tailwind dark: classes so the theme toggle
- * affects the ENTIRE page, not just the nav.
+ * Single brand: Indigo/Violet primary — matches dashboard + CSS variable system
+ * All colours use CSS variables via Tailwind semantic tokens
  */
 
 import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { logoutUser } from "@/app/actions/auth";
 import JsonLd from "@/components/JsonLd";
-// import { cn } from "@/lib/utils";
 import {
   Briefcase,
   LineChart,
@@ -22,16 +19,21 @@ import {
   Clock,
   Zap,
   ArrowUpRight,
+  Sparkles,
+  Brain,
+  FileText,
 } from "lucide-react";
 
 export default async function HomePage() {
+  const session = await auth();
+  
   const faqData = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: [
       {
         "@type": "Question",
-        name: "Is JobTracker free?",
+        name: "Is CareerOS free?",
         acceptedAnswer: {
           "@type": "Answer",
           text: "Yes — free for every job seeker, unlimited applications, no card needed.",
@@ -41,86 +43,110 @@ export default async function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 transition-colors duration-300">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <JsonLd data={faqData} />
 
       {/* ─── HERO ─────────────────────────────────── */}
       <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center overflow-hidden">
-        {/* Light mode warm dot texture */}
+        {/* Dot texture */}
         <div
-          className="absolute inset-0 opacity-25 dark:opacity-0 transition-opacity duration-500 pointer-events-none"
+          className="absolute inset-0 opacity-20 dark:opacity-[0.04] transition-opacity duration-500 pointer-events-none"
           style={{
-            backgroundImage: `radial-gradient(circle, #d6d3d1 1px, transparent 1px)`,
+            backgroundImage: `radial-gradient(circle, hsl(var(--border)) 1px, transparent 1px)`,
             backgroundSize: "28px 28px",
           }}
         />
 
-        {/* Light mode warm top wash */}
-        <div className="absolute inset-0 bg-gradient-to-b from-teal-50/70 via-stone-50/30 to-transparent dark:from-transparent pointer-events-none transition-colors duration-300" />
-
-        {/* Dark mode teal glow */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-teal-600/10 blur-[140px] opacity-0 dark:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        {/* Brand glow — indigo instead of teal */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background/30 to-transparent pointer-events-none transition-colors duration-300" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-primary/8 blur-[140px] opacity-60 dark:opacity-40 transition-opacity duration-500 pointer-events-none" />
 
         <div className="relative max-w-3xl mx-auto pt-24">
           {/* Badge */}
           <div
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-10 text-sm font-medium
-            bg-teal-50 text-teal-700 border border-teal-200/80
-            dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800/60
+            bg-primary/8 text-primary border border-primary/20
             transition-colors duration-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
-            Automated job tracking — built for serious seekers
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            AI-powered career management — built for serious seekers
           </div>
 
-          {/* Headline — serif creates warmth, memorability, editorial feel */}
+          {/* Headline */}
           <h1
-            className="text-5xl sm:text-6xl md:text-7xl font-serif font-bold tracking-tight leading-[1.07] mb-6
-            text-stone-900 dark:text-stone-50 transition-colors duration-300">
-            Your job search,
+            className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.07] mb-6
+            text-foreground transition-colors duration-300">
+            Your career,
             <br />
-            <span className="text-teal-600 dark:text-teal-400 transition-colors duration-300">
-              finally in order.
+            <span className="text-ai-gradient">
+              finally organised.
             </span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-stone-500 dark:text-stone-400 max-w-xl mx-auto mb-10 leading-relaxed transition-colors duration-300">
-            Stop losing track. JobTracker organises every application, sends
-            smart follow-up reminders, and shows your full pipeline —
-            automatically.
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed transition-colors duration-300">
+            CareerOS tracks every application, scores jobs with AI, generates
+            tailored documents, and sends smart follow-up nudges — automatically.
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-10">
-            {/* Primary */}
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                text-base font-semibold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0
-                bg-teal-600 text-white hover:bg-teal-700 shadow-lg shadow-teal-600/25
-                dark:bg-teal-500 dark:text-stone-950 dark:hover:bg-teal-400 dark:shadow-teal-500/20">
-              Start Tracking Free
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            {/* Secondary */}
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                text-base font-semibold transition-all duration-200
-                border-2 border-stone-300 text-stone-700 hover:bg-stone-100 hover:border-stone-400
-                dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600">
-              Sign In
-            </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10 w-full px-4 sm:px-0">
+            {!session ? (
+              <>
+                <Link
+                  href="/register"
+                  className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                    text-base font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0
+                    bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/25 overflow-hidden">
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                  <span className="relative flex items-center gap-2">
+                    Start Free
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                </Link>
+                <Link
+                  href="/login"
+                  className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                    text-base font-semibold transition-all duration-300 shadow-sm
+                    bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border">
+                  Sign In
+                  <ArrowUpRight className="w-4 h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                    text-base font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0
+                    bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/25 overflow-hidden">
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                  <span className="relative flex items-center gap-2">
+                    Open Dashboard
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                </Link>
+                <form action={logoutUser} className="w-full sm:w-auto">
+                  <button
+                    type="submit"
+                    className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl w-full
+                      text-base font-semibold transition-all duration-300 shadow-sm
+                      bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground
+                      border border-destructive/20 hover:border-destructive">
+                    Logout
+                  </button>
+                </form>
+              </>
+            )}
           </div>
 
           {/* Trust strip */}
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-stone-400 dark:text-stone-600 transition-colors duration-300">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground transition-colors duration-300">
             {[
-              { icon: Check, label: "Free forever" },
+              { icon: Check,  label: "Free forever" },
               { icon: Shield, label: "No card required" },
-              { icon: Clock, label: "Setup in 2 min" },
+              { icon: Clock,  label: "Setup in 2 min" },
             ].map(({ icon: Icon, label }) => (
               <span key={label} className="flex items-center gap-1.5">
-                <Icon className="w-3.5 h-3.5 text-teal-500 dark:text-teal-600" />
+                <Icon className="w-3.5 h-3.5 text-primary/70" />
                 {label}
               </span>
             ))}
@@ -129,28 +155,26 @@ export default async function HomePage() {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-          <div className="w-5 h-8 rounded-full border-2 border-stone-300 dark:border-stone-700 flex justify-center transition-colors duration-300">
-            <div className="w-1 h-2 rounded-full bg-teal-500 mt-1.5 animate-bounce" />
+          <div className="w-5 h-8 rounded-full border-2 border-border flex justify-center transition-colors duration-300">
+            <div className="w-1 h-2 rounded-full bg-primary mt-1.5 animate-bounce" />
           </div>
         </div>
       </section>
 
       {/* ─── STATS ────────────────────────────────── */}
-      <div className="border-y border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 transition-colors duration-300">
+      <div className="border-y border-border bg-card transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-6 py-10 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
           {[
             { value: "10K+", label: "Jobs tracked" },
-            { value: "87%", label: "Fewer missed follow-ups" },
-            { value: "3×", label: "Faster than spreadsheets" },
+            { value: "87%",  label: "Fewer missed follow-ups" },
+            { value: "3×",   label: "Faster than spreadsheets" },
             { value: "Free", label: "No strings attached" },
           ].map(({ value, label }) => (
             <div key={label}>
-              <div className="text-2xl sm:text-3xl font-serif font-bold text-teal-600 dark:text-teal-400 transition-colors duration-300">
+              <div className="text-2xl sm:text-3xl font-bold text-primary transition-colors duration-300">
                 {value}
               </div>
-              <div className="text-xs text-stone-500 dark:text-stone-500 mt-1">
-                {label}
-              </div>
+              <div className="text-xs text-muted-foreground mt-1">{label}</div>
             </div>
           ))}
         </div>
@@ -160,11 +184,11 @@ export default async function HomePage() {
       <section id="features" className="py-28 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="mb-14">
-            <p className="text-teal-600 dark:text-teal-400 text-xs font-bold uppercase tracking-widest mb-3 transition-colors duration-300">
+            <p className="text-primary text-xs font-bold uppercase tracking-widest mb-3 transition-colors duration-300">
               What you get
             </p>
-            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-stone-900 dark:text-stone-100 transition-colors duration-300">
-              Built for the job search
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground transition-colors duration-300">
+              Built for the modern job search
             </h2>
           </div>
 
@@ -173,38 +197,49 @@ export default async function HomePage() {
               {
                 Icon: LineChart,
                 title: "Visual Pipeline",
-                desc: "One clean board — Applied, Interview, Offer, Closed. Every application visible, nothing forgotten.",
+                desc: "One clean board — Wishlist, Applied, Interview, Offer. Every application visible, nothing forgotten.",
               },
               {
                 Icon: Bell,
-                title: "Follow-up Reminders",
-                desc: "Automated nudges when it's time to reach back out. Silence never means rejection again.",
+                title: "Smart Nudges",
+                desc: "AI-powered follow-up reminders arrive exactly when you need them. Silence never means rejection again.",
               },
               {
                 Icon: Zap,
                 title: "Quick Add",
                 desc: "Log a new job in under 30 seconds. Company, role, deadline, notes — before the tab even closes.",
               },
+              {
+                Icon: Brain,
+                title: "AI Job Scoring",
+                desc: "Instant match scores based on your profile. Know which jobs are worth your time before you apply.",
+              },
+              {
+                Icon: FileText,
+                title: "Document Generation",
+                desc: "Tailored cover letters and resume bullets generated by AI — personalised to each job description.",
+              },
+              {
+                Icon: Sparkles,
+                title: "Interview Prep",
+                desc: "AI-generated STAR stories and prep packs so you walk into every interview fully prepared.",
+              },
             ].map(({ Icon, title, desc }) => (
               <div
                 key={title}
-                className="group p-7 rounded-2xl border transition-all duration-300
-                  border-stone-200 bg-white hover:border-teal-200 hover:shadow-lg hover:shadow-teal-500/5
-                  dark:border-stone-800 dark:bg-stone-900 dark:hover:border-teal-800 dark:hover:shadow-teal-500/5">
-                {/* Accent top bar */}
-                <div className="w-8 h-0.5 rounded-full mb-6 bg-stone-200 group-hover:bg-teal-500 dark:bg-stone-700 dark:group-hover:bg-teal-500 transition-colors duration-300" />
+                className="group p-7 rounded-lg border transition-all duration-300
+                  border-border bg-card hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+                {/* Accent bar */}
+                <div className="w-8 h-0.5 rounded-full mb-6 bg-border group-hover:bg-primary transition-colors duration-300" />
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center mb-5
-                  bg-stone-100 dark:bg-stone-800 group-hover:bg-teal-50 dark:group-hover:bg-teal-950/50
-                  transition-colors duration-300">
-                  <Icon className="w-5 h-5 text-stone-500 dark:text-stone-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors duration-300" />
+                  bg-muted group-hover:bg-primary/10 transition-colors duration-300">
+                  <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
                 </div>
-                <h3 className="font-semibold text-stone-900 dark:text-stone-100 mb-2 transition-colors duration-300">
+                <h3 className="font-semibold text-foreground mb-2 transition-colors duration-300">
                   {title}
                 </h3>
-                <p className="text-sm text-stone-500 dark:text-stone-500 leading-relaxed">
-                  {desc}
-                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
@@ -214,13 +249,13 @@ export default async function HomePage() {
       {/* ─── HOW IT WORKS ─────────────────────────── */}
       <section
         id="how-it-works"
-        className="py-28 px-6 bg-stone-100/60 dark:bg-stone-900/40 transition-colors duration-300">
+        className="py-28 px-6 bg-muted/40 transition-colors duration-300">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-teal-600 dark:text-teal-400 text-xs font-bold uppercase tracking-widest mb-3 transition-colors duration-300">
+            <p className="text-primary text-xs font-bold uppercase tracking-widest mb-3 transition-colors duration-300">
               How it works
             </p>
-            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-stone-900 dark:text-stone-100 transition-colors duration-300">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground transition-colors duration-300">
               Simple by design
             </h2>
           </div>
@@ -234,34 +269,35 @@ export default async function HomePage() {
               },
               {
                 n: "2",
-                title: "Get timely nudges",
-                desc: "JobTracker watches the clock. When it's time to follow up, you'll know exactly what to do.",
+                title: "Let AI score your matches",
+                desc: "CareerOS analyses every job against your profile and highlights the best opportunities automatically.",
               },
               {
                 n: "3",
-                title: "Focus on getting hired",
-                desc: "Drag cards through your pipeline, not your brain. Your full search, visible in one glance.",
+                title: "Get timely nudges",
+                desc: "When it's time to follow up, you'll know exactly what to do — and the AI will help you write it.",
+              },
+              {
+                n: "4",
+                title: "Walk in prepared",
+                desc: "Instant interview prep packs with STAR stories tailored to the specific role you're interviewing for.",
               },
             ].map(({ n, title, desc }) => (
               <div
                 key={n}
-                className="flex gap-6 items-start p-7 rounded-2xl border transition-all duration-300
-                  bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800
-                  hover:border-teal-200 dark:hover:border-teal-900">
+                className="flex gap-6 items-start p-7 rounded-lg border transition-all duration-300
+                  bg-card border-border hover:border-primary/30">
                 <div
                   className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm
-                  bg-teal-600 text-white shadow-md shadow-teal-600/20
-                  dark:bg-teal-500 dark:text-stone-950 dark:shadow-teal-500/15
+                  bg-primary text-primary-foreground shadow-md shadow-primary/20
                   transition-colors duration-300">
                   {n}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-stone-900 dark:text-stone-100 mb-1 transition-colors duration-300">
+                  <h3 className="font-semibold text-foreground mb-1 transition-colors duration-300">
                     {title}
                   </h3>
-                  <p className="text-sm text-stone-500 dark:text-stone-500 leading-relaxed">
-                    {desc}
-                  </p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -273,77 +309,97 @@ export default async function HomePage() {
       <section className="py-28 px-6">
         <div className="max-w-2xl mx-auto">
           <div
-            className="relative overflow-hidden rounded-3xl p-10 md:p-14 text-center
-            bg-teal-600 dark:bg-stone-900 border-0 dark:border dark:border-teal-800/50
-            transition-colors duration-300">
+            className="relative overflow-hidden rounded-3xl p-10 md:p-14 text-center"
+            style={{
+              background: "linear-gradient(135deg, hsl(239 84% 55%) 0%, hsl(270 90% 65%) 100%)",
+            }}>
             {/* Dot texture overlay */}
             <div
-              className="absolute inset-0 opacity-[0.06] dark:opacity-[0.04] pointer-events-none"
+              className="absolute inset-0 opacity-[0.06] pointer-events-none"
               style={{
                 backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
                 backgroundSize: "20px 20px",
               }}
             />
 
-            {/* Dark mode teal ambient glow */}
-            <div className="absolute inset-0 opacity-0 dark:opacity-100 transition-opacity duration-300 pointer-events-none">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-teal-600/15 rounded-full blur-3xl" />
+            {/* Ambient glow */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-white/10 rounded-full blur-3xl" />
             </div>
 
             <div className="relative">
               <h2
-                className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-5 leading-tight
-                text-white dark:text-stone-100 transition-colors duration-300">
+                className="text-3xl sm:text-4xl md:text-5xl font-bold mb-5 leading-tight
+                text-white">
                 Your next role is
                 <br />
-                <span className="text-teal-100 dark:text-teal-400 transition-colors duration-300">
-                  already out there.
-                </span>
+                <span className="text-white/80">already out there.</span>
               </h2>
 
-              <p
-                className="mb-8 leading-relaxed max-w-md mx-auto
-                text-teal-100 dark:text-stone-400 transition-colors duration-300">
+              <p className="mb-8 leading-relaxed max-w-md mx-auto text-white/70">
                 Stop letting opportunities slip through the cracks. Start
                 tracking with a system that actually works.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                {/* Primary — inverted in light, teal in dark */}
-                <Link
-                  href="/register"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                    text-base font-semibold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0
-                    bg-white text-teal-700 hover:bg-teal-50 shadow-lg shadow-black/10
-                    dark:bg-teal-600 dark:text-white dark:hover:bg-teal-500 dark:shadow-teal-600/20">
-                  Get Started Free
-                  <ArrowUpRight className="w-4 h-4" />
-                </Link>
-                {/* Ghost */}
-                <Link
-                  href="/login"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                    text-base font-semibold transition-all duration-200
-                    border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50
-                    dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600">
-                  Sign In
-                </Link>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center w-full px-4 sm:px-0">
+                {!session ? (
+                  <>
+                    <Link
+                      href="/register"
+                      className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                        text-base font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0
+                        bg-white text-primary font-bold shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 overflow-hidden">
+                      <div className="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                      <span className="relative flex items-center gap-2">
+                        Get Started Free
+                        <ArrowUpRight className="w-5 h-5" />
+                      </span>
+                    </Link>
+                    <Link
+                      href="/login"
+                      className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                        text-base font-semibold transition-all duration-300
+                        bg-white/5 hover:bg-white/20 text-white border border-white/20 hover:border-white/40
+                        backdrop-blur-md shadow-sm">
+                        Sign In
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                        text-base font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0
+                        bg-white text-primary font-bold shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 overflow-hidden">
+                      <div className="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                      <span className="relative flex items-center gap-2">
+                        Go to Dashboard
+                        <ArrowRight className="w-5 h-5" />
+                      </span>
+                    </Link>
+                    <form action={logoutUser} className="w-full sm:w-auto">
+                      <button
+                        type="submit"
+                        className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
+                          text-base font-semibold transition-all duration-300 w-full
+                          bg-white/5 hover:bg-red-500/80 text-white border border-white/20 hover:border-red-500
+                          backdrop-blur-md shadow-sm cursor-pointer">
+                        Logout
+                      </button>
+                    </form>
+                  </>
+                )}
               </div>
 
-              <div
-                className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 text-sm
-                text-teal-200/80 dark:text-stone-600 transition-colors duration-300">
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 text-sm text-white/60">
                 <span className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5" />
-                  Free forever
+                  <Check className="w-3.5 h-3.5" /> Free forever
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5" />
-                  No card required
+                  <Shield className="w-3.5 h-3.5" /> No card required
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" />
-                  2-minute setup
+                  <Clock className="w-3.5 h-3.5" /> 2-minute setup
                 </span>
               </div>
             </div>
@@ -352,18 +408,18 @@ export default async function HomePage() {
       </section>
 
       {/* ─── FOOTER ───────────────────────────────── */}
-      <footer className="border-t border-stone-200 dark:border-stone-800 py-10 px-6 transition-colors duration-300">
+      <footer className="border-t border-border py-10 px-6 transition-colors duration-300">
         <div
           className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4
-          text-sm text-stone-400 dark:text-stone-600 transition-colors duration-300">
+          text-sm text-muted-foreground transition-colors duration-300">
           <div className="flex items-center gap-2.5">
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center
-              bg-teal-600 dark:bg-teal-500 transition-colors duration-300">
-              <Briefcase className="w-3.5 h-3.5 text-white dark:text-stone-950" />
+              bg-primary transition-colors duration-300">
+              <Briefcase className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-stone-600 dark:text-stone-400 transition-colors duration-300">
-              JobTracker
+            <span className="font-semibold text-foreground/70 transition-colors duration-300">
+              CareerOS
             </span>
           </div>
           <div className="flex gap-6">
@@ -371,12 +427,12 @@ export default async function HomePage() {
               <Link
                 key={item}
                 href={`/${item.toLowerCase()}`}
-                className="hover:text-stone-700 dark:hover:text-stone-300 transition-colors duration-200">
+                className="hover:text-foreground transition-colors duration-200">
                 {item}
               </Link>
             ))}
           </div>
-          <span>© {new Date().getFullYear()} JobTracker</span>
+          <span>© {new Date().getFullYear()} CareerOS</span>
         </div>
       </footer>
     </div>

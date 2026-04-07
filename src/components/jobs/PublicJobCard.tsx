@@ -58,10 +58,10 @@ export function PublicJobCard({ job, initialStatus = "IDLE", onDiscard }: Public
 
   return (
     <div className={cn(
-      "group relative flex flex-col bg-white dark:bg-stone-900 border rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-px",
-      isSaved   ? "border-indigo-200 dark:border-indigo-800/60"   :
-      isApplied ? "border-teal-200  dark:border-teal-800/60"      :
-                  "border-stone-200 dark:border-stone-800 hover:border-indigo-200 dark:hover:border-indigo-800/50"
+      "group relative flex flex-col bg-card border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-px",
+      isSaved   ? "border-primary/40"   :
+      isApplied ? "border-success/40"   :
+                  "border-border hover:border-primary/30"
     )}>
 
       {/* Discard button */}
@@ -69,7 +69,7 @@ export function PublicJobCard({ job, initialStatus = "IDLE", onDiscard }: Public
         onClick={() => handleAction("DISCARDED")}
         disabled={!isIdle || isPending}
         title="Hide this job"
-        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 z-10 h-7 w-7 flex items-center justify-center rounded-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-400 hover:text-red-500 hover:border-red-300 dark:hover:border-red-700 transition-all shadow-sm"
+        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 z-10 h-7 w-7 flex items-center justify-center rounded-full bg-card border border-border text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-all shadow-sm"
       >
         <X className="h-3.5 w-3.5" />
       </button>
@@ -78,35 +78,35 @@ export function PublicJobCard({ job, initialStatus = "IDLE", onDiscard }: Public
         {/* Header */}
         <div className="pr-7">
           <div className="flex items-start gap-3">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary/80 to-gradient-2 flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
               {job.company.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm text-stone-900 dark:text-stone-50 leading-snug line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              <h3 className="font-semibold text-sm text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
                 {job.title}
               </h3>
               <div className="flex items-center gap-1.5 mt-1">
-                <Building2 className="h-3 w-3 text-stone-400 shrink-0" />
-                <span className="text-xs text-stone-500 truncate font-medium">{job.company}</span>
+                <Building2 className="h-3 w-3 text-muted-foreground shrink-0" />
+                <span className="text-xs text-muted-foreground truncate font-medium">{job.company}</span>
               </div>
             </div>
-            <span className="text-[10px] font-semibold text-stone-400 whitespace-nowrap shrink-0">
+            <span className="text-[10px] font-semibold text-muted-foreground whitespace-nowrap shrink-0">
               {new Date(job.postedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
             </span>
           </div>
         </div>
 
         {/* Meta */}
-        <div className="space-y-2 text-xs text-stone-500">
+        <div className="space-y-2 text-xs text-muted-foreground">
           {job.location && (
             <div className="flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-stone-400" />
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
               <span className="truncate">{job.location}</span>
             </div>
           )}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <Timer className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+              <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
               <span>{job.type}</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -124,10 +124,10 @@ export function PublicJobCard({ job, initialStatus = "IDLE", onDiscard }: Public
             className={cn(
               "flex-1 text-xs gap-1.5 transition-colors",
               isSaved
-                ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300"
+                ? "bg-primary/8 border-primary/30 text-primary"
                 : isApplied
-                ? "bg-teal-50 dark:bg-teal-950/40 border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300"
-                : "hover:bg-indigo-50 dark:hover:bg-indigo-950/30 hover:border-indigo-200 dark:hover:border-indigo-800 hover:text-indigo-700 dark:hover:text-indigo-300"
+                ? "bg-success/8 border-success/30 text-success"
+                : "hover:bg-primary/8 hover:border-primary/20 hover:text-primary"
             )}
             onClick={() => handleAction("WISHLIST")}
             disabled={!isIdle || isPending}
@@ -137,7 +137,7 @@ export function PublicJobCard({ job, initialStatus = "IDLE", onDiscard }: Public
           </Button>
           <Button
             size="sm"
-            className="flex-[1.4] text-xs gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-500/25"
+            className="flex-[1.4] text-xs gap-1.5 shadow-sm shadow-primary/20"
             onClick={() => router.push(`/dashboard/explore/${job.id}`)}
           >
             View details

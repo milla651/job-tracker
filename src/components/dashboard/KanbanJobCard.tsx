@@ -37,14 +37,14 @@ export function KanbanJobCard({ job, onDragStart }: KanbanJobCardProps) {
         onDragStart(e, job.id);
       }}
       className={cn(
-        "group relative bg-white dark:bg-stone-900 border rounded-xl p-3.5 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-all duration-200",
+        "group relative bg-card border rounded-xl p-3.5 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-all duration-200",
         isStale && !isAccepted
           ? "border-orange-200 dark:border-orange-900/60"
           : isOffer
           ? "border-emerald-200 dark:border-emerald-800/60"
           : isInterview
           ? "border-amber-200 dark:border-amber-800/40"
-          : "border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700",
+          : "border-border hover:border-border-strong",
       )}
     >
       {/* Urgency bar */}
@@ -56,10 +56,10 @@ export function KanbanJobCard({ job, onDragStart }: KanbanJobCardProps) {
         {/* Header row */}
         <div className="flex justify-between items-start gap-2">
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-stone-900 dark:text-stone-100 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            <p className="font-semibold text-sm text-foreground line-clamp-1 group-hover:text-primary transition-colors">
               {job.position}
             </p>
-            <p className="text-xs text-stone-500 dark:text-stone-400 font-medium line-clamp-1">
+            <p className="text-xs text-muted-foreground font-medium line-clamp-1">
               {job.company}
             </p>
           </div>
@@ -69,7 +69,7 @@ export function KanbanJobCard({ job, onDragStart }: KanbanJobCardProps) {
         {/* Meta tags */}
         <div className="flex flex-wrap gap-1.5">
           {job.location && (
-            <span className="text-[10px] bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 px-1.5 py-0.5 rounded-md truncate max-w-[100px]">
+            <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-md truncate max-w-[100px]">
               {job.location}
             </span>
           )}
@@ -82,8 +82,8 @@ export function KanbanJobCard({ job, onDragStart }: KanbanJobCardProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-stone-100 dark:border-stone-800">
-          <span className="text-[10px] text-stone-400">
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+          <span className="text-[10px] text-muted-foreground">
             {formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true })}
           </span>
 
@@ -98,7 +98,7 @@ export function KanbanJobCard({ job, onDragStart }: KanbanJobCardProps) {
 
             {/* Prep indicator */}
             {isInterview && (
-              <span className="flex items-center gap-1 text-[10px] font-medium text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/30 px-1.5 py-0.5 rounded-full">
+              <span className="flex items-center gap-1 text-[10px] font-medium text-success bg-success/10 px-1.5 py-0.5 rounded-full">
                 <ClipboardCheck className="h-2.5 w-2.5" />
                 Prep
               </span>

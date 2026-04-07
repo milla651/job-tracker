@@ -78,7 +78,7 @@ interface PipelineData {
 
 function StatStrip({ pipeline }: { pipeline: PipelineData }) {
   const stats = [
-    { label: "Total",     value: pipeline.total,     href: "/dashboard/pipeline", color: "text-stone-700 dark:text-stone-200" },
+    { label: "Total",     value: pipeline.total,     href: "/dashboard/pipeline", color: "text-foreground" },
     { label: "Active",    value: pipeline.active,    href: "/dashboard/pipeline", color: "text-blue-600 dark:text-blue-400" },
     { label: "Interview", value: pipeline.interview, href: "/dashboard/pipeline", color: "text-amber-600 dark:text-amber-400" },
     { label: "Offers",    value: pipeline.offer,     href: "/dashboard/pipeline", color: "text-emerald-600 dark:text-emerald-400" },
@@ -87,7 +87,7 @@ function StatStrip({ pipeline }: { pipeline: PipelineData }) {
     <div className="grid grid-cols-4 gap-3">
       {stats.map(({ label, value, href, color }) => (
         <Link key={label} href={href}>
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-4 text-center hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-sm transition-all group">
+          <div className="bg-card border border-border rounded-lg p-4 text-center hover:border-primary/30 hover:shadow-sm transition-all group">
             <p className={`text-2xl font-bold tabular-nums leading-none ${color}`}>{value}</p>
             <p className="text-[11px] font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-wide mt-1.5">{label}</p>
           </div>
@@ -121,14 +121,14 @@ function PipelineFlow({ pipeline }: { pipeline: PipelineData }) {
                 style={{ height: `${Math.max((stage.count / max) * 44, stage.count > 0 ? 6 : 2)}px` }}
               />
             </div>
-            <span className="text-[10px] font-bold tabular-nums text-stone-500">{stage.count}</span>
+            <span className="text-[10px] font-bold tabular-nums text-muted-foreground">{stage.count}</span>
           </div>
         ))}
         {pipeline.accepted > 0 && (
           <div className="flex-1 flex flex-col items-center gap-1">
             <div className="w-full flex items-end justify-center" style={{ height: "44px" }}>
               <div
-                className="w-full rounded-t-md bg-teal-500 opacity-80 group-hover:opacity-100 transition-all"
+                className="w-full rounded-t-md bg-success opacity-80 group-hover:opacity-100 transition-all"
                 style={{ height: `${Math.max((pipeline.accepted / max) * 44, 6)}px` }}
               />
             </div>
@@ -136,7 +136,7 @@ function PipelineFlow({ pipeline }: { pipeline: PipelineData }) {
           </div>
         )}
       </div>
-      <div className="flex items-center gap-2 text-xs text-stone-400 group-hover:text-indigo-500 transition-colors">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground group-hover:text-primary transition-colors">
         <Columns3 className="h-3 w-3" />
         Open pipeline board
         <ChevronRight className="h-3 w-3 ml-auto group-hover:translate-x-0.5 transition-transform" />
@@ -151,7 +151,7 @@ function NudgeCard({ nudge }: { nudge: Awaited<ReturnType<typeof getSmartNudges>
   const config = {
     STALE:       { label: "Stale",       icon: AlertCircle,  accent: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30", border: "border-orange-200 dark:border-orange-900/50" },
     FOLLOW_UP:   { label: "Follow up",   icon: MessageSquare,accent: "text-blue-500",   bg: "bg-blue-50 dark:bg-blue-950/30",   border: "border-blue-200 dark:border-blue-900/50" },
-    PREP_READY:  { label: "Prep ready",  icon: BookOpen,     accent: "text-teal-500",   bg: "bg-teal-50 dark:bg-teal-950/30",   border: "border-teal-200 dark:border-teal-900/50" },
+    PREP_READY:  { label: "Prep ready",  icon: BookOpen,     accent: "text-success",    bg: "bg-success/8",                    border: "border-success/20" },
     PREP_PENDING:{ label: "Generate prep",icon: Sparkles,    accent: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30",border: "border-indigo-200 dark:border-indigo-900/50" },
   } as const;
 
@@ -164,11 +164,11 @@ function NudgeCard({ nudge }: { nudge: Awaited<ReturnType<typeof getSmartNudges>
       <div className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all hover:shadow-sm hover:-translate-y-px ${c.bg} ${c.border}`}>
         <Icon className={`h-4 w-4 shrink-0 ${c.accent}`} />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate leading-tight">{nudge.jobTitle}</p>
-          <p className="text-xs text-stone-500 truncate">{nudge.company}</p>
+          <p className="text-sm font-semibold text-foreground truncate leading-tight">{nudge.jobTitle}</p>
+          <p className="text-xs text-muted-foreground truncate">{nudge.company}</p>
         </div>
         <span className={`text-[10px] font-bold uppercase tracking-wide shrink-0 ${c.accent}`}>{c.label}</span>
-        <ChevronRight className="h-3.5 w-3.5 text-stone-300 shrink-0" />
+        <ChevronRight className="h-3.5 w-3.5 text-border shrink-0" />
       </div>
     </Link>
   );
@@ -179,24 +179,24 @@ function NudgeCard({ nudge }: { nudge: Awaited<ReturnType<typeof getSmartNudges>
 function JobRow({ job }: { job: { id: string; company: string; position: string; status: string; aiScore: string | null; updatedAt: Date } }) {
   return (
     <Link href={`/dashboard/jobs/${job.id}`}>
-      <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 dark:hover:bg-stone-900/60 rounded-xl transition-colors group cursor-pointer">
-        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
+      <div className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 rounded-xl transition-colors group cursor-pointer">
+        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary/80 to-gradient-2 flex items-center justify-center text-primary-foreground font-bold text-xs shrink-0">
           {job.company.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-stone-800 dark:text-stone-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+          <p className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
             {job.position}
           </p>
-          <p className="text-xs text-stone-400 truncate">{job.company}</p>
+          <p className="text-xs text-muted-foreground truncate">{job.company}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <AiScoreBadge score={job.aiScore as AiScore} size="sm" />
           <StatusBadge status={job.status as JobStatus} size="sm" />
-          <span className="text-xs text-stone-400 hidden lg:block w-20 text-right">
+          <span className="text-xs text-muted-foreground hidden lg:block w-20 text-right">
             {formatDistanceToNow(job.updatedAt, { addSuffix: true })}
           </span>
         </div>
-        <ChevronRight className="h-4 w-4 text-stone-300 group-hover:text-stone-400 transition-colors shrink-0" />
+        <ChevronRight className="h-4 w-4 text-border group-hover:text-muted-foreground transition-colors shrink-0" />
       </div>
     </Link>
   );
@@ -215,14 +215,14 @@ function OnboardingChecklist({ profilePct }: { profilePct: number }) {
   const nextStep = steps.find((s) => !s.done);
 
   return (
-    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
-      <div className="px-5 pt-5 pb-4 border-b border-stone-100 dark:border-stone-800 flex items-center gap-2.5">
-        <div className="h-8 w-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center">
-          <Sparkles className="h-4 w-4 text-indigo-500" />
+    <div className="bg-card rounded-lg border border-border overflow-hidden">
+      <div className="px-5 pt-5 pb-4 border-b border-border flex items-center gap-2.5">
+        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Sparkles className="h-4 w-4 text-primary" />
         </div>
         <div>
-          <h2 className="font-semibold text-stone-900 dark:text-stone-50 text-sm">Get started</h2>
-          <p className="text-xs text-stone-400 mt-0.5">Complete these steps to unlock the full platform.</p>
+          <h2 className="font-semibold text-foreground text-sm">Get started</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Complete these steps to unlock the full platform.</p>
         </div>
       </div>
       <div className="p-3 space-y-1">
@@ -231,31 +231,31 @@ function OnboardingChecklist({ profilePct }: { profilePct: number }) {
             key={i}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors ${
               nextStep === step
-                ? "bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50"
-                : "hover:bg-stone-50 dark:hover:bg-stone-800/40"
+                ? "bg-primary/8 border border-primary/20"
+                : "hover:bg-muted"
             }`}
           >
             {step.done ? (
-              <CheckCircle2 className="h-4 w-4 text-teal-500 shrink-0" />
+              <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
             ) : nextStep === step ? (
-              <div className="h-4 w-4 rounded-full border-2 border-indigo-400 shrink-0 flex items-center justify-center">
-                <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+              <div className="h-4 w-4 rounded-full border-2 border-primary shrink-0 flex items-center justify-center">
+                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
               </div>
             ) : (
-              <Circle className="h-4 w-4 text-stone-300 dark:text-stone-700 shrink-0" />
+              <Circle className="h-4 w-4 text-border shrink-0" />
             )}
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-medium leading-snug ${step.done ? "text-stone-400 dark:text-stone-600 line-through" : "text-stone-800 dark:text-stone-100"}`}>
+              <p className={`text-sm font-medium leading-snug ${step.done ? "text-muted-foreground line-through" : "text-foreground"}`}>
                 {step.label}
               </p>
               {step.hint && !step.done && nextStep === step && (
-                <p className="text-xs text-stone-400 mt-0.5">{step.hint}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{step.hint}</p>
               )}
             </div>
             {!step.done && step.href && nextStep === step && (
               <Link
                 href={step.href}
-                className="shrink-0 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                className="shrink-0 text-xs font-semibold text-primary hover:underline flex items-center gap-1"
               >
                 Start <ArrowRight className="h-3 w-3" />
               </Link>
@@ -272,23 +272,23 @@ function OnboardingChecklist({ profilePct }: { profilePct: number }) {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-14 text-center px-6">
-      <div className="h-14 w-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center mb-4 shadow-inner">
-        <Briefcase className="h-6 w-6 text-indigo-400" />
+      <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 shadow-inner">
+        <Briefcase className="h-6 w-6 text-primary/60" />
       </div>
-      <h3 className="text-base font-semibold text-stone-800 dark:text-stone-100 mb-1">No applications yet</h3>
-      <p className="text-sm text-stone-400 mb-5 max-w-xs leading-relaxed">
+      <h3 className="text-base font-semibold text-foreground mb-1">No applications yet</h3>
+      <p className="text-sm text-muted-foreground mb-5 max-w-xs leading-relaxed">
         Add your first application manually or explore curated job matches.
       </p>
       <div className="flex gap-3">
         <Link
           href="/dashboard/jobs/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm shadow-indigo-500/25 transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-primary-foreground text-sm font-semibold shadow-sm shadow-primary/20 transition-all"
         >
           <Plus className="h-4 w-4" /> Add job
         </Link>
         <Link
           href="/dashboard/explore"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border text-foreground hover:bg-muted text-sm font-medium transition-colors"
         >
           <Telescope className="h-4 w-4" /> Discover
         </Link>
@@ -317,10 +317,10 @@ export default async function DashboardPage() {
         {/* ── Header ───────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-stone-50">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
               {greeting}, {firstName}.
             </h1>
-            <p className="text-stone-500 dark:text-stone-400 mt-1 text-sm">
+            <p className="text-muted-foreground mt-1 text-sm">
               {isNewUser
                 ? "Welcome to CareerOS — let's build your pipeline."
                 : nudges.length > 0
@@ -330,7 +330,7 @@ export default async function DashboardPage() {
           </div>
           <Link
             href="/dashboard/jobs/new"
-            className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm shadow-indigo-500/20 transition-all hover:shadow-md hover:shadow-indigo-500/25"
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-primary-foreground text-sm font-semibold shadow-sm shadow-primary/20 transition-all hover:shadow-md"
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Add Application</span>
@@ -346,13 +346,13 @@ export default async function DashboardPage() {
           <>
             <StatStrip pipeline={pipeline} />
 
-            <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-5">
+            <div className="bg-card rounded-lg border border-border p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-stone-700 dark:text-stone-200 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-indigo-500" />
+                <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
                   Pipeline overview
                 </h2>
-                <span className="text-xs text-stone-400">{pipeline.total} total</span>
+                <span className="text-xs text-muted-foreground">{pipeline.total} total</span>
               </div>
               <PipelineFlow pipeline={pipeline} />
             </div>
@@ -363,11 +363,11 @@ export default async function DashboardPage() {
         {nudges.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs font-bold text-stone-400 dark:text-stone-600 uppercase tracking-widest">
+              <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                 Needs attention
               </h2>
               {nudges.length > 4 && (
-                <Link href="/dashboard/activity" className="text-xs text-indigo-500 hover:underline">
+                <Link href="/dashboard/activity" className="text-xs text-primary hover:underline">
                   +{nudges.length - 4} more
                 </Link>
               )}
@@ -383,21 +383,21 @@ export default async function DashboardPage() {
         {/* ── Recent Applications ───────────────────────────────── */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-bold text-stone-400 dark:text-stone-600 uppercase tracking-widest">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
               Recent Applications
             </h2>
             {jobs.length > 0 && (
-              <Link href="/dashboard/pipeline" className="text-xs text-indigo-500 hover:text-indigo-600 font-medium flex items-center gap-1">
+              <Link href="/dashboard/pipeline" className="text-xs text-primary hover:text-primary-hover font-medium flex items-center gap-1">
                 View all <ChevronRight className="h-3 w-3" />
               </Link>
             )}
           </div>
 
-          <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="bg-card rounded-lg border border-border overflow-hidden">
             {jobs.length === 0 ? (
               <EmptyState />
             ) : (
-              <div className="divide-y divide-stone-50 dark:divide-stone-800/50 p-1.5">
+              <div className="divide-y divide-border/50 p-1.5">
                 {jobs.map((job) => (
                   <JobRow key={job.id} job={job} />
                 ))}

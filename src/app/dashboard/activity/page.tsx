@@ -37,12 +37,12 @@ export default async function ActivityPage(props: {
         {/* ── Header ───────────────────────────────────────────── */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center">
-              <ClipboardList className="h-4.5 w-4.5 text-indigo-500" />
+            <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <ClipboardList className="h-4.5 w-4.5 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-stone-900 dark:text-stone-50">Applications</h1>
-              <p className="text-xs text-stone-400 mt-0.5">Full history of your job search activity</p>
+              <h1 className="text-xl font-bold text-foreground">Applications</h1>
+              <p className="text-xs text-muted-foreground mt-0.5">Full history of your job search activity</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -52,7 +52,7 @@ export default async function ActivityPage(props: {
               </Button>
             </Link>
             <Link href="/dashboard/jobs/new">
-              <Button size="sm" className="gap-1.5 text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-500/20">
+              <Button size="sm" className="gap-1.5 text-sm">
                 <Plus className="h-4 w-4" /> Add job
               </Button>
             </Link>
@@ -61,17 +61,17 @@ export default async function ActivityPage(props: {
 
         {/* ── Analytics charts ─────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-5">
+          <div className="bg-card rounded-lg border border-border p-5">
             <div className="flex items-center gap-2 mb-4">
-              <BarChart2 className="h-4 w-4 text-indigo-400" />
-              <h2 className="text-xs font-bold text-stone-400 dark:text-stone-600 uppercase tracking-widest">Activity heatmap</h2>
+              <BarChart2 className="h-4 w-4 text-primary" />
+              <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Activity heatmap</h2>
             </div>
             <ActivityHeatmap data={activityData} />
           </div>
-          <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-5">
+          <div className="bg-card rounded-lg border border-border p-5">
             <div className="flex items-center gap-2 mb-4">
-              <BarChart2 className="h-4 w-4 text-violet-400" />
-              <h2 className="text-xs font-bold text-stone-400 dark:text-stone-600 uppercase tracking-widest">Pipeline funnel</h2>
+              <BarChart2 className="h-4 w-4 text-primary" />
+              <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Pipeline funnel</h2>
             </div>
             <PipelineFunnel data={pipelineData} />
           </div>
@@ -85,9 +85,9 @@ export default async function ActivityPage(props: {
           </aside>
 
           {/* Job listing */}
-          <main className="flex-1 min-w-0 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
-            <div className="px-5 py-4 border-b border-stone-100 dark:border-stone-800">
-              <h2 className="text-sm font-semibold text-stone-700 dark:text-stone-200">
+          <main className="flex-1 min-w-0 bg-card rounded-lg border border-border overflow-hidden">
+            <div className="px-5 py-4 border-b border-border">
+              <h2 className="text-sm font-semibold text-foreground">
                 {total} application{total !== 1 ? "s" : ""}
               </h2>
             </div>

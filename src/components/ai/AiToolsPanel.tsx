@@ -98,14 +98,14 @@ export function AiToolsPanel({ jobApplicationId, hasOffer }: AiToolsPanelProps) 
   }
 
   return (
-    <div className="glass-card rounded-2xl overflow-hidden">
+    <div className="glass-card ai-glow-ring rounded-2xl overflow-hidden">
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-violet-500/10">
-            <Wand2 className="w-5 h-5 text-violet-500" />
+          <div className="p-2 rounded-xl bg-primary/10">
+            <Wand2 className="w-5 h-5 text-primary" />
           </div>
           <div>
             <h2 className="text-base font-bold text-foreground">AI Tools</h2>
@@ -143,7 +143,7 @@ export function AiToolsPanel({ jobApplicationId, hasOffer }: AiToolsPanelProps) 
             tool="resume"
             label="Tailor Resume"
             description="ATS-optimized for this role"
-            icon={<Wand2 className="w-4 h-4 text-teal-400" />}
+            icon={<Wand2 className="w-4 h-4 text-success" />}
             isRunning={isPending && activeTool === "resume"}
             result={results["resume"]}
             onRun={() => run("resume")}
@@ -249,7 +249,7 @@ function ToolSection({
             title="Copy to clipboard"
           >
             {isCopied ? (
-              <Check className="w-3 h-3 text-teal-400" />
+              <Check className="w-3 h-3 text-success" />
             ) : (
               <Copy className="w-3 h-3 text-muted-foreground" />
             )}
