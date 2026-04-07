@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getJobById, deleteJob } from "@/app/actions/jobs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusSelector } from "@/components/StatusSelector";
 import { Timeline } from "@/components/Timeline";
+import { AiEvaluationReport } from "@/components/ai/AiEvaluationReport";
+import { AiScoreBadge } from "@/components/ai/AiScoreBadge";
 import { formatDate, formatSalary } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -17,6 +18,7 @@ import {
   Trash2,
   FileText,
   Clock,
+  Sparkles,
 } from "lucide-react";
 
 interface JobDetailPageProps {
@@ -60,9 +62,12 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-              <span className="text-gradient">{job.position}</span>
-            </h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl sm:text-4xl font-bold">
+                <span className="text-gradient">{job.position}</span>
+              </h1>
+              <AiScoreBadge score={job.aiScore} size="md" />
+            </div>
             <div className="flex items-center gap-2 text-muted-foreground group">
               <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <Building2 className="w-4 h-4 text-primary" />
@@ -177,8 +182,24 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
             </div>
           </div>
 
-          {/* Sidebar - Timeline */}
-          <div className="lg:col-span-1">
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* AI Evaluation */}
+            <div className="glass-card p-6 rounded-2xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-xl bg-teal-500/10">
+                  <Sparkles className="w-5 h-5 text-teal-500" />
+                </div>
+                <h2 className="text-xl font-bold text-foreground">AI Evaluation</h2>
+              </div>
+              <AiEvaluationReport
+                jobApplicationId={job.id}
+                evaluation={job.aiEvaluation ?? null}
+                isPending={false}
+              />
+            </div>
+
+            {/* Timeline */}
             <div className="glass-card p-6 rounded-2xl">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 rounded-xl bg-purple-500/10">

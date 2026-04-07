@@ -1,5 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// CareerOS — Database Schema
+// Merged from job-tracker + career-ops
 
 generator client {
   provider = "prisma-client-js"
@@ -10,58 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id              String           @id @default(cuid())
-  email           String           @unique
-  emailVerified   DateTime?
-  name            String?
-  password        String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  jobApplications JobApplication[]
-}
-
-model VerificationToken {
-  id      String   @id @default(cuid())
-  email   String
-  token   String
-  expires     DateTime
-  attempts    Int      @default(0)
-  lastAttempt DateTime @default(now())
-
-  @@unique([email, token])
-}
-
-model PasswordResetToken {
-  id      String   @id @default(cuid())
-  email   String
-  token   String   @unique
-  expires DateTime
-
-  @@unique([email, token])
-}
-
-model JobApplication {
-  id          String          @id @default(cuid())
-  company     String
-  position    String
-  location    String?
-  salaryMin   Int?
-  salaryMax   Int?
-  jobUrl      String?
-  description String?
-  notes       String?
-  status      JobStatus       @default(APPLIED)
-  appliedAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  userId      String
-  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  timeline    TimelineEvent[]
-  documents   Document[]
-
-  @@index([userId])
-  @@index([status])
-}
+// ─── Enums ────────────────────────────────────────────────────────────────────
 
 enum JobStatus {
   WISHLIST
@@ -76,6 +25,262 @@ enum JobStatus {
   DISCARDED
 }
 
+enum WorkPreference {
+  REMOTE
+  HYBRID
+  ONSITE
+}
+
+enum Seniority {
+  JUNIOR
+  MID
+  SENIOR
+  STAFF
+  PRINCIPAL
+}
+
+enum AiScore {
+  A
+  B
+  C
+  D
+  F
+}
+
+// ─── User ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  emailVerified   DateTime?
+  name            String?
+  password        String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  jobApplications JobApplication[]
+  profile         UserProfile?
+  storyBank       StoryBankEntry[]
+}
+
+// ─── User Profile (career-ops profile.yml → DB) ───────────────────────────────
+
+model UserProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Identity
+  location       String?
+  timezone       String?
+  visaSponsorship Boolean        @default(false)
+  workPreference WorkPreference @default(HYBRID)
+
+  // Target roles
+  primaryRoles String[]  // e.g. ["Software Engineer", "Staff Engineer"]
+  seniority    Seniority @default(MID)
+  archetypes   String[]  // e.g. ["LLMOps", "Fullstack", "Platform"]
+
+  // Narrative (used in AI personalization)
+  headline    String?  // "Staff engineer specializing in distributed systems"
+  exitStory   String?  // What makes this candidate unique
+  superpower1 String?
+  superpower2 String?
+  superpower3 String?
+
+  // Proof points (JSON array of { name, url, heroMetric })
+  proofPoints Json?
+
+  // Compensation
+  targetCompMin  Int?
+  targetCompMax  Int?
+  minimumComp    Int?
+  compCurrency   String @default("USD")
+
+  // Links
+  linkedInUrl   String?
+  githubUrl     String?
+  portfolioUrl  String?
+  twitterUrl    String?
+
+  // Base CV — extracted text from uploaded PDF (used for resume tailoring)
+  baseCvContent String? @db.Text
+
+  // Onboarding state
+  wizardCompleted Boolean  @default(false)
+  completionPct   Int      @default(0) // 0-100, cached
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Job Application ──────────────────────────────────────────────────────────
+
+model JobApplication {
+  id          String    @id @default(cuid())
+  company     String
+  position    String
+  location    String?
+  salaryMin   Int?
+  salaryMax   Int?
+  jobUrl      String?
+  description String?   @db.Text
+  notes       String?   @db.Text
+  status      JobStatus @default(APPLIED)
+  appliedAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // AI evaluation (cached grade — full report in AiEvaluation)
+  aiScore AiScore?
+
+  // Offer details (populated when status = OFFER)
+  offerBase      Int?
+  offerEquity    String?  // e.g. "0.5%" or "$50,000"
+  offerBonus     Int?
+  offerBenefits  String?  @db.Text
+  offerStartDate DateTime?
+  offerExpiresAt DateTime?
+
+  // Relations
+  timeline      TimelineEvent[]
+  documents     Document[]
+  aiEvaluation  AiEvaluation?
+  interviewPrep InterviewPrepPackage?
+
+  @@index([userId])
+  @@index([status])
+  @@index([userId, status])
+  @@index([userId, updatedAt])
+}
+
+// ─── AI Evaluation (career-ops oferta mode → DB) ─────────────────────────────
+
+model AiEvaluation {
+  id               String         @id @default(cuid())
+  jobApplicationId String         @unique
+  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+
+  // Scores
+  score        AiScore // A / B / C / D / F
+  scoreNumeric Float   // 0.0–1.0 for sorting (A=1.0, B=0.8, C=0.6, D=0.4, F=0.2)
+
+  // Summary
+  summary          String  // One-line verdict
+  cvMatchPercent   Int?    // 0–100
+  keyGaps          String[] // Skills user lacks
+  keyStrengths     String[] // User's strongest matches
+
+  // Compensation
+  compensationSignal String? // "above" | "at" | "below" | "unknown"
+
+  // Full structured report (all 6 blocks from oferta.md)
+  // Stored as JSON: { blockA, blockB, blockC, blockD, blockE, blockF, keywords }
+  fullReport Json
+
+  // Company research (block D + deep mode)
+  companyResearch Json?
+
+  // Personalization plan (block E — top 5 CV changes)
+  personalizationPlan Json?
+
+  // Metadata
+  modelUsed     String  // e.g. "claude-sonnet-4-6"
+  promptVersion Int     @default(1)
+  generatedAt   DateTime @default(now())
+  expiresAt     DateTime? // Re-evaluate after this date (default: +30 days)
+
+  @@index([jobApplicationId])
+}
+
+// ─── STAR Story Bank (career-ops story-bank.md → DB) ─────────────────────────
+
+model StoryBankEntry {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title      String   // Short label: "Led migration to microservices"
+  situation  String   @db.Text
+  task       String   @db.Text
+  action     String   @db.Text
+  result     String   @db.Text
+  reflection String?  @db.Text // What you learned (the +R in STAR+R)
+
+  // Tagging
+  tags   String[] // ["leadership", "technical", "cross-functional"]
+  impact String?  // Quantified: "Reduced deploy time 40%"
+
+  // Usage tracking (which jobs this story was matched to)
+  usedInJobIds String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ─── Discovered Jobs (career-ops portal scanner → DB) ────────────────────────
+
+model DiscoveredJob {
+  id         String @id @default(cuid())
+  externalId String @unique // hash(company + position + url) — for dedup
+
+  company     String
+  position    String
+  location    String?
+  jobUrl      String
+  description String?  @db.Text
+  source      String   // "greenhouse" | "lever" | "ashby" | "wellfound" | "workable" | "websearch"
+  sourceSlug  String?  // company slug on the ATS platform
+  postedAt    DateTime?
+  discoveredAt DateTime @default(now())
+  isActive    Boolean  @default(true)
+
+  // Pre-filter metadata (set during scan)
+  titleRelevanceScore Float?  // 0–1 based on keyword match
+  rawTitleFromScan    String? // original title before normalization
+
+  @@index([source])
+  @@index([discoveredAt])
+  @@index([isActive])
+  @@index([isActive, discoveredAt])
+}
+
+// ─── Interview Prep Package ───────────────────────────────────────────────────
+
+model InterviewPrepPackage {
+  id               String         @id @default(cuid())
+  jobApplicationId String         @unique
+  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+
+  // Company research (6-axis from career-ops deep mode)
+  // { aiStrategy, recentMoves, engineeringCulture, challenges, competition, candidateAngle }
+  companyResearch Json?
+
+  // Predicted questions
+  // Array of { question, type: "behavioral"|"technical"|"culture", difficulty: 1-3 }
+  predictedQuestions Json?
+
+  // Matched STAR stories
+  // Array of { questionIndex, storyId, matchReason }
+  suggestedStories Json?
+
+  // User's free-form notes for this interview
+  prepNotes String? @db.Text
+
+  // Export state
+  lastExportedAt DateTime?
+
+  generatedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([jobApplicationId])
+}
+
+// ─── Timeline Event ───────────────────────────────────────────────────────────
+
 model TimelineEvent {
   id               String         @id @default(cuid())
   eventType        String
@@ -87,6 +292,8 @@ model TimelineEvent {
   @@index([jobApplicationId])
 }
 
+// ─── Document ─────────────────────────────────────────────────────────────────
+
 model Document {
   id               String         @id @default(cuid())
   name             String
@@ -96,6 +303,28 @@ model Document {
   createdAt        DateTime       @default(now())
   jobApplicationId String
   jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
-  
+
   @@index([jobApplicationId])
+}
+
+// ─── Auth Tokens ──────────────────────────────────────────────────────────────
+
+model VerificationToken {
+  id          String   @id @default(cuid())
+  email       String
+  token       String
+  expires     DateTime
+  attempts    Int      @default(0)
+  lastAttempt DateTime @default(now())
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
 }

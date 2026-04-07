@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { JobStatus } from "@prisma/client";
+import { triggerEvaluationAsync } from "@/app/actions/ai-evaluation";
 
 export async function createJob(formData: FormData) {
   const session = await auth();
@@ -46,6 +47,9 @@ export async function createJob(formData: FormData) {
       },
     },
   });
+
+  // Trigger AI evaluation in background (non-blocking)
+  triggerEvaluationAsync(job.id);
 
   revalidatePath("/dashboard");
   redirect(`/dashboard/jobs/${job.id}`);
@@ -246,9 +250,8 @@ export async function getJobById(jobId: string) {
   const job = await prisma.jobApplication.findUnique({
     where: { id: jobId },
     include: {
-      timeline: {
-        orderBy: { eventDate: "desc" },
-      },
+      timeline: { orderBy: { eventDate: "desc" } },
+      aiEvaluation: true,
     },
   });
 

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { User, Settings, LogOut, ChevronDown, LayoutDashboard } from "lucide-react";
+import { Settings, LogOut, ChevronDown, LayoutDashboard, UserCircle } from "lucide-react";
 import { logoutUser } from "@/app/actions/auth";
 import { cn } from "@/lib/utils";
 
@@ -12,9 +12,10 @@ interface UserMenuProps {
     email?: string | null;
     image?: string | null;
   };
+  profileCompletionPct?: number;
 }
 
-export function UserMenu({ user }: UserMenuProps) {
+export function UserMenu({ user, profileCompletionPct }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -69,6 +70,20 @@ export function UserMenu({ user }: UserMenuProps) {
             <p className="text-xs text-muted-foreground truncate">
               {user.email}
             </p>
+            {profileCompletionPct !== undefined && profileCompletionPct < 100 && (
+              <div className="mt-2">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs text-muted-foreground">Profile</span>
+                  <span className="text-xs text-muted-foreground">{profileCompletionPct}%</span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-teal-500 transition-all duration-500 rounded-full"
+                    style={{ width: `${profileCompletionPct}%` }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <Link
@@ -81,12 +96,26 @@ export function UserMenu({ user }: UserMenuProps) {
           </Link>
 
           <Link
+            href="/dashboard/profile"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+            onClick={() => setIsOpen(false)}
+          >
+            <UserCircle className="w-4 h-4" />
+            Career Profile
+            {profileCompletionPct !== undefined && profileCompletionPct < 60 && (
+              <span className="ml-auto text-xs bg-teal-500/15 text-teal-600 dark:text-teal-400 px-1.5 py-0.5 rounded-full">
+                Incomplete
+              </span>
+            )}
+          </Link>
+
+          <Link
             href="/dashboard/settings"
             className="flex items-center gap-2 px-3 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted rounded-lg transition-colors"
             onClick={() => setIsOpen(false)}
           >
             <Settings className="w-4 h-4" />
-            Profile Settings
+            Settings
           </Link>
 
           <button

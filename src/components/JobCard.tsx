@@ -13,6 +13,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
+import { AiScoreBadge } from "@/components/ai/AiScoreBadge";
 import { formatDate, formatSalary } from "@/lib/utils";
 
 interface JobCardProps {
@@ -56,6 +57,7 @@ export function JobCard({ job }: JobCardProps) {
                   {job.position}
                 </h3>
                 <StatusBadge status={job.status} size="sm" />
+                <AiScoreBadge score={job.aiScore} size="sm" />
               </div>
               <p className="text-muted-foreground font-medium mb-3">{job.company}</p>
 

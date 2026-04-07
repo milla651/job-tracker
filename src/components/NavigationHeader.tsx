@@ -173,9 +173,10 @@ export function NavigationHeader({ session }: NavigationHeaderProps) {
   if (isDashboard && session) {
     const dashNav = [
       { label: "Explore", href: "/dashboard/explore" },
+      { label: "Tracker", href: "/dashboard/tracker" },
       { label: "Activity", href: "/dashboard/activity" },
-      { label: "Pipeline", href: "/dashboard/pipeline" },
-      { label: "Settings", href: "/dashboard/settings" },
+      { label: "Stories", href: "/dashboard/stories" },
+      { label: "Profile", href: "/dashboard/profile" },
     ];
 
     return (

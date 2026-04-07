@@ -2,6 +2,7 @@
 
 import { JobApplication, JobStatus } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
+import { AiScoreBadge } from "@/components/ai/AiScoreBadge";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -37,7 +38,7 @@ export function KanbanJobCard({ job, onDragStart }: KanbanJobCardProps) {
             <div className="flex flex-col gap-3">
                 {/* Header */}
                 <div className="flex justify-between items-start gap-2">
-                    <div>
+                    <div className="flex-1 min-w-0">
                         <h4 className="font-semibold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
                             {job.position}
                         </h4>
@@ -45,8 +46,7 @@ export function KanbanJobCard({ job, onDragStart }: KanbanJobCardProps) {
                             {job.company}
                         </p>
                     </div>
-
-                    {/* If we have a logo or simple icon we could show it here */}
+                    <AiScoreBadge score={job.aiScore} size="sm" />
                 </div>
 
                 {/* Info */}
