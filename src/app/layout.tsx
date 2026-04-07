@@ -49,9 +49,15 @@ export const metadata: Metadata = {
         url: "/og-image.png", // We should ideally create this image
         width: 1200,
         height: 630,
-        alt: "JobTracker Dashboard Preview",
       },
     ],
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/logo.png', type: 'image/png' },
+    ],
+    apple: '/logo.png',
   },
   twitter: {
     card: "summary_large_image",

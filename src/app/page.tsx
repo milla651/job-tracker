@@ -13,20 +13,22 @@ import {
   Briefcase,
   LineChart,
   Bell,
-  ArrowRight,
   Check,
   Shield,
   Clock,
   Zap,
-  ArrowUpRight,
   Sparkles,
   Brain,
   FileText,
+  Rocket,
+  LogIn,
+  LayoutDashboard,
+  LogOut,
 } from "lucide-react";
 
 export default async function HomePage() {
   const session = await auth();
-  
+
   const faqData = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -77,61 +79,78 @@ export default async function HomePage() {
             text-foreground transition-colors duration-300">
             Your career,
             <br />
-            <span className="text-ai-gradient">
-              finally organised.
-            </span>
+            <span className="text-ai-gradient">finally organised.</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed transition-colors duration-300">
             CareerOS tracks every application, scores jobs with AI, generates
-            tailored documents, and sends smart follow-up nudges — automatically.
+            tailored documents, and sends smart follow-up nudges —
+            automatically.
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10 w-full px-4 sm:px-0">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-10 w-full px-4 sm:px-0">
             {!session ? (
               <>
                 <Link
                   href="/register"
-                  className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                    text-base font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0
-                    bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/25 overflow-hidden">
-                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                  <span className="relative flex items-center gap-2">
-                    Start Free
-                    <ArrowRight className="w-4 h-4" />
-                  </span>
+                  className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg
+                    text-sm md:text-base font-semibold
+                    bg-primary dark:bg-indigo-600 text-white dark:text-white
+                    border border-primary dark:border-indigo-500
+                    hover:bg-indigo-700 dark:hover:bg-indigo-500
+                    hover:shadow-lg hover:shadow-primary/40 dark:hover:shadow-indigo-600/30
+                    active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950
+                    transition-all duration-150 ease-out
+                    disabled:opacity-50 disabled:cursor-not-allowed">
+                  <span>Start Free</span>
+                  <Rocket className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform duration-200" />
                 </Link>
                 <Link
                   href="/login"
-                  className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                    text-base font-semibold transition-all duration-300 shadow-sm
-                    bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border">
-                  Sign In
-                  <ArrowUpRight className="w-4 h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+                  className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg
+                    text-sm md:text-base font-semibold
+                    bg-white dark:bg-slate-800 text-slate-900 dark:text-white
+                    border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600
+                    hover:bg-slate-50 dark:hover:bg-slate-700
+                    hover:shadow-md hover:shadow-slate-200 dark:hover:shadow-slate-900/50
+                    active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 dark:focus-visible:ring-slate-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950
+                    transition-all duration-150 ease-out
+                    disabled:opacity-50 disabled:cursor-not-allowed">
+                  <span>Sign In</span>
+                  <LogIn className="w-4 h-4 opacity-75 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
                 </Link>
               </>
             ) : (
               <>
                 <Link
                   href="/dashboard"
-                  className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                    text-base font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0
-                    bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/25 overflow-hidden">
-                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                  <span className="relative flex items-center gap-2">
-                    Open Dashboard
-                    <ArrowRight className="w-4 h-4" />
-                  </span>
+                  className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg
+                    text-sm md:text-base font-semibold
+                    bg-primary dark:bg-indigo-600 text-white dark:text-white
+                    border border-primary dark:border-indigo-500
+                    hover:bg-indigo-700 dark:hover:bg-indigo-500
+                    hover:shadow-lg hover:shadow-primary/40 dark:hover:shadow-indigo-600/30
+                    active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950
+                    transition-all duration-150 ease-out
+                    disabled:opacity-50 disabled:cursor-not-allowed">
+                  <span>Open Dashboard</span>
+                  <LayoutDashboard className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
                 </Link>
                 <form action={logoutUser} className="w-full sm:w-auto">
                   <button
                     type="submit"
-                    className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl w-full
-                      text-base font-semibold transition-all duration-300 shadow-sm
-                      bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground
-                      border border-destructive/20 hover:border-destructive">
-                    Logout
+                    className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg w-full
+                       text-sm md:text-base font-semibold
+                       bg-red-600 dark:bg-red-700 text-white dark:text-white
+                       border border-red-600 dark:border-red-600
+                       hover:bg-red-700 dark:hover:bg-red-600
+                       hover:shadow-lg hover:shadow-red-600/30 dark:hover:shadow-red-700/30
+                       active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:focus-visible:ring-red-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950
+                       transition-all duration-150 ease-out
+                       disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span>Logout</span>
+                    <LogOut className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                   </button>
                 </form>
               </>
@@ -141,9 +160,9 @@ export default async function HomePage() {
           {/* Trust strip */}
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground transition-colors duration-300">
             {[
-              { icon: Check,  label: "Free forever" },
+              { icon: Check, label: "Free forever" },
               { icon: Shield, label: "No card required" },
-              { icon: Clock,  label: "Setup in 2 min" },
+              { icon: Clock, label: "Setup in 2 min" },
             ].map(({ icon: Icon, label }) => (
               <span key={label} className="flex items-center gap-1.5">
                 <Icon className="w-3.5 h-3.5 text-primary/70" />
@@ -166,8 +185,8 @@ export default async function HomePage() {
         <div className="max-w-4xl mx-auto px-6 py-10 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
           {[
             { value: "10K+", label: "Jobs tracked" },
-            { value: "87%",  label: "Fewer missed follow-ups" },
-            { value: "3×",   label: "Faster than spreadsheets" },
+            { value: "87%", label: "Fewer missed follow-ups" },
+            { value: "3×", label: "Faster than spreadsheets" },
             { value: "Free", label: "No strings attached" },
           ].map(({ value, label }) => (
             <div key={label}>
@@ -239,7 +258,9 @@ export default async function HomePage() {
                 <h3 className="font-semibold text-foreground mb-2 transition-colors duration-300">
                   {title}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {desc}
+                </p>
               </div>
             ))}
           </div>
@@ -297,7 +318,9 @@ export default async function HomePage() {
                   <h3 className="font-semibold text-foreground mb-1 transition-colors duration-300">
                     {title}
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {desc}
+                  </p>
                 </div>
               </div>
             ))}
@@ -311,7 +334,8 @@ export default async function HomePage() {
           <div
             className="relative overflow-hidden rounded-3xl p-10 md:p-14 text-center"
             style={{
-              background: "linear-gradient(135deg, hsl(239 84% 55%) 0%, hsl(270 90% 65%) 100%)",
+              background:
+                "linear-gradient(135deg, hsl(239 84% 55%) 0%, hsl(270 90% 65%) 100%)",
             }}>
             {/* Dot texture overlay */}
             <div
@@ -341,50 +365,64 @@ export default async function HomePage() {
                 tracking with a system that actually works.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center w-full px-4 sm:px-0">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center w-full px-4 sm:px-0">
                 {!session ? (
                   <>
                     <Link
                       href="/register"
-                      className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                        text-base font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0
-                        bg-white text-primary font-bold shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 overflow-hidden">
-                      <div className="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                      <span className="relative flex items-center gap-2">
-                        Get Started Free
-                        <ArrowUpRight className="w-5 h-5" />
-                      </span>
+                      className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg
+                        text-sm md:text-base font-semibold
+                        bg-white text-indigo-600
+                        border border-white hover:border-white/90
+                        hover:bg-white/95 hover:shadow-xl hover:shadow-white/20
+                        active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-600
+                        transition-all duration-150 ease-out
+                        disabled:opacity-50 disabled:cursor-not-allowed">
+                      <span>Get Started Free</span>
+                      <Rocket className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform duration-200" />
                     </Link>
                     <Link
                       href="/login"
-                      className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                        text-base font-semibold transition-all duration-300
-                        bg-white/5 hover:bg-white/20 text-white border border-white/20 hover:border-white/40
-                        backdrop-blur-md shadow-sm">
-                        Sign In
+                      className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg
+                        text-sm md:text-base font-semibold
+                        bg-white/10 text-white
+                        border border-white/30 hover:border-white/50
+                        hover:bg-white/15 hover:shadow-lg hover:shadow-white/10
+                        active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-600
+                        transition-all duration-150 ease-out
+                        disabled:opacity-50 disabled:cursor-not-allowed">
+                      <span>Sign In</span>
+                      <LogIn className="w-4 h-4 opacity-75 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
                     </Link>
                   </>
                 ) : (
                   <>
                     <Link
                       href="/dashboard"
-                      className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                        text-base font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0
-                        bg-white text-primary font-bold shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 overflow-hidden">
-                      <div className="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                      <span className="relative flex items-center gap-2">
-                        Go to Dashboard
-                        <ArrowRight className="w-5 h-5" />
-                      </span>
+                      className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg
+                        text-sm md:text-base font-semibold
+                        bg-white text-indigo-600
+                        border border-white hover:border-white/90
+                        hover:bg-white/95 hover:shadow-xl hover:shadow-white/20
+                        active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-600
+                        transition-all duration-150 ease-out
+                        disabled:opacity-50 disabled:cursor-not-allowed">
+                      <span>Go to Dashboard</span>
+                      <LayoutDashboard className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
                     </Link>
                     <form action={logoutUser} className="w-full sm:w-auto">
                       <button
                         type="submit"
-                        className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                          text-base font-semibold transition-all duration-300 w-full
-                          bg-white/5 hover:bg-red-500/80 text-white border border-white/20 hover:border-red-500
-                          backdrop-blur-md shadow-sm cursor-pointer">
-                        Logout
+                        className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg w-full
+                          text-sm md:text-base font-semibold
+                          bg-white/10 text-white
+                          border border-white/30 hover:border-white/60
+                          hover:bg-white/15 hover:shadow-lg hover:shadow-red-500/20
+                          active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-600
+                          transition-all duration-150 ease-out
+                          disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span>Logout</span>
+                        <LogOut className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                       </button>
                     </form>
                   </>
@@ -427,7 +465,7 @@ export default async function HomePage() {
               <Link
                 key={item}
                 href={`/${item.toLowerCase()}`}
-                className="hover:text-foreground transition-colors duration-200">
+                className="text-muted-foreground hover:text-foreground hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-background rounded px-1 transition-all duration-200">
                 {item}
               </Link>
             ))}
