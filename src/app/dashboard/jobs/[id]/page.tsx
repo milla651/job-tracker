@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { getJobById, deleteJob } from "@/app/actions/jobs";
+import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { StatusSelector } from "@/components/StatusSelector";
 import { Timeline } from "@/components/Timeline";
 import { AiEvaluationReport } from "@/components/ai/AiEvaluationReport";
 import { AiScoreBadge } from "@/components/ai/AiScoreBadge";
+import { PrepPackageBanner } from "@/components/jobs/PrepPackageBanner";
 import { formatDate, formatSalary } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -27,11 +30,20 @@ interface JobDetailPageProps {
 
 export default async function JobDetailPage({ params }: JobDetailPageProps) {
   const { id } = await params;
+  const session = await auth();
   const job = await getJobById(id);
 
   if (!job) {
     notFound();
   }
+
+  // Check if a prep package exists (used to show banner state)
+  const prepPackage = session?.user?.id
+    ? await prisma.interviewPrepPackage.findUnique({
+        where: { jobApplicationId: id },
+        select: { id: true },
+      }).catch(() => null)
+    : null;
 
   return (
     <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden pt-24">
@@ -184,6 +196,13 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
 
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
+            {/* Interview Prep Banner */}
+            <PrepPackageBanner
+              jobId={job.id}
+              status={job.status}
+              hasPrepPackage={prepPackage !== null}
+            />
+
             {/* AI Evaluation */}
             <div className="glass-card p-6 rounded-2xl">
               <div className="flex items-center gap-3 mb-4">

@@ -122,39 +122,54 @@ function NudgeItem({
 }: {
   nudge: Awaited<ReturnType<typeof getSmartNudges>>[number];
 }) {
-  const isUrgent = nudge.daysSinceUpdate > 14;
+  const isUrgent = nudge.type === "STALE";
+  const isPrepReady = nudge.type === "PREP_READY";
+  const isPrepPending = nudge.type === "PREP_PENDING";
+
+  const href = nudge.prepUrl ?? `/dashboard/jobs/${nudge.id}`;
+
+  const dotColor = isUrgent
+    ? "bg-orange-400 animate-pulse"
+    : isPrepReady
+    ? "bg-teal-400"
+    : isPrepPending
+    ? "bg-blue-400 animate-pulse"
+    : "bg-teal-400";
+
+  const message =
+    nudge.type === "STALE"
+      ? `No activity in ${nudge.daysSinceUpdate} days`
+      : nudge.type === "FOLLOW_UP"
+      ? `Follow up — applied ${nudge.daysSinceUpdate}d ago`
+      : nudge.type === "PREP_READY"
+      ? "Interview prep ready — review now"
+      : nudge.type === "PREP_PENDING"
+      ? "In interview stage — generate prep"
+      : "";
+
+  const messageColor = isUrgent
+    ? "text-orange-500 dark:text-orange-400"
+    : isPrepReady || isPrepPending
+    ? "text-teal-600 dark:text-teal-400"
+    : "text-teal-600 dark:text-teal-400";
+
   return (
-    <Link href={`/dashboard/jobs/${nudge.id}`}>
+    <Link href={href}>
       <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors group">
-        <div
-          className={`mt-0.5 h-2 w-2 rounded-full shrink-0 ${
-            isUrgent
-              ? "bg-orange-400 animate-pulse"
-              : "bg-teal-400"
-          }`}
-        />
+        <div className={`mt-0.5 h-2 w-2 rounded-full shrink-0 ${dotColor}`} />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-stone-800 dark:text-stone-100 truncate">
             {nudge.company}
           </p>
           <p className="text-xs text-stone-500 truncate">{nudge.jobTitle}</p>
-          <p
-            className={`text-xs mt-0.5 ${
-              isUrgent
-                ? "text-orange-500 dark:text-orange-400"
-                : "text-teal-600 dark:text-teal-400"
-            }`}
-          >
-            {nudge.type === "STALE"
-              ? `No activity in ${nudge.daysSinceUpdate} days`
-              : `Follow up — applied ${nudge.daysSinceUpdate}d ago`}
-          </p>
+          <p className={`text-xs mt-0.5 ${messageColor}`}>{message}</p>
         </div>
         <ChevronRight className="h-4 w-4 text-stone-300 group-hover:text-stone-500 dark:group-hover:text-stone-400 transition-colors shrink-0 mt-0.5" />
       </div>
     </Link>
   );
 }
+
 
 // ── Recent Job Row ────────────────────────────────────────────────────────────
 

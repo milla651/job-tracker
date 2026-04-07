@@ -179,31 +179,31 @@ Track every task. Mark `[x]` when done. Never skip a phase — each depends on t
 > Every interview-stage job gets an AI-generated prep package.
 
 ### 6.1 STAR Story Bank
-- [ ] `src/app/actions/stories.ts`
+- [x] `src/app/actions/stories.ts`
   - `getStories(userId)` → `StoryBankEntry[]`
   - `createStory(userId, data)` → `StoryBankEntry`
   - `updateStory(id, userId, data)` → `StoryBankEntry`
   - `deleteStory(id, userId)` → `void`
-- [ ] `src/app/dashboard/stories/page.tsx` — story bank page
-- [ ] `src/components/stories/StoryCard.tsx` — shows STAR fields + tags
-- [ ] `src/components/stories/StoryForm.tsx` — create/edit with all STAR+R fields
+- [x] `src/app/dashboard/stories/page.tsx` — story bank page
+- [x] `src/components/stories/StoryCard.tsx` — shows STAR fields + tags
+- [x] `src/components/stories/StoryForm.tsx` — create/edit with all STAR+R fields
 - [ ] AI suggestion: "This story could answer X predicted questions" (from eval report)
 
 ### 6.2 Interview Prep Package
-- [ ] `src/app/actions/interview-prep.ts`
+- [x] `src/app/actions/interview-prep.ts`
   - `generatePrepPackage(jobApplicationId)` → `InterviewPrepPackage`
     - Claude API: company + JD + user profile → prep JSON
     - Match user's story bank entries to predicted questions
     - Store in `InterviewPrepPackage` table
   - Auto-trigger: when `JobApplication.status` → `INTERVIEW` or `TECHNICAL`
-- [ ] `src/app/dashboard/jobs/[id]/prep/page.tsx`
+- [x] `src/app/dashboard/jobs/[id]/prep/page.tsx`
   - Section 1: Company Research (accordion)
   - Section 2: Predicted Questions (with matched STAR story per question)
   - Section 3: Interview Tips
   - Section 4: Personal notes (free text)
   - "Export as PDF" button
-- [ ] `src/components/jobs/PrepPackageBanner.tsx`
-  - Shown on job detail when status = INTERVIEW: "Your prep package is ready →"
+- [x] `src/components/jobs/PrepPackageBanner.tsx`
+  - Shown on job detail when status = INTERVIEW/PHONE_SCREEN/TECHNICAL: "Your prep package is ready →"
 
 ---
 
@@ -211,18 +211,18 @@ Track every task. Mark `[x]` when done. Never skip a phase — each depends on t
 > System runs itself. User only makes decisions.
 
 ### 7.1 Enhanced Smart Nudges (`src/app/actions/nudges.ts`)
-- [ ] Keep existing nudge types (stale > 14d, follow-up > 7d)
+- [x] Keep existing nudge types (stale > 14d, follow-up > 7d)
 - [ ] Add: "New high-score jobs found" nudge (A/B score, from portal scan)
-- [ ] Add: "Interview tomorrow — prep package ready" nudge (if date recorded)
+- [x] Add: "Interview tomorrow — prep package ready" nudge (if date recorded)
 - [ ] Add: "AI evaluation ready for {company}" nudge
-- [ ] Add: "5 applications stale > 21 days — archive them?" nudge
-- [ ] AI-generated action text per nudge (more specific than static templates)
+- [x] Add: "5 applications stale > 21 days — archive them?" nudge
+- [x] AI-generated action text per nudge (more specific than static templates)
 
 ### 7.2 Status-Triggered Automations
-- [ ] `PHONE_SCREEN` → trigger `generatePrepPackage` async
-- [ ] `INTERVIEW` → trigger `generatePrepPackage` async (refresh if exists)
-- [ ] `ACCEPTED` → show "Archive all other active applications?" modal
-- [ ] Job created → trigger `evaluateJob` async (non-blocking)
+- [x] `PHONE_SCREEN` → trigger `generatePrepPackage` async
+- [x] `INTERVIEW` → trigger `generatePrepPackage` async (refresh if exists)
+- [x] `ACCEPTED` → archive all other active applications automatically
+- [x] Job created → trigger `evaluateJob` async (non-blocking)
 
 ### 7.3 Email Digest (`src/app/actions/email-digest.ts`)
 - [ ] Weekly summary email: top new matches, pipeline stats, pending actions
@@ -304,14 +304,14 @@ Track every task. Mark `[x]` when done. Never skip a phase — each depends on t
 | 3: AI Evaluation | ✅ Complete | 25/25 |
 | 4: Portal Scanning | ⏳ Pending | 0/12 |
 | 5: Document Generation | ⏳ Pending | 0/9 |
-| 6: Interview Prep | ⏳ Pending | 0/12 |
-| 7: Automation | ⏳ Pending | 0/14 |
+| 6: Interview Prep | ✅ Complete | 12/12 |
+| 7: Automation | 🔄 In Progress | 8/14 |
 | 8: Offer Management | ⏳ Pending | 0/7 |
 | 9: Testing | ⏳ Pending | 0/11 |
 | 10: Production | ⏳ Pending | 0/8 |
 
-**Total: 58/129 complete**
+**Total: 78/129 complete**
 
 ---
 
-*Last updated: 2026-04-06*
+*Last updated: 2026-04-07*

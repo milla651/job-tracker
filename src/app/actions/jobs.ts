@@ -6,6 +6,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { JobStatus } from "@prisma/client";
 import { triggerEvaluationAsync } from "@/app/actions/ai-evaluation";
+import { triggerPrepPackageAsync } from "@/app/actions/interview-prep";
+
+const INTERVIEW_STATUSES: JobStatus[] = ["PHONE_SCREEN", "INTERVIEW", "TECHNICAL"];
+const ARCHIVE_ON_ACCEPT_STATUSES: JobStatus[] = [
+  "WISHLIST", "APPLIED", "PHONE_SCREEN", "INTERVIEW", "TECHNICAL",
+];
 
 export async function createJob(formData: FormData) {
   const session = await auth();
@@ -113,6 +119,7 @@ export async function updateJobStatus(jobId: string, newStatus: JobStatus) {
 
   const oldStatus = job.status;
 
+  // Update status + log timeline event
   await prisma.$transaction([
     prisma.jobApplication.update({
       where: { id: jobId },
@@ -126,6 +133,23 @@ export async function updateJobStatus(jobId: string, newStatus: JobStatus) {
       },
     }),
   ]);
+
+  // When ACCEPTED → archive all other active applications
+  if (newStatus === "ACCEPTED") {
+    await prisma.jobApplication.updateMany({
+      where: {
+        userId: session.user.id,
+        id: { not: jobId },
+        status: { in: ARCHIVE_ON_ACCEPT_STATUSES },
+      },
+      data: { status: "WITHDRAWN" },
+    });
+  }
+
+  // Trigger prep package generation when moving into an interview stage for the first time
+  if (INTERVIEW_STATUSES.includes(newStatus) && !INTERVIEW_STATUSES.includes(oldStatus)) {
+    triggerPrepPackageAsync(jobId);
+  }
 
   revalidatePath("/dashboard");
   revalidatePath(`/dashboard/jobs/${jobId}`);
