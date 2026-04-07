@@ -5,24 +5,11 @@ import { getJobById, deleteJob } from "@/app/actions/jobs";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { StatusSelector } from "@/components/StatusSelector";
-import { Timeline } from "@/components/Timeline";
-import { AiEvaluationReport } from "@/components/ai/AiEvaluationReport";
 import { AiScoreBadge } from "@/components/ai/AiScoreBadge";
-import { PrepPackageBanner } from "@/components/jobs/PrepPackageBanner";
-import { formatDate, formatSalary } from "@/lib/utils";
-import {
-  ArrowLeft,
-  Building2,
-  MapPin,
-  DollarSign,
-  Calendar,
-  ExternalLink,
-  Pencil,
-  Trash2,
-  FileText,
-  Clock,
-  Sparkles,
-} from "lucide-react";
+import { JobDetailTabs } from "@/components/jobs/JobDetailTabs";
+import { ArrowLeft, Building2, Pencil, Trash2, MapPin, DollarSign } from "lucide-react";
+import { formatSalary } from "@/lib/utils";
+import type { AiScore } from "@prisma/client";
 
 interface JobDetailPageProps {
   params: Promise<{ id: string }>;
@@ -33,203 +20,111 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
   const session = await auth();
   const job = await getJobById(id);
 
-  if (!job) {
-    notFound();
-  }
+  if (!job) notFound();
 
-  // Check if a prep package exists (used to show banner state)
-  const prepPackage = session?.user?.id
-    ? await prisma.interviewPrepPackage.findUnique({
-        where: { jobApplicationId: id },
-        select: { id: true },
-      }).catch(() => null)
-    : null;
+  const [prepPackage, stories] = await Promise.all([
+    session?.user?.id
+      ? prisma.interviewPrepPackage.findUnique({ where: { jobApplicationId: id } }).catch(() => null)
+      : null,
+    session?.user?.id
+      ? prisma.storyBankEntry.findMany({
+          where: { userId: session.user.id },
+          orderBy: { createdAt: "desc" },
+        }).catch(() => [])
+      : [],
+  ]);
+
+  const salaryText = formatSalary(job.salaryMin, job.salaryMax);
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden pt-24">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark" />
-      <div className="absolute inset-0 bg-aurora" />
-      <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-accent/20 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-3xl animate-float-delayed" />
-      <div
-        className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
-        style={{
-          backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
-                              linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px'
-        }}
-      />
+    <div className="min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back button */}
+        {/* ── Back nav ──────────────────────────────────────────── */}
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors group"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
+          <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          Dashboard
         </Link>
 
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl sm:text-4xl font-bold">
-                <span className="text-gradient">{job.position}</span>
-              </h1>
-              <AiScoreBadge score={job.aiScore} size="md" />
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground group">
-              <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <Building2 className="w-4 h-4 text-primary" />
-              </div>
-              <span className="text-lg font-medium">{job.company}</span>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <StatusSelector jobId={job.id} currentStatus={job.status} />
-            <Link href={`/dashboard/jobs/${job.id}/edit`}>
-              <Button variant="outline" size="sm">
-                <Pencil className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            </Link>
-            <form action={async () => {
-              "use server";
-              await deleteJob(id);
-            }}>
-              <Button variant="destructive" size="sm" type="submit">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete
-              </Button>
-            </form>
-          </div>
-        </div>
+        {/* ── Job hero ──────────────────────────────────────────── */}
+        <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+          {/* Accent stripe */}
+          <div className="h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500" />
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Job Details Card */}
-            <div className="glass-card p-6 rounded-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl" />
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-xl bg-indigo-500/10">
-                  <FileText className="w-5 h-5 text-indigo-500" />
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              {/* Company avatar */}
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white font-bold text-xl shrink-0 shadow-md shadow-indigo-500/20">
+                {job.company.charAt(0).toUpperCase()}
+              </div>
+
+              {/* Title + company + meta */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start gap-3 flex-wrap">
+                  <h1 className="text-xl font-bold text-stone-900 dark:text-stone-50 leading-tight">
+                    {job.position}
+                  </h1>
+                  <AiScoreBadge score={job.aiScore as AiScore} size="md" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground">Job Details</h2>
-              </div>
-
-              <div className="space-y-4 relative">
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                  <span className="flex items-center gap-1.5 text-sm text-stone-500 dark:text-stone-400">
+                    <Building2 className="h-3.5 w-3.5 shrink-0" />
+                    {job.company}
+                  </span>
                   {job.location && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 border border-border/50 hover:bg-secondary/80 transition-colors">
-                      <MapPin className="w-5 h-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-xs text-muted-foreground font-medium">Location</p>
-                        <p className="text-foreground font-medium">{job.location}</p>
-                      </div>
-                    </div>
+                    <span className="flex items-center gap-1.5 text-sm text-stone-500 dark:text-stone-400">
+                      <MapPin className="h-3.5 w-3.5 shrink-0" />
+                      {job.location}
+                    </span>
                   )}
-                  {(job.salaryMin || job.salaryMax) && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 border border-border/50 hover:bg-secondary/80 transition-colors">
-                      <DollarSign className="w-5 h-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-xs text-muted-foreground font-medium">Salary Range</p>
-                        <p className="text-foreground font-medium">
-                          {formatSalary(job.salaryMin, job.salaryMax)}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 border border-border/50 hover:bg-secondary/80 transition-colors">
-                    <Calendar className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-xs text-muted-foreground font-medium">Applied On</p>
-                      <p className="text-foreground font-medium">{formatDate(job.appliedAt)}</p>
-                    </div>
-                  </div>
-                  {job.jobUrl && (
-                    <a
-                      href={job.jobUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/10 hover:bg-indigo-500/10 transition-colors group"
-                    >
-                      <ExternalLink className="w-5 h-5 text-indigo-500 ml-1 group-hover:scale-110 transition-transform" />
-                      <div>
-                        <p className="text-xs text-indigo-500/70 font-medium">Job Posting</p>
-                        <p className="text-indigo-600 font-semibold">View Original Post</p>
-                      </div>
-                    </a>
+                  {salaryText && (
+                    <span className="flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                      <DollarSign className="h-3.5 w-3.5 shrink-0" />
+                      {salaryText}
+                    </span>
                   )}
                 </div>
-
-                {job.description && (
-                  <div className="mt-8">
-                    <h3 className="text-sm font-bold text-muted-foreground mb-3 flex items-center gap-2">
-                      Job Description
-                    </h3>
-                    <div className="p-5 rounded-xl bg-background/40 border border-border/50 backdrop-blur-sm">
-                      <p className="text-foreground/90 whitespace-pre-wrap leading-relaxed">
-                        {job.description}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {job.notes && (
-                  <div className="mt-6">
-                    <h3 className="text-sm font-bold text-muted-foreground mb-3">
-                      Personal Notes
-                    </h3>
-                    <div className="p-5 rounded-xl bg-amber-500/5 border border-amber-500/10">
-                      <p className="text-foreground/90 whitespace-pre-wrap leading-relaxed">
-                        {job.notes}
-                      </p>
-                    </div>
-                  </div>
-                )}
               </div>
-            </div>
-          </div>
 
-          {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Interview Prep Banner */}
-            <PrepPackageBanner
-              jobId={job.id}
-              status={job.status}
-              hasPrepPackage={prepPackage !== null}
-            />
-
-            {/* AI Evaluation */}
-            <div className="glass-card p-6 rounded-2xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-xl bg-teal-500/10">
-                  <Sparkles className="w-5 h-5 text-teal-500" />
-                </div>
-                <h2 className="text-xl font-bold text-foreground">AI Evaluation</h2>
+              {/* Actions */}
+              <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                <StatusSelector jobId={job.id} currentStatus={job.status} />
+                <Link href={`/dashboard/jobs/${job.id}/edit`}>
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <Pencil className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Edit</span>
+                  </Button>
+                </Link>
+                <form action={async () => {
+                  "use server";
+                  await deleteJob(id);
+                }}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    type="submit"
+                    className="text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </form>
               </div>
-              <AiEvaluationReport
-                jobApplicationId={job.id}
-                evaluation={job.aiEvaluation ?? null}
-                isPending={false}
-              />
-            </div>
-
-            {/* Timeline */}
-            <div className="glass-card p-6 rounded-2xl">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-xl bg-purple-500/10">
-                  <Clock className="w-5 h-5 text-purple-500" />
-                </div>
-                <h2 className="text-xl font-bold text-foreground">Timeline</h2>
-              </div>
-              <Timeline events={job.timeline} />
             </div>
           </div>
         </div>
+
+        {/* ── Tabbed content ────────────────────────────────────── */}
+        <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-6">
+          <JobDetailTabs
+            job={job}
+            prepPackage={prepPackage ?? null}
+            stories={stories ?? []}
+          />
+        </div>
+
       </div>
     </div>
   );

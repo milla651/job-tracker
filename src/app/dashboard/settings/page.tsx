@@ -1,81 +1,87 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ProfileForm } from "@/components/ProfileForm";
+import { NudgeEmailSettings } from "@/components/settings/NudgeEmailSettings";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Sparkles, ChevronRight } from "lucide-react";
+import { Sparkles, ChevronRight, Bell, UserCircle } from "lucide-react";
+
+export const metadata = { title: "Settings — CareerOS" };
 
 export default async function SettingsPage() {
   const session = await auth();
+  if (!session?.user?.id) redirect("/login");
 
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  const [user, profile] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, email: true },
+    }),
+    prisma.userProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { emailNudgesEnabled: true },
+    }),
+  ]);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { name: true, email: true },
-  });
-
-  if (!user) {
-    // Should not happen if session exists, but good safety
-    redirect("/login");
-  }
+  if (!user) redirect("/login");
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden pt-24">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark" />
-      <div className="absolute inset-0 bg-aurora" />
-      <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-accent/20 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-3xl animate-float-delayed" />
-      <div
-        className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
-        style={{
-          backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
-                              linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px'
-        }}
-      />
+    <div className="min-h-screen">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold">
-            <span className="text-gradient">Settings</span>
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your account settings and profile information.
+        {/* ── Header ───────────────────────────────────────────── */}
+        <div>
+          <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-50">Settings</h1>
+          <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
+            Manage your account and notification preferences.
           </p>
         </div>
 
-        {/* Career profile banner */}
-        <Link href="/dashboard/profile" className="block mb-4">
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-teal-50 dark:bg-teal-950/30 border border-teal-200/60 dark:border-teal-800/60 hover:bg-teal-100 dark:hover:bg-teal-950/50 transition-colors group">
-            <div className="p-2 rounded-xl bg-teal-100 dark:bg-teal-900/50">
-              <Sparkles className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+        {/* ── Career profile CTA ───────────────────────────────── */}
+        <Link href="/dashboard/profile">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-800/50 hover:bg-indigo-100/80 dark:hover:bg-indigo-950/50 transition-colors group">
+            <div className="h-9 w-9 rounded-xl bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center shrink-0">
+              <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-teal-800 dark:text-teal-200">Career Profile & AI Settings</p>
-              <p className="text-xs text-teal-600 dark:text-teal-400">Target roles, CV, compensation expectations — powers AI job scoring.</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">Career Profile & AI</p>
+              <p className="text-xs text-indigo-600/80 dark:text-indigo-400/80">
+                Target roles, CV, salary targets — powers all AI features
+              </p>
             </div>
-            <ChevronRight className="h-4 w-4 text-teal-400 group-hover:text-teal-600 transition-colors" />
+            <ChevronRight className="h-4 w-4 text-indigo-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        <div className="glass-card p-8 rounded-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
-          <div className="relative">
-            <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-              <span className="p-2 rounded-lg bg-primary/10">
-                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </span>
-              Account Information
-            </h2>
+        {/* ── Account info ─────────────────────────────────────── */}
+        <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="px-5 py-4 border-b border-stone-100 dark:border-stone-800 flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+              <UserCircle className="h-4 w-4 text-stone-500" />
+            </div>
+            <h2 className="text-sm font-semibold text-stone-800 dark:text-stone-100">Account information</h2>
+          </div>
+          <div className="p-5">
             <ProfileForm initialData={user} />
           </div>
         </div>
+
+        {/* ── Notifications ────────────────────────────────────── */}
+        <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="px-5 py-4 border-b border-stone-100 dark:border-stone-800 flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center">
+              <Bell className="h-4 w-4 text-teal-500" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-stone-800 dark:text-stone-100">Notifications</h2>
+              <p className="text-xs text-stone-400 mt-0.5">Weekly digest of your job pipeline nudges</p>
+            </div>
+          </div>
+          <div className="p-5">
+            <NudgeEmailSettings enabled={profile?.emailNudgesEnabled ?? true} />
+          </div>
+        </div>
+
       </div>
     </div>
   );

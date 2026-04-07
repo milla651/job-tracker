@@ -2,7 +2,7 @@ import { JobForm } from "@/components/JobForm";
 
 export default function NewJobPage() {
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden pt-24">
+    <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden pt-8">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark" />
       <div className="absolute inset-0 bg-aurora" />

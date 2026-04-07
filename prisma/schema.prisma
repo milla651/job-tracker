@@ -106,6 +106,9 @@ model UserProfile {
   // Base CV — extracted text from uploaded PDF (used for resume tailoring)
   baseCvContent String? @db.Text
 
+  // Notifications
+  emailNudgesEnabled Boolean @default(true)
+
   // Onboarding state
   wizardCompleted Boolean  @default(false)
   completionPct   Int      @default(0) // 0-100, cached

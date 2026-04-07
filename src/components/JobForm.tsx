@@ -35,17 +35,26 @@ interface JobFormProps {
   mode: "create" | "edit";
 }
 
-const statusOptions = [
-  { value: "WISHLIST", label: "🌟 Dream Job" },
-  { value: "APPLIED", label: "📤 Applied & Waiting" },
-  { value: "PHONE_SCREEN", label: "📞 First Contact" },
-  { value: "INTERVIEW", label: "🎤 Crushing It" },
-  { value: "TECHNICAL", label: "💻 Code Mode" },
-  { value: "OFFER", label: "📋 Offer Received" },
-  { value: "ACCEPTED", label: "🎉 Let's Go!" },
-  { value: "REJECTED", label: "❌ Their Loss" },
-  { value: "WITHDRAWN", label: "↩️ Changed Mind" },
+// New job: only show statuses that make sense at discovery time
+const createStatusOptions = [
+  { value: "WISHLIST", label: "Saved — interested, not applied yet" },
+  { value: "APPLIED",  label: "Applied — already submitted application" },
 ];
+
+// Edit: show full status list
+const allStatusOptions = [
+  { value: "WISHLIST",     label: "Wishlist" },
+  { value: "APPLIED",      label: "Applied" },
+  { value: "PHONE_SCREEN", label: "Phone Screen" },
+  { value: "INTERVIEW",    label: "Interview" },
+  { value: "TECHNICAL",    label: "Technical Round" },
+  { value: "OFFER",        label: "Offer Received" },
+  { value: "ACCEPTED",     label: "Accepted" },
+  { value: "REJECTED",     label: "Rejected" },
+  { value: "WITHDRAWN",    label: "Withdrawn" },
+];
+
+const statusOptions = allStatusOptions; // keep for edit mode reference
 
 export function JobForm({ job, mode }: JobFormProps) {
   const router = useRouter();
@@ -68,7 +77,8 @@ export function JobForm({ job, mode }: JobFormProps) {
           setError(result.error);
         } else {
           if (isWin) triggerFireworks();
-          router.push("/jobs");
+          // createJob does a server redirect, so this is a fallback
+          router.push("/dashboard");
         }
       } else if (job) {
         const result = await updateJob(job.id, formData);
@@ -76,7 +86,7 @@ export function JobForm({ job, mode }: JobFormProps) {
           setError(result.error);
         } else {
           if (isWin) triggerFireworks();
-          router.push(`/jobs/${job.id}`);
+          router.push(`/dashboard/jobs/${job.id}`);
         }
       }
     } catch (e) {
@@ -248,7 +258,7 @@ export function JobForm({ job, mode }: JobFormProps) {
                          shadow-sm hover:shadow
                          cursor-pointer"
               >
-                {statusOptions.map(option => (
+                {(mode === "create" ? createStatusOptions : allStatusOptions).map(option => (
                   <option key={option.value} value={option.value} className="py-2">
                     {option.label}
                   </option>

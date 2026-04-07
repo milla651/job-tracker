@@ -9,268 +9,288 @@ import { formatDistanceToNow } from "date-fns";
 import {
   Plus,
   Briefcase,
-  MessageSquare,
-  Trophy,
-  TrendingUp,
-  Bell,
   ChevronRight,
-  Compass,
-  Kanban,
-  Clock,
+  ArrowRight,
+  AlertCircle,
+  MessageSquare,
   Sparkles,
-  ArrowUpRight,
+  BookOpen,
+  Telescope,
+  CheckCircle2,
+  Circle,
+  TrendingUp,
+  Columns3,
 } from "lucide-react";
+import type { AiScore, JobStatus } from "@prisma/client";
 
 export const metadata = { title: "Dashboard — CareerOS" };
 
-// ── Server helpers ────────────────────────────────────────────────────────────
+// ── Data ──────────────────────────────────────────────────────────────────────
 
 async function getDashboardData(userId: string) {
-  const [jobs, nudges] = await Promise.all([
+  const [jobs, nudges, stats, profile] = await Promise.all([
     prisma.jobApplication.findMany({
-      where: { userId },
+      where: { userId, status: { notIn: ["DISCARDED", "REJECTED", "WITHDRAWN"] } },
       orderBy: { updatedAt: "desc" },
-      take: 6,
-      select: {
-        id: true,
-        company: true,
-        position: true,
-        status: true,
-        aiScore: true,
-        updatedAt: true,
-        appliedAt: true,
-      },
+      take: 8,
+      select: { id: true, company: true, position: true, status: true, aiScore: true, updatedAt: true },
     }),
     getSmartNudges(),
+    prisma.jobApplication.groupBy({
+      by: ["status"],
+      where: { userId },
+      _count: { status: true },
+    }),
+    prisma.userProfile.findUnique({
+      where: { userId },
+      select: { completionPct: true, wizardCompleted: true },
+    }),
   ]);
 
-  const stats = await prisma.jobApplication.groupBy({
-    by: ["status"],
-    where: { userId },
-    _count: { status: true },
-  });
-
-  const byStatus = Object.fromEntries(
-    stats.map((s) => [s.status, s._count.status])
-  );
+  const byStatus = Object.fromEntries(stats.map((s) => [s.status, s._count.status]));
+  const total = stats.reduce((s, r) => s + r._count.status, 0);
+  const active = (byStatus["APPLIED"] ?? 0) + (byStatus["PHONE_SCREEN"] ?? 0) + (byStatus["INTERVIEW"] ?? 0) + (byStatus["TECHNICAL"] ?? 0);
 
   return {
     jobs,
     nudges,
-    stats: {
-      total: stats.reduce((s, r) => s + r._count.status, 0),
-      active:
-        (byStatus["APPLIED"] ?? 0) +
-        (byStatus["PHONE_SCREEN"] ?? 0) +
-        (byStatus["INTERVIEW"] ?? 0) +
-        (byStatus["TECHNICAL"] ?? 0),
-      interviews:
-        (byStatus["INTERVIEW"] ?? 0) + (byStatus["TECHNICAL"] ?? 0),
-      offers: byStatus["OFFER"] ?? 0,
-      accepted: byStatus["ACCEPTED"] ?? 0,
+    profile,
+    pipeline: {
+      wishlist:  byStatus["WISHLIST"]     ?? 0,
+      applied:   byStatus["APPLIED"]      ?? 0,
+      screening: byStatus["PHONE_SCREEN"] ?? 0,
+      interview: (byStatus["INTERVIEW"]   ?? 0) + (byStatus["TECHNICAL"] ?? 0),
+      offer:     byStatus["OFFER"]        ?? 0,
+      accepted:  byStatus["ACCEPTED"]     ?? 0,
+      total,
+      active,
     },
   };
 }
 
-// ── Stat Card ─────────────────────────────────────────────────────────────────
+// ── Stat Strip ────────────────────────────────────────────────────────────────
 
-function StatCard({
-  label,
-  value,
-  icon: Icon,
-  accent,
-  href,
-}: {
-  label: string;
-  value: number;
-  icon: React.ElementType;
-  accent: string;
-  href?: string;
-}) {
-  const inner = (
-    <div
-      className={`group relative overflow-hidden rounded-2xl border bg-white dark:bg-stone-900 p-5 transition-all duration-200 hover:shadow-md ${accent}`}
-    >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">
-            {label}
-          </p>
-          <p className="text-4xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-            {value}
-          </p>
-        </div>
-        <div className={`p-2.5 rounded-xl ${accent.replace("border-", "bg-").replace("/30", "/15")}`}>
-          <Icon className="h-5 w-5" />
-        </div>
-      </div>
-      {href && (
-        <div className="mt-3 flex items-center gap-1 text-xs text-stone-400 group-hover:text-stone-600 dark:group-hover:text-stone-300 transition-colors">
-          View all <ChevronRight className="h-3 w-3" />
-        </div>
-      )}
+interface PipelineData {
+  wishlist: number; applied: number; screening: number;
+  interview: number; offer: number; accepted: number;
+  total: number; active: number;
+}
+
+function StatStrip({ pipeline }: { pipeline: PipelineData }) {
+  const stats = [
+    { label: "Total",     value: pipeline.total,     href: "/dashboard/pipeline", color: "text-stone-700 dark:text-stone-200" },
+    { label: "Active",    value: pipeline.active,    href: "/dashboard/pipeline", color: "text-blue-600 dark:text-blue-400" },
+    { label: "Interview", value: pipeline.interview, href: "/dashboard/pipeline", color: "text-amber-600 dark:text-amber-400" },
+    { label: "Offers",    value: pipeline.offer,     href: "/dashboard/pipeline", color: "text-emerald-600 dark:text-emerald-400" },
+  ];
+  return (
+    <div className="grid grid-cols-4 gap-3">
+      {stats.map(({ label, value, href, color }) => (
+        <Link key={label} href={href}>
+          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-4 text-center hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-sm transition-all group">
+            <p className={`text-2xl font-bold tabular-nums leading-none ${color}`}>{value}</p>
+            <p className="text-[11px] font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-wide mt-1.5">{label}</p>
+          </div>
+        </Link>
+      ))}
     </div>
   );
-
-  return href ? <Link href={href}>{inner}</Link> : inner;
 }
 
-// ── Nudge Item ────────────────────────────────────────────────────────────────
+// ── Pipeline Flow ─────────────────────────────────────────────────────────────
 
-function NudgeItem({
-  nudge,
-}: {
-  nudge: Awaited<ReturnType<typeof getSmartNudges>>[number];
-}) {
-  const isUrgent = nudge.type === "STALE";
-  const isPrepReady = nudge.type === "PREP_READY";
-  const isPrepPending = nudge.type === "PREP_PENDING";
+function PipelineFlow({ pipeline }: { pipeline: PipelineData }) {
+  const stages = [
+    { label: "Wishlist",  count: pipeline.wishlist,  dot: "bg-stone-400" },
+    { label: "Applied",   count: pipeline.applied,   dot: "bg-blue-500" },
+    { label: "Screening", count: pipeline.screening, dot: "bg-violet-500" },
+    { label: "Interview", count: pipeline.interview, dot: "bg-amber-500" },
+    { label: "Offer",     count: pipeline.offer,     dot: "bg-emerald-500" },
+  ];
 
+  const max = Math.max(...stages.map((s) => s.count), 1);
+
+  return (
+    <Link href="/dashboard/pipeline" className="block group">
+      <div className="flex items-end gap-2 h-14 mb-3">
+        {stages.map((stage) => (
+          <div key={stage.label} className="flex-1 flex flex-col items-center gap-1">
+            <div className="w-full flex items-end justify-center" style={{ height: "44px" }}>
+              <div
+                className={`w-full rounded-t-md opacity-80 group-hover:opacity-100 transition-all ${stage.dot.replace("bg-", "bg-")}`}
+                style={{ height: `${Math.max((stage.count / max) * 44, stage.count > 0 ? 6 : 2)}px` }}
+              />
+            </div>
+            <span className="text-[10px] font-bold tabular-nums text-stone-500">{stage.count}</span>
+          </div>
+        ))}
+        {pipeline.accepted > 0 && (
+          <div className="flex-1 flex flex-col items-center gap-1">
+            <div className="w-full flex items-end justify-center" style={{ height: "44px" }}>
+              <div
+                className="w-full rounded-t-md bg-teal-500 opacity-80 group-hover:opacity-100 transition-all"
+                style={{ height: `${Math.max((pipeline.accepted / max) * 44, 6)}px` }}
+              />
+            </div>
+            <span className="text-[10px] font-bold tabular-nums text-stone-500">{pipeline.accepted}</span>
+          </div>
+        )}
+      </div>
+      <div className="flex items-center gap-2 text-xs text-stone-400 group-hover:text-indigo-500 transition-colors">
+        <Columns3 className="h-3 w-3" />
+        Open pipeline board
+        <ChevronRight className="h-3 w-3 ml-auto group-hover:translate-x-0.5 transition-transform" />
+      </div>
+    </Link>
+  );
+}
+
+// ── Nudge Card ────────────────────────────────────────────────────────────────
+
+function NudgeCard({ nudge }: { nudge: Awaited<ReturnType<typeof getSmartNudges>>[number] }) {
+  const config = {
+    STALE:       { label: "Stale",       icon: AlertCircle,  accent: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30", border: "border-orange-200 dark:border-orange-900/50" },
+    FOLLOW_UP:   { label: "Follow up",   icon: MessageSquare,accent: "text-blue-500",   bg: "bg-blue-50 dark:bg-blue-950/30",   border: "border-blue-200 dark:border-blue-900/50" },
+    PREP_READY:  { label: "Prep ready",  icon: BookOpen,     accent: "text-teal-500",   bg: "bg-teal-50 dark:bg-teal-950/30",   border: "border-teal-200 dark:border-teal-900/50" },
+    PREP_PENDING:{ label: "Generate prep",icon: Sparkles,    accent: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30",border: "border-indigo-200 dark:border-indigo-900/50" },
+  } as const;
+
+  const c = config[nudge.type as keyof typeof config] ?? config.STALE;
+  const Icon = c.icon;
   const href = nudge.prepUrl ?? `/dashboard/jobs/${nudge.id}`;
 
-  const dotColor = isUrgent
-    ? "bg-orange-400 animate-pulse"
-    : isPrepReady
-    ? "bg-teal-400"
-    : isPrepPending
-    ? "bg-blue-400 animate-pulse"
-    : "bg-teal-400";
-
-  const message =
-    nudge.type === "STALE"
-      ? `No activity in ${nudge.daysSinceUpdate} days`
-      : nudge.type === "FOLLOW_UP"
-      ? `Follow up — applied ${nudge.daysSinceUpdate}d ago`
-      : nudge.type === "PREP_READY"
-      ? "Interview prep ready — review now"
-      : nudge.type === "PREP_PENDING"
-      ? "In interview stage — generate prep"
-      : "";
-
-  const messageColor = isUrgent
-    ? "text-orange-500 dark:text-orange-400"
-    : isPrepReady || isPrepPending
-    ? "text-teal-600 dark:text-teal-400"
-    : "text-teal-600 dark:text-teal-400";
-
   return (
     <Link href={href}>
-      <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors group">
-        <div className={`mt-0.5 h-2 w-2 rounded-full shrink-0 ${dotColor}`} />
+      <div className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all hover:shadow-sm hover:-translate-y-px ${c.bg} ${c.border}`}>
+        <Icon className={`h-4 w-4 shrink-0 ${c.accent}`} />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-stone-800 dark:text-stone-100 truncate">
-            {nudge.company}
-          </p>
-          <p className="text-xs text-stone-500 truncate">{nudge.jobTitle}</p>
-          <p className={`text-xs mt-0.5 ${messageColor}`}>{message}</p>
+          <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate leading-tight">{nudge.jobTitle}</p>
+          <p className="text-xs text-stone-500 truncate">{nudge.company}</p>
         </div>
-        <ChevronRight className="h-4 w-4 text-stone-300 group-hover:text-stone-500 dark:group-hover:text-stone-400 transition-colors shrink-0 mt-0.5" />
+        <span className={`text-[10px] font-bold uppercase tracking-wide shrink-0 ${c.accent}`}>{c.label}</span>
+        <ChevronRight className="h-3.5 w-3.5 text-stone-300 shrink-0" />
       </div>
     </Link>
   );
 }
 
+// ── Job Row ───────────────────────────────────────────────────────────────────
 
-// ── Recent Job Row ────────────────────────────────────────────────────────────
-
-function JobRow({
-  job,
-}: {
-  job: {
-    id: string;
-    company: string;
-    position: string;
-    status: string;
-    aiScore: string | null;
-    updatedAt: Date;
-  };
-}) {
+function JobRow({ job }: { job: { id: string; company: string; position: string; status: string; aiScore: string | null; updatedAt: Date } }) {
   return (
     <Link href={`/dashboard/jobs/${job.id}`}>
-      <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 dark:hover:bg-stone-800/50 rounded-xl transition-colors group">
-        {/* Company initial */}
-        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 dark:from-teal-500 dark:to-teal-700 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm">
+      <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 dark:hover:bg-stone-900/60 rounded-xl transition-colors group cursor-pointer">
+        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
           {job.company.charAt(0).toUpperCase()}
         </div>
-
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-stone-800 dark:text-stone-100 truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+          <p className="text-sm font-semibold text-stone-800 dark:text-stone-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
             {job.position}
           </p>
-          <p className="text-xs text-stone-500 truncate">{job.company}</p>
+          <p className="text-xs text-stone-400 truncate">{job.company}</p>
         </div>
-
         <div className="flex items-center gap-2 shrink-0">
-          <AiScoreBadge score={job.aiScore as never} size="sm" />
-          <StatusBadge status={job.status as never} size="sm" />
-          <span className="text-xs text-stone-400 hidden sm:block w-16 text-right">
-            {formatDistanceToNow(job.updatedAt, { addSuffix: false })}
+          <AiScoreBadge score={job.aiScore as AiScore} size="sm" />
+          <StatusBadge status={job.status as JobStatus} size="sm" />
+          <span className="text-xs text-stone-400 hidden lg:block w-20 text-right">
+            {formatDistanceToNow(job.updatedAt, { addSuffix: true })}
           </span>
         </div>
-
-        <ChevronRight className="h-4 w-4 text-stone-300 group-hover:text-stone-500 transition-colors shrink-0" />
+        <ChevronRight className="h-4 w-4 text-stone-300 group-hover:text-stone-400 transition-colors shrink-0" />
       </div>
     </Link>
   );
 }
 
-// ── Quick Action Button ───────────────────────────────────────────────────────
+// ── Onboarding ────────────────────────────────────────────────────────────────
 
-function QuickAction({
-  href,
-  icon: Icon,
-  label,
-  description,
-}: {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-  description: string;
-}) {
+function OnboardingChecklist({ profilePct }: { profilePct: number }) {
+  const steps = [
+    { label: "Create your account",        done: true,          href: null,                    hint: null },
+    { label: "Build your career profile",  done: profilePct >= 60, href: "/dashboard/profile", hint: "Unlock AI match scoring" },
+    { label: "Explore job matches",        done: false,          href: "/dashboard/explore",    hint: "Discover curated opportunities" },
+    { label: "Track your first application", done: false,        href: "/dashboard/jobs/new",   hint: "Start your pipeline" },
+  ];
+
+  const nextStep = steps.find((s) => !s.done);
+
   return (
-    <Link href={href}>
-      <div className="flex items-center gap-3 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-teal-300 dark:hover:border-teal-700 hover:shadow-md transition-all duration-200 group">
-        <div className="p-2 rounded-xl bg-teal-50 dark:bg-teal-950/50 group-hover:bg-teal-100 dark:group-hover:bg-teal-900/50 transition-colors">
-          <Icon className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+      <div className="px-5 pt-5 pb-4 border-b border-stone-100 dark:border-stone-800 flex items-center gap-2.5">
+        <div className="h-8 w-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center">
+          <Sparkles className="h-4 w-4 text-indigo-500" />
         </div>
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-stone-800 dark:text-stone-100">{label}</p>
-          <p className="text-xs text-stone-500 truncate">{description}</p>
+        <div>
+          <h2 className="font-semibold text-stone-900 dark:text-stone-50 text-sm">Get started</h2>
+          <p className="text-xs text-stone-400 mt-0.5">Complete these steps to unlock the full platform.</p>
         </div>
-        <ArrowUpRight className="h-4 w-4 text-stone-300 group-hover:text-teal-500 transition-colors ml-auto shrink-0" />
       </div>
-    </Link>
+      <div className="p-3 space-y-1">
+        {steps.map((step, i) => (
+          <div
+            key={i}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors ${
+              nextStep === step
+                ? "bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50"
+                : "hover:bg-stone-50 dark:hover:bg-stone-800/40"
+            }`}
+          >
+            {step.done ? (
+              <CheckCircle2 className="h-4 w-4 text-teal-500 shrink-0" />
+            ) : nextStep === step ? (
+              <div className="h-4 w-4 rounded-full border-2 border-indigo-400 shrink-0 flex items-center justify-center">
+                <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+              </div>
+            ) : (
+              <Circle className="h-4 w-4 text-stone-300 dark:text-stone-700 shrink-0" />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-medium leading-snug ${step.done ? "text-stone-400 dark:text-stone-600 line-through" : "text-stone-800 dark:text-stone-100"}`}>
+                {step.label}
+              </p>
+              {step.hint && !step.done && nextStep === step && (
+                <p className="text-xs text-stone-400 mt-0.5">{step.hint}</p>
+              )}
+            </div>
+            {!step.done && step.href && nextStep === step && (
+              <Link
+                href={step.href}
+                className="shrink-0 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+              >
+                Start <ArrowRight className="h-3 w-3" />
+              </Link>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
-// ── Empty State ───────────────────────────────────────────────────────────────
+// ── Empty ─────────────────────────────────────────────────────────────────────
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="h-16 w-16 rounded-2xl bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center mb-4">
-        <Briefcase className="h-8 w-8 text-teal-500" />
+    <div className="flex flex-col items-center justify-center py-14 text-center px-6">
+      <div className="h-14 w-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center mb-4 shadow-inner">
+        <Briefcase className="h-6 w-6 text-indigo-400" />
       </div>
-      <h3 className="text-lg font-semibold text-stone-800 dark:text-stone-100 mb-1">
-        Start your job search
-      </h3>
-      <p className="text-sm text-stone-500 mb-6 max-w-xs">
-        Add your first application or explore AI-curated matches.
+      <h3 className="text-base font-semibold text-stone-800 dark:text-stone-100 mb-1">No applications yet</h3>
+      <p className="text-sm text-stone-400 mb-5 max-w-xs leading-relaxed">
+        Add your first application manually or explore curated job matches.
       </p>
       <div className="flex gap-3">
         <Link
           href="/dashboard/jobs/new"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm shadow-indigo-500/25 transition-all"
         >
-          <Plus className="h-4 w-4" />
-          Add application
+          <Plus className="h-4 w-4" /> Add job
         </Link>
         <Link
           href="/dashboard/explore"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 text-sm font-medium transition-colors"
         >
-          <Compass className="h-4 w-4" />
-          Explore jobs
+          <Telescope className="h-4 w-4" /> Discover
         </Link>
       </div>
     </div>
@@ -283,168 +303,108 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const { jobs, nudges, stats } = await getDashboardData(session.user.id);
+  const { jobs, nudges, profile, pipeline } = await getDashboardData(session.user.id);
   const firstName = session.user.name?.split(" ")[0] ?? "there";
   const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const profilePct = profile?.completionPct ?? 0;
+  const isNewUser = pipeline.total === 0;
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
-        {/* ── Header ───────────────────────────────────────────────────── */}
+        {/* ── Header ───────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-stone-50">
               {greeting}, {firstName}.
             </h1>
             <p className="text-stone-500 dark:text-stone-400 mt-1 text-sm">
-              {stats.total === 0
-                ? "Let's start building your pipeline."
-                : `${stats.active} active application${stats.active !== 1 ? "s" : ""} in your pipeline.`}
+              {isNewUser
+                ? "Welcome to CareerOS — let's build your pipeline."
+                : nudges.length > 0
+                ? `${nudges.length} action${nudges.length !== 1 ? "s" : ""} waiting for you.`
+                : "You're all caught up — keep the momentum going."}
             </p>
           </div>
           <Link
             href="/dashboard/jobs/new"
-            className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold shadow-sm shadow-teal-500/25 transition-all hover:shadow-md hover:shadow-teal-500/30"
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm shadow-indigo-500/20 transition-all hover:shadow-md hover:shadow-indigo-500/25"
           >
             <Plus className="h-4 w-4" />
-            Add Application
+            <span className="hidden sm:inline">Add Application</span>
+            <span className="sm:hidden">Add</span>
           </Link>
         </div>
 
-        {/* ── Stats row ────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            label="Total"
-            value={stats.total}
-            icon={Briefcase}
-            accent="border-stone-200 dark:border-stone-800"
-            href="/dashboard/pipeline"
-          />
-          <StatCard
-            label="Active"
-            value={stats.active}
-            icon={TrendingUp}
-            accent="border-teal-200/60 dark:border-teal-800/60 text-teal-600 dark:text-teal-400"
-            href="/dashboard/tracker"
-          />
-          <StatCard
-            label="Interviews"
-            value={stats.interviews}
-            icon={MessageSquare}
-            accent="border-blue-200/60 dark:border-blue-800/60 text-blue-600 dark:text-blue-400"
-            href="/dashboard/tracker"
-          />
-          <StatCard
-            label={stats.accepted > 0 ? "Accepted" : "Offers"}
-            value={stats.accepted > 0 ? stats.accepted : stats.offers}
-            icon={Trophy}
-            accent="border-amber-200/60 dark:border-amber-800/60 text-amber-600 dark:text-amber-400"
-            href="/dashboard/tracker"
-          />
-        </div>
+        {/* ── Onboarding (new users) ────────────────────────────── */}
+        {isNewUser && <OnboardingChecklist profilePct={profilePct} />}
 
-        {/* ── Main grid ────────────────────────────────────────────────── */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        {/* ── Stats + Pipeline ──────────────────────────────────── */}
+        {!isNewUser && (
+          <>
+            <StatStrip pipeline={pipeline} />
 
-          {/* ── Recent Applications (2/3 width) ──────────────────────── */}
-          <div className="lg:col-span-2">
-            <div className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100 dark:border-stone-800">
-                <h2 className="font-semibold text-stone-800 dark:text-stone-100 flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-stone-400" />
-                  Recent Applications
+            <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-semibold text-stone-700 dark:text-stone-200 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-indigo-500" />
+                  Pipeline overview
                 </h2>
-                <Link
-                  href="/dashboard/pipeline"
-                  className="text-xs text-teal-600 dark:text-teal-400 hover:underline font-medium"
-                >
-                  View all
+                <span className="text-xs text-stone-400">{pipeline.total} total</span>
+              </div>
+              <PipelineFlow pipeline={pipeline} />
+            </div>
+          </>
+        )}
+
+        {/* ── Nudges ───────────────────────────────────────────── */}
+        {nudges.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xs font-bold text-stone-400 dark:text-stone-600 uppercase tracking-widest">
+                Needs attention
+              </h2>
+              {nudges.length > 4 && (
+                <Link href="/dashboard/activity" className="text-xs text-indigo-500 hover:underline">
+                  +{nudges.length - 4} more
                 </Link>
-              </div>
-
-              {jobs.length === 0 ? (
-                <EmptyState />
-              ) : (
-                <div className="divide-y divide-stone-50 dark:divide-stone-800/50 p-1">
-                  {jobs.map((job) => (
-                    <JobRow key={job.id} job={job} />
-                  ))}
-                </div>
               )}
             </div>
-          </div>
-
-          {/* ── Right column (1/3 width) ──────────────────────────────── */}
-          <div className="space-y-5">
-
-            {/* Smart Nudges */}
-            <div className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100 dark:border-stone-800">
-                <h2 className="font-semibold text-stone-800 dark:text-stone-100 flex items-center gap-2">
-                  <Bell className="h-4 w-4 text-stone-400" />
-                  Nudges
-                  {nudges.length > 0 && (
-                    <span className="ml-1 h-5 min-w-5 px-1.5 rounded-full bg-orange-100 dark:bg-orange-950/50 text-orange-600 dark:text-orange-400 text-xs font-bold flex items-center justify-center">
-                      {nudges.length}
-                    </span>
-                  )}
-                </h2>
-              </div>
-
-              {nudges.length === 0 ? (
-                <div className="px-5 py-8 text-center">
-                  <div className="h-10 w-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center mx-auto mb-2">
-                    <Sparkles className="h-5 w-5 text-teal-500" />
-                  </div>
-                  <p className="text-xs text-stone-500">All caught up.</p>
-                </div>
-              ) : (
-                <div className="p-2">
-                  {nudges.slice(0, 4).map((nudge) => (
-                    <NudgeItem key={nudge.id} nudge={nudge} />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Quick Actions */}
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider px-1">
-                Quick Actions
-              </p>
-              <div className="space-y-2">
-                <QuickAction
-                  href="/dashboard/explore"
-                  icon={Compass}
-                  label="Explore Jobs"
-                  description="AI-curated matches for you"
-                />
-                <QuickAction
-                  href="/dashboard/tracker"
-                  icon={Kanban}
-                  label="Kanban Board"
-                  description="Drag & drop your pipeline"
-                />
-                <QuickAction
-                  href="/dashboard/stories"
-                  icon={MessageSquare}
-                  label="Story Bank"
-                  description="Build your STAR stories"
-                />
-                <QuickAction
-                  href="/dashboard/profile"
-                  icon={Sparkles}
-                  label="Career Profile"
-                  description="Unlock AI job scoring"
-                />
-              </div>
+              {nudges.slice(0, 4).map((nudge) => (
+                <NudgeCard key={nudge.id} nudge={nudge} />
+              ))}
             </div>
+          </section>
+        )}
 
+        {/* ── Recent Applications ───────────────────────────────── */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-bold text-stone-400 dark:text-stone-600 uppercase tracking-widest">
+              Recent Applications
+            </h2>
+            {jobs.length > 0 && (
+              <Link href="/dashboard/pipeline" className="text-xs text-indigo-500 hover:text-indigo-600 font-medium flex items-center gap-1">
+                View all <ChevronRight className="h-3 w-3" />
+              </Link>
+            )}
           </div>
-        </div>
+
+          <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+            {jobs.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div className="divide-y divide-stone-50 dark:divide-stone-800/50 p-1.5">
+                {jobs.map((job) => (
+                  <JobRow key={job.id} job={job} />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
 
       </div>
     </div>

@@ -176,7 +176,7 @@ export async function savePrepNotes(
 export async function triggerPrepPackageAsync(
   jobApplicationId: string
 ): Promise<void> {
-  generatePrepPackage(jobApplicationId).catch(() => {
-    // Silently fail — prep is non-critical
+  generatePrepPackage(jobApplicationId).catch((err: unknown) => {
+    console.error("[triggerPrepPackageAsync] background prep generation failed:", err);
   });
 }

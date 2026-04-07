@@ -171,80 +171,59 @@ export function NavigationHeader({ session }: NavigationHeaderProps) {
 
   // ── DASHBOARD ─────────────────────────────────
   if (isDashboard && session) {
-    const dashNav = [
-      { label: "Explore", href: "/dashboard/explore" },
-      { label: "Tracker", href: "/dashboard/tracker" },
-      { label: "Activity", href: "/dashboard/activity" },
-      { label: "Stories", href: "/dashboard/stories" },
-      { label: "Profile", href: "/dashboard/profile" },
+    const mobileNav = [
+      { label: "Dashboard",    href: "/dashboard",          exact: true },
+      { label: "Discover Jobs",href: "/dashboard/explore"              },
+      { label: "Pipeline",     href: "/dashboard/pipeline"             },
+      { label: "Applications", href: "/dashboard/activity"             },
+      { label: "Story Bank",   href: "/dashboard/stories"              },
+      { label: "My Profile",   href: "/dashboard/profile"              },
+      { label: "Settings",     href: "/dashboard/settings"             },
     ];
 
     return (
-      <header className={headerBase}>
-        <div className={innerWrap}>
-          <div className="flex items-center justify-between h-14">
+      <>
+        {/* Mobile-only top bar — desktop has the sidebar */}
+        <header className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 dark:bg-stone-950/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800">
+          <div className="flex items-center justify-between h-14 px-4">
             <NavLogo href="/dashboard" />
-
-            <nav className="hidden md:flex items-center gap-1">
-              {dashNav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
-                    pathname === item.href
-                      ? "bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300"
-                      : "text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800",
-                  )}>
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="md:hidden p-2 rounded-lg transition-colors duration-200
-                  text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
-                aria-label="Toggle menu">
-                {showMobileMenu ? (
-                  <X className="w-4 h-4" />
-                ) : (
-                  <Menu className="w-4 h-4" />
-                )}
-              </button>
-              <ThemeToggle />
-              <button
-                onClick={handleLogout}
-                className="p-2 rounded-lg transition-colors duration-200
-                  text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
-                aria-label="Sign out"
-                title="Sign out">
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
 
+          {/* Mobile dropdown */}
           {showMobileMenu && (
-            <div className="md:hidden pb-3 pt-2 border-t border-stone-100 dark:border-stone-800 space-y-0.5">
-              {dashNav.map((item) => (
+            <div className="border-t border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-950 px-3 py-2 space-y-0.5">
+              {mobileNav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setShowMobileMenu(false)}
                   className={cn(
-                    "block px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+                    "flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
                     pathname === item.href
-                      ? "bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300"
-                      : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-800",
-                  )}>
+                      ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300"
+                      : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-900"
+                  )}
+                >
                   {item.label}
                 </Link>
               ))}
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+              >
+                Sign out
+              </button>
             </div>
           )}
-        </div>
-      </header>
+        </header>
+      </>
     );
   }
 

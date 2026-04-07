@@ -25,7 +25,7 @@ export async function savePublicJob(job: ScrapedJob, type: 'WISHLIST' | 'APPLIED
     });
 
     if (existingJob) {
-        return { error: "You have already interaction with this job." };
+        return { error: "You have already interacted with this job." };
     }
 
     // Parse salary to min/max if possible, otherwise store raw string in notes
@@ -56,7 +56,7 @@ export async function savePublicJob(job: ScrapedJob, type: 'WISHLIST' | 'APPLIED
     });
 
     revalidatePath("/dashboard");
-    return { success: true };
+    return { success: true, jobId: job.id };
   } catch (error) {
     console.error("Failed to save job:", error);
     return { error: "Failed to save job" };

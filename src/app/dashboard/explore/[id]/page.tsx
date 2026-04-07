@@ -48,7 +48,7 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ id:
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 relative overflow-hidden flex flex-col">
+    <div className="min-h-screen pt-8 pb-12 relative overflow-hidden flex flex-col">
       <div className="absolute inset-0 bg-mesh dark:bg-mesh-dark opacity-30 pointer-events-none" />
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full">

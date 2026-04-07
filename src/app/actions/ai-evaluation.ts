@@ -169,7 +169,7 @@ export async function triggerEvaluationAsync(
   jobApplicationId: string
 ): Promise<void> {
   // Run without awaiting — let it complete in the background
-  evaluateJob(jobApplicationId).catch(() => {
-    // Silently fail — evaluation is non-critical
+  evaluateJob(jobApplicationId).catch((err: unknown) => {
+    console.error("[triggerEvaluationAsync] background evaluation failed:", err);
   });
 }

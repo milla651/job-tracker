@@ -189,7 +189,7 @@ export function PrepPageClient({ job, initialPrepPackage, stories }: PrepPageCli
   const [savingNotes, setSavingNotes] = useState(false);
 
   const questions = prepPackage?.predictedQuestions as PredictedQuestions | null;
-  const suggestedStories = (prepPackage?.suggestedStories ?? []) as SuggestedStory[];
+  const suggestedStories = (prepPackage?.suggestedStories ?? []) as unknown as SuggestedStory[];
 
   // Build story lookup for behavioral questions
   const behavioralStoryMap = new Map<number, StoryBankEntry>();
