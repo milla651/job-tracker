@@ -1,10 +1,11 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { revalidateUserCache } from "@/lib/cache-tags";
 import { z } from "zod/v4";
-import type { UserProfile } from "@prisma/client";
+import type { UserProfile } from "@/lib/db-types";
 
 // ── Validation schemas ───────────────────────────────────────────────────────
 
@@ -73,7 +74,7 @@ export async function getProfile(): Promise<UserProfile | null> {
   if (!session?.user?.id) return null;
 
   try {
-    return await prisma.userProfile.findUnique({
+    return await db.userProfile.findUnique({
       where: { userId: session.user.id },
     });
   } catch {
@@ -95,23 +96,24 @@ export async function upsertProfileStep1(
     return { success: false, error: parsed.error.issues[0]?.message };
   }
 
-  const existing = await prisma.userProfile.findUnique({
+  const existing = await db.userProfile.findUnique({
     where: { userId: session.user.id },
   });
 
-  const updated = await prisma.userProfile.upsert({
+  const updated = await db.userProfile.upsert({
     where: { userId: session.user.id },
     create: { userId: session.user.id, ...parsed.data },
     update: parsed.data,
   });
 
   const pct = calcCompletionPct({ ...existing, ...updated });
-  await prisma.userProfile.update({
+  await db.userProfile.update({
     where: { userId: session.user.id },
     data: { completionPct: pct },
   });
 
   revalidatePath("/dashboard");
+  revalidateUserCache(session.user.id);
   return { success: true };
 }
 
@@ -126,23 +128,24 @@ export async function upsertProfileStep2(
     return { success: false, error: parsed.error.issues[0]?.message };
   }
 
-  const existing = await prisma.userProfile.findUnique({
+  const existing = await db.userProfile.findUnique({
     where: { userId: session.user.id },
   });
 
-  const updated = await prisma.userProfile.upsert({
+  const updated = await db.userProfile.upsert({
     where: { userId: session.user.id },
     create: { userId: session.user.id, ...parsed.data },
     update: parsed.data,
   });
 
   const pct = calcCompletionPct({ ...existing, ...updated });
-  await prisma.userProfile.update({
+  await db.userProfile.update({
     where: { userId: session.user.id },
     data: { completionPct: pct },
   });
 
   revalidatePath("/dashboard");
+  revalidateUserCache(session.user.id);
   return { success: true };
 }
 
@@ -157,23 +160,24 @@ export async function upsertProfileStep3(
     return { success: false, error: parsed.error.issues[0]?.message };
   }
 
-  const existing = await prisma.userProfile.findUnique({
+  const existing = await db.userProfile.findUnique({
     where: { userId: session.user.id },
   });
 
-  const updated = await prisma.userProfile.upsert({
+  const updated = await db.userProfile.upsert({
     where: { userId: session.user.id },
     create: { userId: session.user.id, ...parsed.data },
     update: parsed.data,
   });
 
   const pct = calcCompletionPct({ ...existing, ...updated });
-  await prisma.userProfile.update({
+  await db.userProfile.update({
     where: { userId: session.user.id },
     data: { completionPct: pct, wizardCompleted: true },
   });
 
   revalidatePath("/dashboard");
+  revalidateUserCache(session.user.id);
   return { success: true };
 }
 
@@ -189,22 +193,23 @@ export async function saveCvContent(
     return { success: false, error: "CV content too short — extraction may have failed" };
   }
 
-  const existing = await prisma.userProfile.findUnique({
+  const existing = await db.userProfile.findUnique({
     where: { userId: session.user.id },
   });
 
-  const updated = await prisma.userProfile.upsert({
+  const updated = await db.userProfile.upsert({
     where: { userId: session.user.id },
     create: { userId: session.user.id, baseCvContent: content },
     update: { baseCvContent: content },
   });
 
   const pct = calcCompletionPct({ ...existing, ...updated });
-  await prisma.userProfile.update({
+  await db.userProfile.update({
     where: { userId: session.user.id },
     data: { completionPct: pct },
   });
 
   revalidatePath("/dashboard/profile");
+  revalidateUserCache(session.user.id);
   return { success: true };
 }

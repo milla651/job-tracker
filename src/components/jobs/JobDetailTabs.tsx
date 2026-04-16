@@ -12,8 +12,8 @@ import {
   FileText, Sparkles, ClipboardList, Clock,
   CheckCircle2, Circle, ChevronRight,
 } from "lucide-react";
-import type { AiEvaluation, JobApplication, InterviewPrepPackage, StoryBankEntry } from "@prisma/client";
-import type { TimelineEvent } from "@prisma/client";
+import type { AiEvaluation, JobApplication, InterviewPrepPackage, StoryBankEntry } from "@/lib/db-types";
+import type { TimelineEvent } from "@/lib/db-types";
 
 interface JobDetailTabsProps {
   job: JobApplication & {

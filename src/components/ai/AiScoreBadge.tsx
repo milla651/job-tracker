@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { AiScore } from "@prisma/client";
+import type { AiScore } from "@/lib/db-types";
 
 interface AiScoreBadgeProps {
   score: AiScore | null | undefined;

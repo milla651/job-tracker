@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { StoryBankEntry } from "@prisma/client";
+import type { StoryBankEntry } from "@/lib/db-types";
 import { StoryCard } from "@/components/stories/StoryCard";
 import { StoryForm } from "@/components/stories/StoryForm";
 import { useRouter } from "next/navigation";

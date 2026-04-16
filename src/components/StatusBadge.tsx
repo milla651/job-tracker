@@ -1,5 +1,5 @@
 import { cn, STATUS_CONFIG } from "@/lib/utils";
-import { JobStatus } from "@prisma/client";
+import { JobStatus } from "@/lib/db-types";
 
 interface StatusBadgeProps {
   status: JobStatus;

@@ -1,6 +1,6 @@
 
 
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 
 export const generateVerificationToken = async (email: string) => {
   // Generate a random 6-digit number
@@ -9,11 +9,11 @@ export const generateVerificationToken = async (email: string) => {
   const expires = new Date(new Date().getTime() + 3600 * 1000);
 
   // Delete any existing tokens for this email
-  await prisma.verificationToken.deleteMany({
+  await db.verificationToken.deleteMany({
     where: { email },
   });
 
-  const verificationToken = await prisma.verificationToken.create({
+  const verificationToken = await db.verificationToken.create({
     data: {
       email,
       token,
@@ -30,17 +30,17 @@ export const generatePasswordResetToken = async (email: string) => {
   // Token expires in 1 hour
   const expires = new Date(new Date().getTime() + 3600 * 1000);
 
-  const existingToken = await prisma.passwordResetToken.findFirst({
+  const existingToken = await db.passwordResetToken.findFirst({
     where: { email },
   });
 
   if (existingToken) {
-    await prisma.passwordResetToken.delete({
+    await db.passwordResetToken.delete({
       where: { id: existingToken.id },
     });
   }
 
-  const passwordResetToken = await prisma.passwordResetToken.create({
+  const passwordResetToken = await db.passwordResetToken.create({
     data: {
       email,
       token,

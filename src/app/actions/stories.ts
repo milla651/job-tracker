@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
 
@@ -27,7 +27,7 @@ export async function getStories() {
   if (!session?.user?.id) return [];
 
   try {
-    return await prisma.storyBankEntry.findMany({
+    return await db.storyBankEntry.findMany({
       where: { userId: session.user.id },
       orderBy: { updatedAt: "desc" },
     });
@@ -43,7 +43,7 @@ export async function getStory(id: string) {
   if (!session?.user?.id) return null;
 
   try {
-    return await prisma.storyBankEntry.findFirst({
+    return await db.storyBankEntry.findFirst({
       where: { id, userId: session.user.id },
     });
   } catch {
@@ -65,7 +65,7 @@ export async function createStory(
   }
 
   try {
-    const story = await prisma.storyBankEntry.create({
+    const story = await db.storyBankEntry.create({
       data: {
         userId: session.user.id,
         ...parsed.data,
@@ -95,12 +95,12 @@ export async function updateStory(
   }
 
   try {
-    const existing = await prisma.storyBankEntry.findFirst({
+    const existing = await db.storyBankEntry.findFirst({
       where: { id, userId: session.user.id },
     });
     if (!existing) return { success: false, error: "Story not found" };
 
-    await prisma.storyBankEntry.update({
+    await db.storyBankEntry.update({
       where: { id },
       data: { ...parsed.data, tags: parsed.data.tags ?? existing.tags },
     });
@@ -121,12 +121,12 @@ export async function deleteStory(
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   try {
-    const existing = await prisma.storyBankEntry.findFirst({
+    const existing = await db.storyBankEntry.findFirst({
       where: { id, userId: session.user.id },
     });
     if (!existing) return { success: false, error: "Story not found" };
 
-    await prisma.storyBankEntry.delete({ where: { id } });
+    await db.storyBankEntry.delete({ where: { id } });
 
     revalidatePath("/dashboard/stories");
     return { success: true };

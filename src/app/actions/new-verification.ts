@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { generateVerificationToken } from "@/lib/tokens";
 
 export const newVerification = async (token: string) => {
-  const existingToken = await prisma.verificationToken.findFirst({
+  const existingToken = await db.verificationToken.findFirst({
     where: { token },
   });
 
@@ -18,7 +18,7 @@ export const newVerification = async (token: string) => {
     return { error: "Token has expired!" };
   }
 
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await db.user.findUnique({
     where: { email: existingToken.email },
   });
 
@@ -26,7 +26,7 @@ export const newVerification = async (token: string) => {
     return { error: "Email does not exist!" };
   }
 
-  await prisma.user.update({
+  await db.user.update({
     where: { id: existingUser.id },
     data: { 
       emailVerified: new Date(),
@@ -34,7 +34,7 @@ export const newVerification = async (token: string) => {
     },
   });
 
-  await prisma.verificationToken.delete({
+  await db.verificationToken.delete({
     where: { id: existingToken.id },
   });
 

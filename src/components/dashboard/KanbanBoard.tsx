@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { JobApplication, JobStatus } from "@prisma/client";
+import { JobApplication, JobStatus } from "@/lib/db-types";
 import { KanbanColumn } from "./KanbanColumn";
 import { updateJobStatus } from "@/app/actions/jobs"; // We need to make sure this action is robust
 import { toast } from "sonner";

@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 
 // ── Model constants ──────────────────────────────────────────────────────────
 export const CLAUDE_HAIKU = "claude-haiku-4-5-20251001"; // fast + cheap — bulk ops

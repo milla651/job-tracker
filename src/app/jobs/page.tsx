@@ -5,8 +5,8 @@ import { Sparkles, Search, Briefcase, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { JobStatus } from "@prisma/client";
+import { db } from "@/lib/db";
+import { JobStatus } from "@/lib/db-types";
 
 export const metadata = {
   title: "Explore Jobs | JobTracker",
@@ -34,7 +34,7 @@ export default async function JobsPage(props: {
   const userJobStatus = new Map<string, "WISHLIST" | "APPLIED" | "DISCARDED">();
 
   if (session?.user?.id) {
-    const userApplications = await prisma.jobApplication.findMany({
+    const userApplications = await db.jobApplication.findMany({
       where: {
         userId: session.user.id,
       },

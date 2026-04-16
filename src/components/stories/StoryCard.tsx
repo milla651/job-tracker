@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { StoryBankEntry } from "@prisma/client";
+import type { StoryBankEntry } from "@/lib/db-types";
 import { deleteStory } from "@/app/actions/stories";
 import { Pencil, Trash2, ChevronDown, ChevronUp, Zap } from "lucide-react";
 

@@ -1,12 +1,12 @@
 "use client";
 
-import { JobApplication } from "@prisma/client";
+import { JobApplication } from "@/lib/db-types";
 import { AiScoreBadge } from "@/components/ai/AiScoreBadge";
 import { formatDistanceToNow, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { AlertCircle, ClipboardCheck, DollarSign } from "lucide-react";
-import type { AiScore } from "@prisma/client";
+import type { AiScore } from "@/lib/db-types";
 
 interface KanbanJobCardProps {
   job: JobApplication;

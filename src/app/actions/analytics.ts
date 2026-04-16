@@ -1,8 +1,8 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { JobStatus } from "@prisma/client";
+import { db } from "@/lib/db";
+import { JobStatus } from "@/lib/db-types";
 import { subDays, startOfDay, format } from "date-fns";
 
 export type DailyActivity = {
@@ -27,7 +27,7 @@ export async function getApplicationActivity(): Promise<DailyActivity[]> {
   // we'll fetch metadata and aggregate in JS for simplicity unless dataset is huge.
   // For < 1000 jobs, JS aggregation is microsecond fast.
   
-  const jobs = await prisma.jobApplication.findMany({
+  const jobs = await db.jobApplication.findMany({
     where: {
       userId: session.user.id,
       appliedAt: {
@@ -59,7 +59,7 @@ export async function getPipelineStats(): Promise<PipelineStat[]> {
   const session = await auth();
   if (!session?.user?.id) return [];
 
-  const stats = await prisma.jobApplication.groupBy({
+  const stats = await db.jobApplication.groupBy({
     by: ["status"],
     where: {
       userId: session.user.id,

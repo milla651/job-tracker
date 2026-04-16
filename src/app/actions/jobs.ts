@@ -1,10 +1,17 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { revalidateUserCache } from "@/lib/cache-tags";
+import {
+  getJobByIdWithRelations,
+  listJobsWithTotal,
+  splitListResult,
+  updateJobStatusTransactional,
+} from "@/lib/queries/jobs";
 import { redirect } from "next/navigation";
-import { JobStatus } from "@prisma/client";
+import { JobStatus } from "@/lib/db-types";
 import { triggerEvaluationAsync } from "@/app/actions/ai-evaluation";
 import { triggerPrepPackageAsync } from "@/app/actions/interview-prep";
 
@@ -33,7 +40,7 @@ export async function createJob(formData: FormData) {
     return { error: "Company and position are required" };
   }
 
-  const job = await prisma.jobApplication.create({
+  const job = await db.jobApplication.create({
     data: {
       company,
       position,
@@ -58,6 +65,7 @@ export async function createJob(formData: FormData) {
   triggerEvaluationAsync(job.id);
 
   revalidatePath("/dashboard");
+  revalidateUserCache(session.user.id);
   redirect(`/dashboard/jobs/${job.id}`);
 }
 
@@ -67,7 +75,7 @@ export async function updateJob(jobId: string, formData: FormData) {
     return { error: "Unauthorized" };
   }
 
-  const job = await prisma.jobApplication.findUnique({
+  const job = await db.jobApplication.findUnique({
     where: { id: jobId },
   });
 
@@ -84,7 +92,7 @@ export async function updateJob(jobId: string, formData: FormData) {
   const description = formData.get("description") as string | null;
   const notes = formData.get("notes") as string | null;
 
-  await prisma.jobApplication.update({
+  await db.jobApplication.update({
     where: { id: jobId },
     data: {
       company,
@@ -100,6 +108,7 @@ export async function updateJob(jobId: string, formData: FormData) {
 
   revalidatePath("/dashboard");
   revalidatePath(`/dashboard/jobs/${jobId}`);
+  revalidateUserCache(session.user.id);
   redirect(`/dashboard/jobs/${jobId}`);
 }
 
@@ -109,7 +118,7 @@ export async function updateJobStatus(jobId: string, newStatus: JobStatus) {
     return { error: "Unauthorized" };
   }
 
-  const job = await prisma.jobApplication.findUnique({
+  const job = await db.jobApplication.findUnique({
     where: { id: jobId },
   });
 
@@ -119,24 +128,16 @@ export async function updateJobStatus(jobId: string, newStatus: JobStatus) {
 
   const oldStatus = job.status;
 
-  // Update status + log timeline event
-  await prisma.$transaction([
-    prisma.jobApplication.update({
-      where: { id: jobId },
-      data: { status: newStatus },
-    }),
-    prisma.timelineEvent.create({
-      data: {
-        jobApplicationId: jobId,
-        eventType: "STATUS_CHANGE",
-        description: `Status changed from ${oldStatus} to ${newStatus}`,
-      },
-    }),
-  ]);
+  await updateJobStatusTransactional(
+    jobId,
+    session.user.id,
+    newStatus,
+    `Status changed from ${oldStatus} to ${newStatus}`
+  );
 
   // When ACCEPTED → archive all other active applications
   if (newStatus === "ACCEPTED") {
-    await prisma.jobApplication.updateMany({
+    await db.jobApplication.updateMany({
       where: {
         userId: session.user.id,
         id: { not: jobId },
@@ -153,6 +154,7 @@ export async function updateJobStatus(jobId: string, newStatus: JobStatus) {
 
   revalidatePath("/dashboard");
   revalidatePath(`/dashboard/jobs/${jobId}`);
+  revalidateUserCache(session.user.id);
 }
 
 export async function deleteJob(jobId: string) {
@@ -161,7 +163,7 @@ export async function deleteJob(jobId: string) {
     return { error: "Unauthorized" };
   }
 
-  const job = await prisma.jobApplication.findUnique({
+  const job = await db.jobApplication.findUnique({
     where: { id: jobId },
   });
 
@@ -169,11 +171,12 @@ export async function deleteJob(jobId: string) {
     return { error: "Job not found or unauthorized" };
   }
 
-  await prisma.jobApplication.delete({
+  await db.jobApplication.delete({
     where: { id: jobId },
   });
 
   revalidatePath("/dashboard");
+  revalidateUserCache(session.user.id);
   redirect("/dashboard");
 }
 
@@ -195,68 +198,19 @@ export async function getJobs(options: GetJobsOptions = {}) {
   }
 
   const { status, search, page = 1, limit = 12, sort = "date-desc", location, minSalary, maxSalary } = options;
-  const skip = (page - 1) * limit;
 
-  const where: any = {
+  const rows = await listJobsWithTotal({
     userId: session.user.id,
-    ...(status && { status }),
-    ...(search && {
-      OR: [
-        { company: { contains: search, mode: "insensitive" } },
-        { position: { contains: search, mode: "insensitive" } },
-      ],
-    }),
-    ...(location && {
-      location: { contains: location, mode: "insensitive" },
-    }),
-    ...(minSalary && {
-      salaryMax: { gte: minSalary },
-    }),
-    ...(maxSalary && {
-      salaryMin: { lte: maxSalary },
-    }),
-  };
-
-  let orderBy: any = { updatedAt: "desc" };
-
-  switch (sort) {
-    case "date-asc":
-      orderBy = { updatedAt: "asc" };
-      break;
-    case "company-asc":
-      orderBy = { company: "asc" };
-      break;
-    case "company-desc":
-      orderBy = { company: "desc" };
-      break;
-    case "salary-desc":
-      orderBy = { salaryMax: "desc" }; // prioritizing max salary
-      break;
-    case "salary-asc":
-      orderBy = { salaryMin: "asc" }; // prioritizing min salary
-      break;
-    case "location-asc":
-      orderBy = { location: "asc" };
-      break;
-    case "location-desc":
-      orderBy = { location: "desc" };
-      break;
-
-    case "date-desc":
-    default:
-      orderBy = { updatedAt: "desc" };
-      break;
-  }
-
-  const [jobs, total] = await prisma.$transaction([
-    prisma.jobApplication.findMany({
-      where,
-      orderBy,
-      skip,
-      take: limit,
-    }),
-    prisma.jobApplication.count({ where }),
-  ]);
+    status,
+    search,
+    location,
+    minSalary,
+    maxSalary,
+    sort,
+    page,
+    limit,
+  });
+  const { jobs, total } = splitListResult(rows);
 
   return {
     jobs,
@@ -271,19 +225,7 @@ export async function getJobById(jobId: string) {
     return null;
   }
 
-  const job = await prisma.jobApplication.findUnique({
-    where: { id: jobId },
-    include: {
-      timeline: { orderBy: { eventDate: "desc" } },
-      aiEvaluation: true,
-    },
-  });
-
-  if (!job || job.userId !== session.user.id) {
-    return null;
-  }
-
-  return job;
+  return getJobByIdWithRelations(jobId, session.user.id);
 }
 
 export async function getJobStats() {
@@ -292,13 +234,13 @@ export async function getJobStats() {
     return null;
   }
 
-  const stats = await prisma.jobApplication.groupBy({
+  const stats = await db.jobApplication.groupBy({
     by: ["status"],
     where: { userId: session.user.id },
     _count: { status: true },
   });
 
-  const total = await prisma.jobApplication.count({
+  const total = await db.jobApplication.count({
     where: { userId: session.user.id },
   });
 
@@ -315,7 +257,7 @@ export async function addTimelineEvent(
     return { error: "Unauthorized" };
   }
 
-  const job = await prisma.jobApplication.findUnique({
+  const job = await db.jobApplication.findUnique({
     where: { id: jobId },
   });
 
@@ -323,7 +265,7 @@ export async function addTimelineEvent(
     return { error: "Job not found or unauthorized" };
   }
 
-  await prisma.timelineEvent.create({
+  await db.timelineEvent.create({
     data: {
       jobApplicationId: jobId,
       eventType,
@@ -332,4 +274,5 @@ export async function addTimelineEvent(
   });
 
   revalidatePath(`/dashboard/jobs/${jobId}`);
+  revalidateUserCache(session.user.id);
 }

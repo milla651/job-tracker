@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { generatePasswordResetToken } from "@/lib/tokens";
 import { sendPasswordResetEmail } from "@/lib/mail";
 import { z } from "zod";
@@ -23,7 +23,7 @@ export const requestPasswordReset = async (values: z.infer<typeof RequestResetSc
 
   const { email } = validatedFields.data;
 
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await db.user.findUnique({
     where: { email },
   });
 
@@ -51,7 +51,7 @@ export const resetPassword = async (values: z.infer<typeof NewPasswordSchema>, t
 
   const { password } = validatedFields.data;
 
-  const existingToken = await prisma.passwordResetToken.findUnique({
+  const existingToken = await db.passwordResetToken.findUnique({
     where: { token },
   });
 
@@ -65,7 +65,7 @@ export const resetPassword = async (values: z.infer<typeof NewPasswordSchema>, t
     return { error: "Token has expired!" };
   }
 
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await db.user.findUnique({
     where: { email: existingToken.email },
   });
 
@@ -75,12 +75,12 @@ export const resetPassword = async (values: z.infer<typeof NewPasswordSchema>, t
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await prisma.user.update({
+  await db.user.update({
     where: { id: existingUser.id },
     data: { password: hashedPassword },
   });
 
-  await prisma.passwordResetToken.delete({
+  await db.passwordResetToken.delete({
     where: { id: existingToken.id },
   });
 

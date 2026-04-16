@@ -1,7 +1,7 @@
 "use client";
 
 import { PipelineStat } from "@/app/actions/analytics";
-import { JobStatus } from "@prisma/client";
+import { JobStatus } from "@/lib/db-types";
 import { cn } from "@/lib/utils";
 
 interface PipelineFunnelProps {

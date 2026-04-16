@@ -1,5 +1,5 @@
 import { formatDateTime } from "@/lib/utils";
-import { TimelineEvent } from "@prisma/client";
+import { TimelineEvent } from "@/lib/db-types";
 import { Clock, ArrowRight, FileText, Plus } from "lucide-react";
 
 interface TimelineProps {

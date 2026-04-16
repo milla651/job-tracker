@@ -10,7 +10,7 @@ import {
   upsertProfileStep3,
   saveCvContent,
 } from "@/app/actions/profile";
-import type { UserProfile } from "@prisma/client";
+import type { UserProfile } from "@/lib/db-types";
 import { MapPin, Briefcase, DollarSign, ChevronRight, ChevronLeft, X, Plus, Upload, FileText, CheckCircle } from "lucide-react";
 
 interface ProfileWizardProps {

@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { getPrepPackage } from "@/app/actions/interview-prep";
 import { PrepPageClient } from "./PrepPageClient";
 import Link from "next/link";
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props) {
   const session = await auth();
   if (!session?.user?.id) return { title: "Prep — CareerOS" };
 
-  const job = await prisma.jobApplication.findFirst({
+  const job = await db.jobApplication.findFirst({
     where: { id, userId: session.user.id },
     select: { company: true, position: true },
   });
@@ -30,7 +30,7 @@ export default async function PrepPage({ params }: Props) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const job = await prisma.jobApplication.findFirst({
+  const job = await db.jobApplication.findFirst({
     where: { id, userId: session.user.id },
     select: {
       id: true,
@@ -45,7 +45,7 @@ export default async function PrepPage({ params }: Props) {
 
   const [prepPackage, stories] = await Promise.all([
     getPrepPackage(id),
-    prisma.storyBankEntry
+    db.storyBankEntry
       .findMany({ where: { userId: session.user.id } })
       .catch(() => []),
   ]);

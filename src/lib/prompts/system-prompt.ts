@@ -1,4 +1,4 @@
-import type { UserProfile } from "@prisma/client";
+import type { UserProfile } from "@/lib/db-types";
 
 /**
  * Builds the per-user system prompt injected into every Claude API call.

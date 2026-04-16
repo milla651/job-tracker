@@ -1,7 +1,7 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { signIn, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
@@ -29,7 +29,7 @@ export async function registerUser(formData: FormData) {
 
     console.log("Checking for existing user...");
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await db.user.findUnique({
       where: { email },
     });
 
@@ -43,7 +43,7 @@ export async function registerUser(formData: FormData) {
 
     console.log("Creating user in DB...");
     // Create user
-    await prisma.user.create({
+    await db.user.create({
       data: {
         name,
         email,
@@ -68,7 +68,7 @@ export async function registerUser(formData: FormData) {
 
 export async function verifyEmail(email: string, code: string) {
   try {
-    const verificationToken = await prisma.verificationToken.findFirst({
+    const verificationToken = await db.verificationToken.findFirst({
       where: {
         email,
         token: code,
@@ -80,14 +80,14 @@ export async function verifyEmail(email: string, code: string) {
     }
 
     if (verificationToken.attempts >= 3) {
-      await prisma.verificationToken.delete({
+      await db.verificationToken.delete({
         where: { id: verificationToken.id },
       });
       return { error: "Too many failed attempts. Please request a new code." };
     }
 
     if (verificationToken.token !== code) {
-      await prisma.verificationToken.update({
+      await db.verificationToken.update({
         where: { id: verificationToken.id },
         data: { attempts: { increment: 1 } },
       });
@@ -100,7 +100,7 @@ export async function verifyEmail(email: string, code: string) {
       return { error: "Code has expired" };
     }
 
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await db.user.findUnique({
       where: { email },
     });
 
@@ -108,7 +108,7 @@ export async function verifyEmail(email: string, code: string) {
       return { error: "User does not exist" };
     }
 
-    await prisma.user.update({
+    await db.user.update({
       where: { id: existingUser.id },
       data: {
         emailVerified: new Date(),
@@ -129,7 +129,7 @@ export async function verifyEmail(email: string, code: string) {
       // If auto-login fails, user is still verified, just needs to login manually.
     }
 
-    await prisma.verificationToken.delete({
+    await db.verificationToken.delete({
       where: { id: verificationToken.id },
     });
 
@@ -147,7 +147,7 @@ export async function verifyEmail(email: string, code: string) {
 
 export async function resendVerificationCode(email: string) {
   try {
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await db.user.findUnique({
       where: { email },
     });
 
@@ -159,7 +159,7 @@ export async function resendVerificationCode(email: string) {
       return { error: "Email already verified" };
     }
 
-    const existingToken = await prisma.verificationToken.findFirst({
+    const existingToken = await db.verificationToken.findFirst({
       where: { email },
     });
 

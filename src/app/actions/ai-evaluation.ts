@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import {
   callClaudeJson,
   isAiEnabled,
@@ -15,7 +15,7 @@ import {
   EVALUATE_JOB_PROMPT_VERSION,
   type EvaluationResult,
 } from "@/lib/prompts/evaluate-job";
-import type { AiEvaluation, AiScore } from "@prisma/client";
+import type { AiEvaluation, AiScore } from "@/lib/db-types";
 
 // ── Get existing evaluation ──────────────────────────────────────────────────
 
@@ -26,12 +26,12 @@ export async function getEvaluation(
   if (!session?.user?.id) return null;
 
   try {
-    const job = await prisma.jobApplication.findFirst({
+    const job = await db.jobApplication.findFirst({
       where: { id: jobApplicationId, userId: session.user.id },
     });
     if (!job) return null;
 
-    return await prisma.aiEvaluation.findUnique({ where: { jobApplicationId } });
+    return await db.aiEvaluation.findUnique({ where: { jobApplicationId } });
   } catch {
     return null;
   }
@@ -52,7 +52,7 @@ export async function evaluateJob(
   }
 
   // Fetch job with ownership check
-  const job = await prisma.jobApplication.findFirst({
+  const job = await db.jobApplication.findFirst({
     where: { id: jobApplicationId, userId: session.user.id },
   });
   if (!job) {
@@ -67,7 +67,7 @@ export async function evaluateJob(
   }
 
   // Fetch user profile
-  const profile = await prisma.userProfile.findUnique({
+  const profile = await db.userProfile.findUnique({
     where: { userId: session.user.id },
   });
 
@@ -112,7 +112,7 @@ export async function evaluateJob(
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
 
-  const evaluation = await prisma.aiEvaluation.upsert({
+  const evaluation = await db.aiEvaluation.upsert({
     where: { jobApplicationId },
     create: {
       jobApplicationId,
@@ -148,7 +148,7 @@ export async function evaluateJob(
   });
 
   // Cache the letter grade on the job itself (for fast UI rendering)
-  await prisma.jobApplication.update({
+  await db.jobApplication.update({
     where: { id: jobApplicationId },
     data: { aiScore: result.score as AiScore },
   });

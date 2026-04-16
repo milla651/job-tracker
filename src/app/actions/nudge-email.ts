@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { getSmartNudges } from "@/app/actions/nudges";
 import { Resend } from "resend";
 
@@ -18,7 +18,7 @@ export async function toggleNudgeEmails(
   if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
   try {
-    await prisma.userProfile.upsert({
+    await db.userProfile.upsert({
       where: { userId: session.user.id },
       update: { emailNudgesEnabled: enabled },
       create: {
@@ -39,8 +39,8 @@ export async function toggleNudgeEmails(
 
 export async function sendNudgeDigestForUser(userId: string): Promise<void> {
   const [user, profile] = await Promise.all([
-    prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } }),
-    prisma.userProfile.findUnique({ where: { userId }, select: { emailNudgesEnabled: true } }),
+    db.user.findUnique({ where: { id: userId }, select: { email: true, name: true } }),
+    db.userProfile.findUnique({ where: { userId }, select: { emailNudgesEnabled: true } }),
   ]);
 
   if (!user || !profile?.emailNudgesEnabled) return;
@@ -122,7 +122,7 @@ export async function sendMyNudgeDigest(): Promise<{ success: boolean; error?: s
 // ── Batch send to all opted-in users (call from a cron/webhook) ───────────────
 
 export async function sendNudgeDigestToAll(): Promise<{ sent: number }> {
-  const profiles = await prisma.userProfile.findMany({
+  const profiles = await db.userProfile.findMany({
     where: { emailNudgesEnabled: true },
     select: { userId: true },
   });
@@ -143,7 +143,7 @@ async function getNudgesForUser(userId: string) {
   const staleThresholdDays = 14;
   const followUpThresholdDays = 7;
 
-  const jobs = await prisma.jobApplication.findMany({
+  const jobs = await db.jobApplication.findMany({
     where: {
       userId,
       status: {

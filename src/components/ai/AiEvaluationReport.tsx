@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { AiEvaluation } from "@prisma/client";
+import type { AiEvaluation } from "@/lib/db-types";
 import { AiScoreBadge } from "./AiScoreBadge";
 import { refreshEvaluation } from "@/app/actions/ai-evaluation";
 import {

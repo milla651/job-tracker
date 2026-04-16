@@ -4,8 +4,8 @@ import { Building2, MapPin, Timer, Coins, ArrowLeft, ArrowUpRight, ExternalLink 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { JobStatus } from "@prisma/client";
+import { db } from "@/lib/db";
+import { JobStatus } from "@/lib/db-types";
 import { JobActionButtons } from "./components/JobActionButtons";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -32,7 +32,7 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ id:
   let initialStatus: "IDLE" | "WISHLIST" | "APPLIED" | "DISCARDED" = "IDLE";
 
   if (session?.user?.id) {
-    const existingApp = await prisma.jobApplication.findFirst({
+    const existingApp = await db.jobApplication.findFirst({
       where: {
         userId: session.user.id,
         company: job.company,

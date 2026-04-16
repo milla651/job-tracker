@@ -1,6 +1,6 @@
 "use client";
 
-import { JobApplication, JobStatus } from "@prisma/client";
+import { JobApplication, JobStatus } from "@/lib/db-types";
 import { KanbanJobCard } from "./KanbanJobCard";
 import { cn } from "@/lib/utils";
 import { useState } from "react";

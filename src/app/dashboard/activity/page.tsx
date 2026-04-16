@@ -6,7 +6,7 @@ import { ActivityHeatmap } from "@/components/analytics/ActivityHeatmap";
 import { PipelineFunnel } from "@/components/analytics/PipelineFunnel";
 import { Button } from "@/components/ui/button";
 import { ActivitySidebar } from "./components/ActivitySidebar";
-import { JobStatus } from "@prisma/client";
+import { JobStatus } from "@/lib/db-types";
 import { Plus, ClipboardList, BarChart2 } from "lucide-react";
 
 export const metadata = { title: "Applications — CareerOS" };

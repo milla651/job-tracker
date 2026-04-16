@@ -2,14 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getJobById, deleteJob } from "@/app/actions/jobs";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { StatusSelector } from "@/components/StatusSelector";
 import { AiScoreBadge } from "@/components/ai/AiScoreBadge";
 import { JobDetailTabs } from "@/components/jobs/JobDetailTabs";
 import { ArrowLeft, Building2, Pencil, Trash2, MapPin, DollarSign } from "lucide-react";
 import { formatSalary } from "@/lib/utils";
-import type { AiScore } from "@prisma/client";
+import type { AiScore } from "@/lib/db-types";
 
 interface JobDetailPageProps {
   params: Promise<{ id: string }>;
@@ -24,10 +24,10 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
 
   const [prepPackage, stories] = await Promise.all([
     session?.user?.id
-      ? prisma.interviewPrepPackage.findUnique({ where: { jobApplicationId: id } }).catch(() => null)
+      ? db.interviewPrepPackage.findUnique({ where: { jobApplicationId: id } }).catch(() => null)
       : null,
     session?.user?.id
-      ? prisma.storyBankEntry.findMany({
+      ? db.storyBankEntry.findMany({
           where: { userId: session.user.id },
           orderBy: { createdAt: "desc" },
         }).catch(() => [])

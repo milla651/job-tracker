@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import {
   callClaudeJson,
@@ -15,7 +15,7 @@ import {
   PredictedQuestionsSchema,
   type PredictedQuestions,
 } from "@/lib/prompts/predict-questions";
-import type { InterviewPrepPackage } from "@prisma/client";
+import type { InterviewPrepPackage } from "@/lib/db-types";
 
 // ── Get prep package ──────────────────────────────────────────────────────────
 
@@ -26,12 +26,12 @@ export async function getPrepPackage(
   if (!session?.user?.id) return null;
 
   try {
-    const job = await prisma.jobApplication.findFirst({
+    const job = await db.jobApplication.findFirst({
       where: { id: jobApplicationId, userId: session.user.id },
     });
     if (!job) return null;
 
-    return await prisma.interviewPrepPackage.findUnique({
+    return await db.interviewPrepPackage.findUnique({
       where: { jobApplicationId },
     });
   } catch {
@@ -54,7 +54,7 @@ export async function generatePrepPackage(
   }
 
   // Fetch job with ownership check
-  const job = await prisma.jobApplication.findFirst({
+  const job = await db.jobApplication.findFirst({
     where: { id: jobApplicationId, userId: session.user.id },
     include: { aiEvaluation: true },
   });
@@ -69,7 +69,7 @@ export async function generatePrepPackage(
     };
   }
 
-  const profile = await prisma.userProfile.findUnique({
+  const profile = await db.userProfile.findUnique({
     where: { userId: session.user.id },
   });
 
@@ -108,7 +108,7 @@ export async function generatePrepPackage(
   }
 
   // Match stories to behavioral questions
-  const stories = await prisma.storyBankEntry.findMany({
+  const stories = await db.storyBankEntry.findMany({
     where: { userId: session.user.id },
     select: { id: true, title: true, tags: true, impact: true },
   });
@@ -116,7 +116,7 @@ export async function generatePrepPackage(
   const suggestedStories = questions.behavioral.map((q, idx) => {
     const matched = stories.find((s) =>
       q.whyAsked.toLowerCase().includes(s.tags[0]?.toLowerCase() ?? "") ||
-      s.tags.some((t) => q.question.toLowerCase().includes(t))
+      s.tags.some((t: string) => q.question.toLowerCase().includes(t))
     );
     return matched
       ? { questionIndex: idx, questionType: "behavioral", storyId: matched.id, storyTitle: matched.title, matchReason: "Tag overlap" }
@@ -124,7 +124,7 @@ export async function generatePrepPackage(
   }).filter(Boolean);
 
   // Persist (upsert)
-  const prepPackage = await prisma.interviewPrepPackage.upsert({
+  const prepPackage = await db.interviewPrepPackage.upsert({
     where: { jobApplicationId },
     create: {
       jobApplicationId,
@@ -153,12 +153,12 @@ export async function savePrepNotes(
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   try {
-    const job = await prisma.jobApplication.findFirst({
+    const job = await db.jobApplication.findFirst({
       where: { id: jobApplicationId, userId: session.user.id },
     });
     if (!job) return { success: false, error: "Job not found" };
 
-    await prisma.interviewPrepPackage.upsert({
+    await db.interviewPrepPackage.upsert({
       where: { jobApplicationId },
       create: { jobApplicationId, prepNotes: notes },
       update: { prepNotes: notes },

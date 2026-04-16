@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 
 const nextAuthResult = NextAuth({
   secret: process.env.NEXTAUTH_SECRET || "development-secret-please-change-in-production",
@@ -24,7 +24,7 @@ const nextAuthResult = NextAuth({
         if (credentials.verificationToken) {
           const token = credentials.verificationToken as string;
           
-          const verificationToken = await prisma.verificationToken.findFirst({
+          const verificationToken = await db.verificationToken.findFirst({
             where: {
               email,
               token,
@@ -35,7 +35,7 @@ const nextAuthResult = NextAuth({
             return null;
           }
 
-          const user = await prisma.user.findUnique({
+          const user = await db.user.findUnique({
             where: { email },
           });
 
@@ -56,7 +56,7 @@ const nextAuthResult = NextAuth({
 
         const password = credentials.password as string;
 
-        const user = await prisma.user.findUnique({
+        const user = await db.user.findUnique({
           where: { email },
         });
 

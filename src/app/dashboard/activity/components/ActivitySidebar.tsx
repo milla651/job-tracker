@@ -1,4 +1,4 @@
-import { JobStatus } from "@prisma/client";
+import { JobStatus } from "@/lib/db-types";
 import { STATUS_CONFIG } from "@/lib/utils";
 import { Briefcase, TrendingUp, CheckCircle2, Clock } from "lucide-react";
 import { SmartNudges } from "@/components/dashboard/SmartNudges";

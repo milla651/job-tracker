@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { JobApplication, JobStatus } from "@prisma/client";
+import { JobApplication, JobStatus } from "@/lib/db-types";
 import { JobCard } from "@/components/JobCard";
 import { DashboardEmptyState } from "@/components/DashboardEmptyState";
 import { Button } from "@/components/ui/button";

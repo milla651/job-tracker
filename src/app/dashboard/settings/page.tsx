@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { ProfileForm } from "@/components/ProfileForm";
 import { NudgeEmailSettings } from "@/components/settings/NudgeEmailSettings";
 import { redirect } from "next/navigation";
@@ -13,11 +13,11 @@ export default async function SettingsPage() {
   if (!session?.user?.id) redirect("/login");
 
   const [user, profile] = await Promise.all([
-    prisma.user.findUnique({
+    db.user.findUnique({
       where: { id: session.user.id },
       select: { name: true, email: true },
     }),
-    prisma.userProfile.findUnique({
+    db.userProfile.findUnique({
       where: { userId: session.user.id },
       select: { emailNudgesEnabled: true },
     }),

@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/StatusBadge";
 import { updateJobStatus } from "@/app/actions/jobs";
-import { JobStatus } from "@prisma/client";
+import { JobStatus } from "@/lib/db-types";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Check, Loader2 } from "lucide-react";
 

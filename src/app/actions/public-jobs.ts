@@ -1,10 +1,10 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { ScrapedJob } from "@/lib/mock-jobs";
-import { JobStatus } from "@prisma/client";
+import { JobStatus } from "@/lib/db-types";
 
 export async function savePublicJob(job: ScrapedJob, type: 'WISHLIST' | 'APPLIED' | 'DISCARDED') {
   const session = await auth();
@@ -16,7 +16,7 @@ export async function savePublicJob(job: ScrapedJob, type: 'WISHLIST' | 'APPLIED
   try {
     // Check if job already exists for this user to avoid duplicates
     // We can use the job URL or company+position as a unique constraint proxy
-    const existingJob = await prisma.jobApplication.findFirst({
+    const existingJob = await db.jobApplication.findFirst({
         where: {
             userId: session.user.id,
             position: job.title,
@@ -40,7 +40,7 @@ export async function savePublicJob(job: ScrapedJob, type: 'WISHLIST' | 'APPLIED
         salaryMax = parseInt(salaryMatch[2]) * 1000;
     }
 
-    await prisma.jobApplication.create({
+    await db.jobApplication.create({
       data: {
         userId: session.user.id,
         company: job.company,

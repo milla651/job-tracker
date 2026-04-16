@@ -1,7 +1,9 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
+import { db } from "@/lib/db";
+import { userCacheTag } from "@/lib/cache-tags";
 import { getSmartNudges } from "@/app/actions/nudges";
 import { AiScoreBadge } from "@/components/ai/AiScoreBadge";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -21,7 +23,7 @@ import {
   TrendingUp,
   Columns3,
 } from "lucide-react";
-import type { AiScore, JobStatus } from "@prisma/client";
+import type { AiScore, JobStatus } from "@/lib/db-types";
 
 export const metadata = { title: "Dashboard — CareerOS" };
 
@@ -29,19 +31,19 @@ export const metadata = { title: "Dashboard — CareerOS" };
 
 async function getDashboardData(userId: string) {
   const [jobs, nudges, stats, profile] = await Promise.all([
-    prisma.jobApplication.findMany({
+    db.jobApplication.findMany({
       where: { userId, status: { notIn: ["DISCARDED", "REJECTED", "WITHDRAWN"] } },
       orderBy: { updatedAt: "desc" },
       take: 8,
       select: { id: true, company: true, position: true, status: true, aiScore: true, updatedAt: true },
     }),
     getSmartNudges(),
-    prisma.jobApplication.groupBy({
+    db.jobApplication.groupBy({
       by: ["status"],
       where: { userId },
       _count: { status: true },
     }),
-    prisma.userProfile.findUnique({
+    db.userProfile.findUnique({
       where: { userId },
       select: { completionPct: true, wizardCompleted: true },
     }),
@@ -66,6 +68,14 @@ async function getDashboardData(userId: string) {
       active,
     },
   };
+}
+
+function loadCachedDashboard(userId: string) {
+  return unstable_cache(
+    async () => getDashboardData(userId),
+    ["dashboard", userId],
+    { revalidate: 60, tags: [userCacheTag(userId)] }
+  )();
 }
 
 // ── Stat Strip ────────────────────────────────────────────────────────────────
@@ -303,7 +313,7 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const { jobs, nudges, profile, pipeline } = await getDashboardData(session.user.id);
+  const { jobs, nudges, profile, pipeline } = await loadCachedDashboard(session.user.id);
   const firstName = session.user.name?.split(" ")[0] ?? "there";
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";

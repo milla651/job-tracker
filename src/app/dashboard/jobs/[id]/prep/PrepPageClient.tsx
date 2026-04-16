@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { InterviewPrepPackage, StoryBankEntry } from "@prisma/client";
+import type { InterviewPrepPackage, StoryBankEntry } from "@/lib/db-types";
 import {
   generatePrepPackage,
   savePrepNotes,

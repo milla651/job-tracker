@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { JobApplication } from "@prisma/client";
+import { JobApplication } from "@/lib/db-types";
 import { differenceInHours, differenceInDays } from "date-fns";
 import {
   Clock,

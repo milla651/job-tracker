@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createStory, updateStory, type StoryFormData } from "@/app/actions/stories";
-import type { StoryBankEntry } from "@prisma/client";
+import type { StoryBankEntry } from "@/lib/db-types";
 import { X, Plus, Loader2 } from "lucide-react";
 
 // ── Common labels ─────────────────────────────────────────────────────────────

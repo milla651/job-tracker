@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { callClaude, isAiEnabled, CLAUDE_SONNET } from "@/lib/claude";
 import { buildUserSystemPrompt } from "@/lib/prompts/system-prompt";
 import { buildCoverLetterPrompt } from "@/lib/prompts/generate-cover-letter";
@@ -19,11 +19,11 @@ async function getJobAndProfile(jobApplicationId: string) {
   if (!session?.user?.id) return null;
 
   const [job, profile] = await Promise.all([
-    prisma.jobApplication.findFirst({
+    db.jobApplication.findFirst({
       where: { id: jobApplicationId, userId: session.user.id },
       include: { aiEvaluation: true },
     }),
-    prisma.userProfile.findUnique({ where: { userId: session.user.id } }),
+    db.userProfile.findUnique({ where: { userId: session.user.id } }),
   ]);
 
   if (!job) return null;

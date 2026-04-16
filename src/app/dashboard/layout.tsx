@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 
 export default async function DashboardLayout({
@@ -11,7 +11,7 @@ export default async function DashboardLayout({
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const profile = await prisma.userProfile.findUnique({
+  const profile = await db.userProfile.findUnique({
     where: { userId: session.user.id },
     select: { completionPct: true },
   }).catch(() => null);

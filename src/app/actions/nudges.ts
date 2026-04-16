@@ -1,9 +1,9 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { JobStatus } from "@prisma/client";
+import { JobStatus } from "@/lib/db-types";
 import { differenceInDays } from "date-fns";
+import { fetchJobsForNudges } from "@/lib/queries/nudges";
 
 export type NudgeType =
   | "STALE"
@@ -31,26 +31,7 @@ export async function getSmartNudges(): Promise<Nudge[]> {
   const nudges: Nudge[] = [];
   const now = new Date();
 
-  // Fetch all active jobs with related data
-  const jobs = await prisma.jobApplication.findMany({
-    where: {
-      userId: session.user.id,
-      status: {
-        notIn: ["REJECTED", "WITHDRAWN", "OFFER", "ACCEPTED", "WISHLIST"],
-      },
-    },
-    select: {
-      id: true,
-      position: true,
-      company: true,
-      updatedAt: true,
-      appliedAt: true,
-      status: true,
-      aiScore: true,
-      aiEvaluation: { select: { id: true } },
-      interviewPrep: { select: { id: true } },
-    },
-  });
+  const jobs = await fetchJobsForNudges(session.user.id);
 
   for (const job of jobs) {
     const daysSinceUpdate = differenceInDays(now, job.updatedAt);
@@ -84,7 +65,7 @@ export async function getSmartNudges(): Promise<Nudge[]> {
     }
 
     // Rule 3: Interview stage — nudge if prep package not yet generated
-    if (isInterviewStage && !job.interviewPrep) {
+    if (isInterviewStage && !job.interviewPrepId) {
       nudges.push({
         id: job.id,
         type: "PREP_PENDING",
@@ -98,7 +79,7 @@ export async function getSmartNudges(): Promise<Nudge[]> {
     }
 
     // Rule 4: Interview stage — prep package is ready
-    if (isInterviewStage && job.interviewPrep) {
+    if (isInterviewStage && job.interviewPrepId) {
       nudges.push({
         id: job.id,
         type: "PREP_READY",

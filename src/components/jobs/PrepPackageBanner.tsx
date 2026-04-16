@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BookOpen, ChevronRight, Sparkles } from "lucide-react";
-import type { JobStatus } from "@prisma/client";
+import type { JobStatus } from "@/lib/db-types";
 
 const INTERVIEW_STAGES: JobStatus[] = ["PHONE_SCREEN", "INTERVIEW", "TECHNICAL"];
 

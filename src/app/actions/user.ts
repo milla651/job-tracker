@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -24,7 +24,7 @@ export async function updateProfile(data: z.infer<typeof profileSchema>) {
   }
 
   try {
-    await prisma.user.update({
+    await db.user.update({
       where: { id: session.user.id },
       data: {
         name: result.data.name,

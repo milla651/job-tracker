@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
 // Maximum file size: 4MB (to be safe with Vercel/Serverless limits)
@@ -19,7 +19,7 @@ export async function uploadDocument(jobId: string, formData: FormData) {
   }
 
   // Verify job ownership
-  const job = await prisma.jobApplication.findUnique({
+  const job = await db.jobApplication.findUnique({
     where: { id: jobId },
   });
 
@@ -30,7 +30,7 @@ export async function uploadDocument(jobId: string, formData: FormData) {
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    await prisma.document.create({
+    await db.document.create({
       data: {
         name: file.name,
         mediaType: file.type,
@@ -52,7 +52,7 @@ export async function getDocuments(jobId: string) {
   const session = await auth();
   if (!session?.user?.id) return [];
 
-  return await prisma.document.findMany({
+  return await db.document.findMany({
     where: { 
       jobApplicationId: jobId,
       jobApplication: { userId: session.user.id } // Ensure ownership
@@ -74,7 +74,7 @@ export async function deleteDocument(docId: string) {
   if (!session?.user?.id) return { error: "Unauthorized" };
 
   // Check ownership via relation
-  const doc = await prisma.document.findFirst({
+  const doc = await db.document.findFirst({
     where: { 
       id: docId,
       jobApplication: { userId: session.user.id }
@@ -84,7 +84,7 @@ export async function deleteDocument(docId: string) {
 
   if (!doc) return { error: "Document not found" };
 
-  await prisma.document.delete({
+  await db.document.delete({
     where: { id: docId },
   });
 
@@ -97,7 +97,7 @@ export async function getDocumentContent(docId: string) {
    const session = await auth();
    if (!session?.user?.id) return null;
 
-   const doc = await prisma.document.findFirst({
+  const doc = await db.document.findFirst({
      where: { 
        id: docId,
        jobApplication: { userId: session.user.id }

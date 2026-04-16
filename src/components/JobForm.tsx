@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { createJob, updateJob } from "@/app/actions/jobs";
 import { useConfetti } from "@/hooks/useConfetti";
-import { JobApplication } from "@prisma/client";
+import { JobApplication } from "@/lib/db-types";
 import {
   Loader2,
   Building2,
