@@ -208,5 +208,6 @@ export async function loginUser(formData: FormData) {
 }
 
 export async function logoutUser() {
-  await signOut({ redirectTo: "/" });
+  await signOut({ redirect: false });
+  redirect("/");
 }
