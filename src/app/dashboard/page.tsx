@@ -37,7 +37,7 @@ async function getDashboardData(userId: string) {
       take: 8,
       select: { id: true, company: true, position: true, status: true, aiScore: true, updatedAt: true },
     }),
-    getSmartNudges(),
+    getSmartNudges(userId),
     db.jobApplication.groupBy({
       by: ["status"],
       where: { userId },

@@ -1,44 +1,125 @@
-import { Pool, PoolClient } from "pg";
+import { Pool, PoolClient, type PoolConfig } from "pg";
 import type { JobStatus } from "@/lib/db-types";
 
 type Queryable = Pool | PoolClient;
 
-const globalForDb = globalThis as unknown as {
-  pgPool?: Pool;
-};
+function buildPoolConfig(rawUrl: string): PoolConfig {
+  let connectionString = rawUrl;
+  let ssl: PoolConfig["ssl"] = { rejectUnauthorized: false };
 
-const poolMax = Math.min(50, Math.max(2, parseInt(process.env.PG_POOL_MAX ?? "12", 10)));
-const poolIdleMs = parseInt(process.env.PG_IDLE_TIMEOUT_MS ?? "30000", 10);
-const poolConnTimeoutMs = parseInt(process.env.PG_CONNECTION_TIMEOUT_MS ?? "10000", 10);
+  try {
+    const parsed = new URL(rawUrl);
+    // pg v8+ maps sslmode=require → verify-full, which rejects self-signed certs.
+    // Strip the param and manage SSL directly via the ssl object instead.
+    const sslMode = (
+      process.env.DB_SSL_MODE ??
+      parsed.searchParams.get("sslmode") ??
+      ""
+    ).toLowerCase();
+    parsed.searchParams.delete("sslmode");
+    parsed.searchParams.delete("uselibpqcompat");
+    connectionString = parsed.toString();
 
-const pool =
-  globalForDb.pgPool ??
-  new Pool({
-    connectionString: process.env.DATABASE_URL,
+    const isLocal = ["localhost", "127.0.0.1", "::1"].includes(parsed.hostname);
+    if (sslMode === "disable" || isLocal) ssl = false;
+    // All remote hosts: rejectUnauthorized:false accepts self-signed/snakeoil certs
+  } catch {
+    connectionString = rawUrl;
+  }
+
+  const poolMax = Math.min(
+    50,
+    Math.max(2, parseInt(process.env.PG_POOL_MAX ?? "5", 10))
+  );
+
+  return {
+    connectionString,
+    ssl,
     max: poolMax,
-    idleTimeoutMillis: poolIdleMs,
-    connectionTimeoutMillis: poolConnTimeoutMs,
-  });
-
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.pgPool = pool;
+    idleTimeoutMillis: parseInt(process.env.PG_IDLE_TIMEOUT_MS ?? "15000", 10),
+    connectionTimeoutMillis: parseInt(
+      process.env.PG_CONNECTION_TIMEOUT_MS ?? "20000",
+      10
+    ),
+  };
 }
 
-/** Parameterized query; pass a PoolClient from {@link withTransaction} for real transactions. */
+// Lazy pool — survives Next.js HMR without spawning duplicate connections
+const g = globalThis as unknown as { pgPool?: Pool; pgPoolUrl?: string };
+
+function getPool(): Pool {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) throw new Error('Define "DATABASE_URL" environment variable.');
+
+  if (g.pgPool && g.pgPoolUrl === dbUrl) return g.pgPool;
+  if (g.pgPool) g.pgPool.end().catch(() => {});
+
+  const pool = new Pool(buildPoolConfig(dbUrl));
+  pool.on("error", (err) =>
+    console.warn("[DB] Idle client error:", err.message)
+  );
+  g.pgPool = pool;
+  g.pgPoolUrl = dbUrl;
+  return pool;
+}
+
+// Transient errors that warrant one automatic retry
+const RETRYABLE = [
+  "Connection terminated",
+  "Connection ended unexpectedly",
+  "connection timeout",
+  "ETIMEDOUT",
+];
+
+/** Execute a parameterized query with automatic retry on transient errors. */
 export async function query<T = any>(
   sql: string,
-  params: any[] = [],
-  db: Queryable = pool
+  params: unknown[] = [],
+  db?: Queryable
 ): Promise<T[]> {
-  const result = await db.query(sql, params);
-  return result.rows as T[];
+  if (db) {
+    const result = await db.query(sql, params);
+    return result.rows as T[];
+  }
+
+  const pool = getPool();
+  let lastErr: unknown;
+
+  for (let attempt = 0; attempt <= 1; attempt++) {
+    let client: PoolClient | undefined;
+    try {
+      client = await pool.connect();
+      const result = await client.query(sql, params);
+      return result.rows as T[];
+    } catch (err: unknown) {
+      lastErr = err;
+      if (client) {
+        client.release(true);
+        client = undefined;
+      }
+      const msg = err instanceof Error ? err.message : "";
+      const isTransient = RETRYABLE.some((s) => msg.includes(s));
+      if (attempt === 0 && isTransient) {
+        await new Promise((r) => setTimeout(r, 2000));
+        continue;
+      }
+      throw err;
+    } finally {
+      if (client) client.release();
+    }
+  }
+  throw lastErr;
 }
 
 const runQuery = query;
 
 export const createId = () => crypto.randomUUID().replace(/-/g, "");
 
-export async function withTransaction<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
+/** Run multiple queries inside a single atomic transaction. */
+export async function withTransaction<T>(
+  fn: (client: PoolClient) => Promise<T>
+): Promise<T> {
+  const pool = getPool();
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -46,38 +127,41 @@ export async function withTransaction<T>(fn: (client: PoolClient) => Promise<T>)
     await client.query("COMMIT");
     return out;
   } catch (e) {
-    await client.query("ROLLBACK");
+    await client.query("ROLLBACK").catch(() => {});
     throw e;
   } finally {
     client.release();
   }
 }
 
-const normalizeRow = <T extends Record<string, any>>(row: T): T => {
-  const next: Record<string, any> = { ...row };
+const normalizeRow = <T extends Record<string, unknown>>(row: T): T => {
+  const next: Record<string, unknown> = { ...row };
   if ("content" in next && Buffer.isBuffer(next.content)) {
-    next.content = new Uint8Array(next.content);
+    next.content = new Uint8Array(next.content as Buffer);
   }
   return next as T;
 };
 
-type Where = Record<string, any> | undefined;
+type Where = Record<string, unknown> | undefined;
 
-const buildWhere = (where?: Where, startAt = 1): { clause: string; params: any[]; next: number } => {
+const buildWhere = (
+  where?: Where,
+  startAt = 1
+): { clause: string; params: unknown[]; next: number } => {
   if (!where || Object.keys(where).length === 0) {
     return { clause: "", params: [], next: startAt };
   }
 
   let idx = startAt;
-  const params: any[] = [];
+  const params: unknown[] = [];
   const parts: string[] = [];
 
-  const addCondition = (key: string, value: any) => {
+  const addCondition = (key: string, value: unknown) => {
     if (value === undefined) return;
     if (key === "OR" && Array.isArray(value)) {
       const orParts = value
         .map((entry) => {
-          const built = buildWhere(entry, idx);
+          const built = buildWhere(entry as Where, idx);
           idx = built.next;
           params.push(...built.params);
           return built.clause.replace(/^WHERE /, "");
@@ -89,7 +173,7 @@ const buildWhere = (where?: Where, startAt = 1): { clause: string; params: any[]
     if (key === "AND" && Array.isArray(value)) {
       const andParts = value
         .map((entry) => {
-          const built = buildWhere(entry, idx);
+          const built = buildWhere(entry as Where, idx);
           idx = built.next;
           params.push(...built.params);
           return built.clause.replace(/^WHERE /, "");
@@ -99,47 +183,56 @@ const buildWhere = (where?: Where, startAt = 1): { clause: string; params: any[]
       return;
     }
 
-    if (value && typeof value === "object" && !Array.isArray(value) && !(value instanceof Date)) {
-      if ("notIn" in value && Array.isArray((value as { notIn: unknown }).notIn)) {
-        const arr = (value as { notIn: string[] }).notIn;
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      !(value instanceof Date)
+    ) {
+      const v = value as Record<string, unknown>;
+      if ("notIn" in v && Array.isArray(v.notIn)) {
         parts.push(`NOT ("${key}"::text = ANY($${idx}::text[]))`);
-        params.push(arr);
+        params.push(v.notIn);
         idx += 1;
         return;
       }
-      if ("contains" in value) {
-        const needle = value.mode === "insensitive" ? `%${String(value.contains).toLowerCase()}%` : `%${value.contains}%`;
-        const expr = value.mode === "insensitive" ? `LOWER("${key}") LIKE $${idx}` : `"${key}" LIKE $${idx}`;
+      if ("contains" in v) {
+        const needle =
+          v.mode === "insensitive"
+            ? `%${String(v.contains).toLowerCase()}%`
+            : `%${v.contains}%`;
+        const expr =
+          v.mode === "insensitive"
+            ? `LOWER("${key}") LIKE $${idx}`
+            : `"${key}" LIKE $${idx}`;
         parts.push(expr);
         params.push(needle);
         idx += 1;
         return;
       }
-      if ("in" in value) {
+      if ("in" in v) {
         parts.push(`"${key}" = ANY($${idx})`);
-        params.push(value.in);
+        params.push(v.in);
         idx += 1;
         return;
       }
-      if ("not" in value) {
+      if ("not" in v) {
         parts.push(`"${key}" <> $${idx}`);
-        params.push(value.not);
+        params.push(v.not);
         idx += 1;
         return;
       }
-      if ("gte" in value) {
+      if ("gte" in v) {
         parts.push(`"${key}" >= $${idx}`);
-        params.push(value.gte);
+        params.push(v.gte);
         idx += 1;
       }
-      if ("lte" in value) {
+      if ("lte" in v) {
         parts.push(`"${key}" <= $${idx}`);
-        params.push(value.lte);
+        params.push(v.lte);
         idx += 1;
       }
-      if ("increment" in value) {
-        return;
-      }
+      if ("increment" in v) return;
       return;
     }
 
@@ -157,19 +250,25 @@ const buildOrderBy = (orderBy?: Record<string, "asc" | "desc">) => {
   if (!orderBy) return "";
   const [key, direction] = Object.entries(orderBy)[0] ?? [];
   if (!key) return "";
-  return `ORDER BY "${key}" ${String(direction).toUpperCase() === "ASC" ? "ASC" : "DESC"}`;
+  return `ORDER BY "${key}" ${
+    String(direction).toUpperCase() === "ASC" ? "ASC" : "DESC"
+  }`;
 };
 
-const buildUpdateSet = (data: Record<string, any>, startAt: number) => {
+const buildUpdateSet = (data: Record<string, unknown>, startAt: number) => {
   const setParts: string[] = [];
-  const params: any[] = [];
+  const params: unknown[] = [];
   let idx = startAt;
 
   Object.entries(data).forEach(([key, value]) => {
     if (value === undefined) return;
-    if (value && typeof value === "object" && "increment" in value) {
+    if (
+      value &&
+      typeof value === "object" &&
+      "increment" in (value as Record<string, unknown>)
+    ) {
       setParts.push(`"${key}" = "${key}" + $${idx}`);
-      params.push(value.increment);
+      params.push((value as { increment: number }).increment);
       idx += 1;
       return;
     }
@@ -214,7 +313,9 @@ const basicModel = (table: string) => ({
     const keys = Object.keys(nextData);
     const placeholders = keys.map((_, i) => `$${i + 1}`).join(", ");
     const rows = await runQuery<any>(
-      `INSERT INTO "${table}" (${keys.map((k) => `"${k}"`).join(", ")}) VALUES (${placeholders}) RETURNING *`,
+      `INSERT INTO "${table}" (${keys
+        .map((k) => `"${k}"`)
+        .join(", ")}) VALUES (${placeholders}) RETURNING *`,
       keys.map((k) => nextData[k])
     );
     return normalizeRow(rows[0]);
@@ -239,12 +340,18 @@ const basicModel = (table: string) => ({
   },
   async delete({ where }: any) {
     const whereBuilt = buildWhere(where);
-    const rows = await runQuery<any>(`DELETE FROM "${table}" ${whereBuilt.clause} RETURNING *`, whereBuilt.params);
+    const rows = await runQuery<any>(
+      `DELETE FROM "${table}" ${whereBuilt.clause} RETURNING *`,
+      whereBuilt.params
+    );
     return rows[0] ? normalizeRow(rows[0]) : null;
   },
   async deleteMany({ where }: any) {
     const whereBuilt = buildWhere(where);
-    const rows = await runQuery<any>(`DELETE FROM "${table}" ${whereBuilt.clause} RETURNING "id"`, whereBuilt.params);
+    const rows = await runQuery<any>(
+      `DELETE FROM "${table}" ${whereBuilt.clause} RETURNING "id"`,
+      whereBuilt.params
+    );
     return { count: rows.length };
   },
   async upsert({ where, create, update }: any) {
@@ -264,13 +371,19 @@ const basicModel = (table: string) => ({
 
 const jobApplicationBase = basicModel("JobApplication");
 
-async function insertRow(client: PoolClient, table: string, data: Record<string, any>) {
+async function insertRow(
+  client: PoolClient,
+  table: string,
+  data: Record<string, unknown>
+) {
   const nextData = { ...data };
   if (!nextData.id) nextData.id = createId();
   const keys = Object.keys(nextData);
   const placeholders = keys.map((_, i) => `$${i + 1}`).join(", ");
   const rows = await query<any>(
-    `INSERT INTO "${table}" (${keys.map((k) => `"${k}"`).join(", ")}) VALUES (${placeholders}) RETURNING *`,
+    `INSERT INTO "${table}" (${keys
+      .map((k) => `"${k}"`)
+      .join(", ")}) VALUES (${placeholders}) RETURNING *`,
     keys.map((k) => nextData[k]),
     client
   );
@@ -317,7 +430,9 @@ export const db = {
         });
       }
       if (include?.aiEvaluation) {
-        job.aiEvaluation = await db.aiEvaluation.findUnique({ where: { jobApplicationId: job.id } });
+        job.aiEvaluation = await db.aiEvaluation.findUnique({
+          where: { jobApplicationId: job.id },
+        });
       }
       return job;
     },
@@ -330,7 +445,10 @@ export const db = {
         `SELECT "status", COUNT(*)::int AS count FROM "JobApplication" ${whereBuilt.clause} GROUP BY "status"`,
         whereBuilt.params
       );
-      return rows.map((row) => ({ status: row.status, _count: { status: Number(row.count) } }));
+      return rows.map((row) => ({
+        status: row.status,
+        _count: { status: Number(row.count) },
+      }));
     },
   },
   /**

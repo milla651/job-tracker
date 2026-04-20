@@ -110,12 +110,16 @@ export function OnboardingLayout({
           {/* Logo */}
           <div className="relative flex items-center gap-3">
             <div
-              className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center
-              shadow-md shadow-primary/40">
-              <Briefcase className="w-4 h-4 text-primary-foreground" />
+              className="w-9 h-9 rounded-xl flex items-center justify-center shadow-md relative overflow-hidden
+              bg-gradient-to-br from-indigo-500 to-violet-600 shadow-primary/40">
+              <div className="absolute inset-0 bg-white/20 blur-[2px] opacity-0 transition-opacity duration-300" />
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white relative z-10">
+                <path d="M12 5L4 9l8 4 8-4-8-4z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M4 14l8 4 8-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
-            <span className="font-bold text-white text-lg tracking-tight">
-              CareerOS
+            <span className="font-extrabold text-white text-xl tracking-tight">
+              Career<span className="text-primary">OS</span>
             </span>
           </div>
 
@@ -196,11 +200,15 @@ export function OnboardingLayout({
         {/* Mobile-only logo */}
         <div className="flex lg:hidden items-center gap-2.5 mb-10">
           <div
-            className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shadow-sm shadow-primary/30">
-            <Briefcase className="w-4 h-4 text-primary-foreground" />
+            className="w-8 h-8 rounded-xl flex items-center justify-center shadow-sm relative overflow-hidden
+            bg-gradient-to-br from-indigo-500 to-violet-600 shadow-primary/30">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white relative z-10">
+              <path d="M12 5L4 9l8 4 8-4-8-4z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M4 14l8 4 8-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
-          <span className="font-bold text-foreground text-base transition-colors duration-300">
-            CareerOS
+          <span className="font-extrabold text-foreground text-base tracking-tight transition-colors duration-300">
+            Career<span className="text-primary">OS</span>
           </span>
         </div>
 

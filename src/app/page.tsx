@@ -96,29 +96,27 @@ export default async function HomePage() {
                   href="/register"
                   className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg
                     text-sm md:text-base font-semibold
-                    bg-primary dark:bg-indigo-600 text-white dark:text-white
-                    border border-primary dark:border-indigo-500
-                    hover:bg-indigo-700 dark:hover:bg-indigo-500
-                    hover:shadow-lg hover:shadow-primary/40 dark:hover:shadow-indigo-600/30
-                    active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950
-                    transition-all duration-150 ease-out
+                    bg-primary hover:bg-primary/90 text-primary-foreground
+                    border border-primary/50 hover:border-primary
+                    shadow-md hover:shadow-lg hover:shadow-primary/25
+                    active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2
+                    transition-all duration-200 ease-out
                     disabled:opacity-50 disabled:cursor-not-allowed">
                   <span>Start Free</span>
-                  <Rocket className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform duration-200" />
+                  <Rocket className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
                 </Link>
                 <Link
                   href="/login"
                   className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg
                     text-sm md:text-base font-semibold
-                    bg-white dark:bg-slate-800 text-slate-900 dark:text-white
-                    border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600
-                    hover:bg-slate-50 dark:hover:bg-slate-700
-                    hover:shadow-md hover:shadow-slate-200 dark:hover:shadow-slate-900/50
-                    active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 dark:focus-visible:ring-slate-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950
-                    transition-all duration-150 ease-out
+                    bg-muted hover:bg-muted/70 text-muted-foreground hover:text-foreground
+                    border border-border hover:border-border/60
+                    hover:shadow-md hover:shadow-border/10
+                    active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2
+                    transition-all duration-200 ease-out
                     disabled:opacity-50 disabled:cursor-not-allowed">
                   <span>Sign In</span>
-                  <LogIn className="w-4 h-4 opacity-75 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
+                  <LogIn className="w-4 h-4 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0.5" />
                 </Link>
               </>
             ) : (
@@ -127,30 +125,28 @@ export default async function HomePage() {
                   href="/dashboard"
                   className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg
                     text-sm md:text-base font-semibold
-                    bg-primary dark:bg-indigo-600 text-white dark:text-white
-                    border border-primary dark:border-indigo-500
-                    hover:bg-indigo-700 dark:hover:bg-indigo-500
-                    hover:shadow-lg hover:shadow-primary/40 dark:hover:shadow-indigo-600/30
-                    active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950
-                    transition-all duration-150 ease-out
+                    bg-primary hover:bg-primary/90 text-primary-foreground
+                    border border-primary/50 hover:border-primary
+                    shadow-md hover:shadow-lg hover:shadow-primary/25
+                    active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2
+                    transition-all duration-200 ease-out
                     disabled:opacity-50 disabled:cursor-not-allowed">
                   <span>Open Dashboard</span>
-                  <LayoutDashboard className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                  <LayoutDashboard className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
                 </Link>
                 <form action={logoutUser} className="w-full sm:w-auto">
                   <button
                     type="submit"
                     className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg w-full
                        text-sm md:text-base font-semibold
-                       bg-red-600 dark:bg-red-700 text-white dark:text-white
-                       border border-red-600 dark:border-red-600
-                       hover:bg-red-700 dark:hover:bg-red-600
-                       hover:shadow-lg hover:shadow-red-600/30 dark:hover:shadow-red-700/30
-                       active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:focus-visible:ring-red-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950
-                       transition-all duration-150 ease-out
+                       bg-destructive/10 hover:bg-destructive/20 text-destructive hover:text-destructive
+                       border border-destructive/20 hover:border-destructive/30
+                       hover:shadow-md hover:shadow-destructive/10
+                       active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-destructive/30 focus-visible:ring-offset-2
+                       transition-all duration-200 ease-out
                        disabled:opacity-50 disabled:cursor-not-allowed">
                     <span>Logout</span>
-                    <LogOut className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    <LogOut className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                   </button>
                 </form>
               </>
@@ -372,7 +368,7 @@ export default async function HomePage() {
                       href="/register"
                       className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg
                         text-sm md:text-base font-semibold
-                        bg-white text-indigo-600
+                        bg-white dark:bg-foreground text-indigo-600 dark:text-background
                         border border-white hover:border-white/90
                         hover:bg-white/95 hover:shadow-xl hover:shadow-white/20
                         active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-600

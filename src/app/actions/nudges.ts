@@ -24,14 +24,15 @@ export interface Nudge {
 
 const INTERVIEW_STAGES: JobStatus[] = ["PHONE_SCREEN", "INTERVIEW", "TECHNICAL"];
 
-export async function getSmartNudges(): Promise<Nudge[]> {
-  const session = await auth();
-  if (!session?.user?.id) return [];
+export async function getSmartNudges(userId?: string): Promise<Nudge[]> {
+  const resolvedUserId =
+    userId ?? (await auth())?.user?.id;
+  if (!resolvedUserId) return [];
 
   const nudges: Nudge[] = [];
   const now = new Date();
 
-  const jobs = await fetchJobsForNudges(session.user.id);
+  const jobs = await fetchJobsForNudges(resolvedUserId);
 
   for (const job of jobs) {
     const daysSinceUpdate = differenceInDays(now, job.updatedAt);

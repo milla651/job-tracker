@@ -52,13 +52,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/logo.png', type: 'image/png' },
-    ],
-    apple: '/logo.png',
-  },
   twitter: {
     card: "summary_large_image",
     title: "JobTracker - AI-Powered Job Search Companion",

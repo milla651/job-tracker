@@ -3,16 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently -n tunnel,next -c cyan,green \"npm run db:tunnel\" \"wait-on tcp:5434 && next dev\"",
+    "dev:nodb": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "db:init": "tsx scripts/init-db.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:check": "tsx scripts/check-env.ts",
+    "db:tunnel": "bash scripts/tunnel.sh",
     "db:psql": "psql \"$DATABASE_URL\"",
-    "db:schema": "psql \"$DATABASE_URL\" -f db/schema.sql",
-    "db:migrate": "psql \"$DATABASE_URL\" -f db/migrations/0001_init.sql && psql \"$DATABASE_URL\" -f db/migrations/0002_add_email_nudges_flag.sql"
+    "db:schema": "psql \"$DATABASE_URL\" -f db/schema.sql"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
@@ -56,10 +60,13 @@
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^4.1.1",
     "autoprefixer": "^10.4.23",
+    "concurrently": "^9.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
-    "vitest": "^4.1.1"
+    "vitest": "^4.1.1",
+    "wait-on": "^9.0.5"
   }
 }

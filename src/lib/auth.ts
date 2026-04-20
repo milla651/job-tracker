@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 
 const nextAuthResult = NextAuth({
-  secret: process.env.NEXTAUTH_SECRET || "development-secret-please-change-in-production",
+  secret: process.env.AUTH_SECRET,
   providers: [
     Credentials({
       name: "credentials",
@@ -56,19 +56,18 @@ const nextAuthResult = NextAuth({
 
         const password = credentials.password as string;
 
-        const user = await db.user.findUnique({
-          where: { email },
-        });
-
-        if (!user || !user.password) {
+        let user: any;
+        try {
+          user = await db.user.findUnique({ where: { email } });
+        } catch (err: unknown) {
+          console.error("[auth] DB lookup failed:", err instanceof Error ? err.message : err);
           return null;
         }
+
+        if (!user || !user.password) return null;
 
         const passwordMatch = await bcrypt.compare(password, user.password);
-
-        if (!passwordMatch) {
-          return null;
-        }
+        if (!passwordMatch) return null;
 
         return {
           id: user.id,
