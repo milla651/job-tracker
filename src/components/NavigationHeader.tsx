@@ -75,10 +75,6 @@ export function NavigationHeader({ session }: NavigationHeaderProps) {
   ].includes(pathname || "");
   const isLandingPage = pathname === "/" || pathname === "";
 
-  const handleLogout = async () => {
-    await logoutUser();
-    router.push("/");
-  };
 
   const headerBase =
     "fixed top-0 left-0 right-0 z-40 transition-colors duration-300 " +
@@ -127,19 +123,21 @@ export function NavigationHeader({ session }: NavigationHeaderProps) {
             ) : (
               <div className="flex items-center gap-2">
                 {/* Logout Button */}
-                <button
-                  onClick={handleLogout}
-                  className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 
-                    text-sm font-medium rounded-lg
-                    text-foreground
-                    bg-secondary/80 dark:bg-secondary/90 hover:bg-secondary/95 dark:hover:bg-destructive/20
-                    border border-border/60 dark:border-destructive/30
-                    shadow-sm dark:shadow-slate-900/15
-                    transition-all duration-200 ease-out hover:shadow-md dark:hover:shadow-lg
-                    focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-destructive/30 focus:ring-offset-1">
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </button>
+                <form action={logoutUser} className="contents">
+                  <button
+                    type="submit"
+                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5
+                      text-sm font-medium rounded-lg
+                      text-foreground
+                      bg-secondary/80 dark:bg-secondary/90 hover:bg-secondary/95 dark:hover:bg-destructive/20
+                      border border-border/60 dark:border-destructive/30
+                      shadow-sm dark:shadow-slate-900/15
+                      transition-all duration-200 ease-out hover:shadow-md dark:hover:shadow-lg
+                      focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-destructive/30 focus:ring-offset-1">
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </button>
+                </form>
                 {/* Dashboard Button */}
                 <Link
                   href="/dashboard"
@@ -189,13 +187,15 @@ export function NavigationHeader({ session }: NavigationHeaderProps) {
           <div className="flex items-center gap-1">
             <ThemeToggle />
             {session && (
-              <button
-                onClick={handleLogout}
-                className="p-2 rounded-lg transition-colors duration-200
-                  text-destructive hover:bg-destructive/10"
-                aria-label="Sign out">
-                <LogOut className="w-4 h-4" />
-              </button>
+              <form action={logoutUser} className="contents">
+                <button
+                  type="submit"
+                  className="p-2 rounded-lg transition-colors duration-200
+                    text-destructive hover:bg-destructive/10"
+                  aria-label="Sign out">
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </form>
             )}
           </div>
         </div>
@@ -262,13 +262,15 @@ export function NavigationHeader({ session }: NavigationHeaderProps) {
               >
                 <Rocket className="w-5 h-5" />
               </Link>
-              <button
-                onClick={handleLogout}
-                className="p-2 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                title="Sign out"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
+              <form action={logoutUser} className="contents">
+                <button
+                  type="submit"
+                  className="p-2 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  title="Sign out"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </form>
               
               {/* Mobile Menu Toggle */}
               <button
@@ -307,12 +309,14 @@ export function NavigationHeader({ session }: NavigationHeaderProps) {
               >
                 Settings & Profile
               </Link>
-              <button
-                onClick={handleLogout}
-                className="flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-destructive hover:bg-destructive/10"
-              >
-                Sign out
-              </button>
+              <form action={logoutUser}>
+                <button
+                  type="submit"
+                  className="flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-destructive hover:bg-destructive/10 w-full"
+                >
+                  Sign out
+                </button>
+              </form>
             </div>
           </div>
         )}

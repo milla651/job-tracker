@@ -86,13 +86,17 @@ const nextAuthResult = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = user.id ?? user.sub;
+      }
+      // Ensure id is always present — fall back to sub (set automatically by NextAuth)
+      if (!token.id && token.sub) {
+        token.id = token.sub;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
+        session.user.id = (token.id ?? token.sub) as string;
       }
       return session;
     },

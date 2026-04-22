@@ -181,14 +181,16 @@ export function DashboardSidebar({ user, profilePct }: DashboardSidebarProps) {
           </div>
         </div>
         <ThemeToggle />
-        <button
-          onClick={() => logoutUser()}
-          className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-          aria-label="Sign out"
-          title="Sign out"
-        >
-          <LogOut className="h-4 w-4" />
-        </button>
+        <form action={logoutUser}>
+          <button
+            type="submit"
+            className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            aria-label="Sign out"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </form>
       </div>
     </aside>
   );
