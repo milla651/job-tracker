@@ -1,0 +1,22 @@
+[Unit]
+Description=CareerOS Celery Worker
+After=network.target careeros-ollama.service redis.service
+Requires=careeros-ollama.service redis.service
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/job-tracker/services/ai-backend
+Environment="PATH=/home/YOUR_USERNAME/job-tracker/services/ai-backend/venv/bin"
+EnvironmentFile=/home/YOUR_USERNAME/job-tracker/services/ai-backend/.env
+ExecStart=/home/YOUR_USERNAME/job-tracker/services/ai-backend/venv/bin/celery -A tasks.celery_config.celery_app worker --loglevel=info --concurrency=2 --logfile=/var/log/careeros/celery.log
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Performance
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
