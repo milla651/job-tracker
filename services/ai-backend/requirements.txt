@@ -1,0 +1,30 @@
+# CareerOS AI Backend - Python Dependencies
+# Flask + WSGI
+flask==3.0.3
+flask-cors==5.0.0
+gunicorn==22.0.0
+
+# Background Tasks
+celery==5.4.0
+redis==5.2.0
+
+# Database
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.35
+
+# LLM (Local)
+ollama==0.3.3
+
+# PDF Processing
+PyMuPDF==1.24.10          # PDF text extraction
+weasyprint==62.3          # HTML → PDF rendering
+jinja2==3.1.4             # Template rendering
+
+# Utilities
+pydantic==2.9.2           # Data validation
+python-dotenv==1.0.1      # Environment variables
+requests==2.32.3          # HTTP client
+
+# Development
+pytest==8.3.3             # Testing
+black==24.8.0             # Code formatting

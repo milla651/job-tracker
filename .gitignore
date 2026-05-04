@@ -44,5 +44,3 @@ next-env.d.ts
 
 tess.py
 scripts/scrape_jobs.py
-requirements.txt
-*.md
