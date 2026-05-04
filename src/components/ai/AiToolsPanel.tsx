@@ -18,6 +18,7 @@ import {
   Check,
   Loader2,
 } from "lucide-react";
+import { GenerateCVButton } from "@/components/cv/GenerateCVButton";
 
 interface AiToolsPanelProps {
   jobApplicationId: string;
@@ -121,6 +122,11 @@ export function AiToolsPanel({ jobApplicationId, hasOffer }: AiToolsPanelProps) 
 
       {open && (
         <div className="px-6 pb-6 space-y-4 border-t border-border/50">
+          {/* CV Generation (Python Backend) */}
+          <div className="pt-4 border-b border-border/50 pb-4">
+            <GenerateCVButton jobApplicationId={jobApplicationId} company="this job" />
+          </div>
+
           {/* Cover Letter */}
           <ToolSection
             tool="cover-letter"

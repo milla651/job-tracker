@@ -42,6 +42,7 @@ const NAV = [
     section: "Career",
     items: [
       { label: "Story Bank",    href: "/dashboard/stories", icon: BookOpen },
+      { label: "CV Builder",    href: "/dashboard/profile/cv-builder", icon: Briefcase },
       { label: "My Profile",    href: "/dashboard/profile", icon: UserCircle },
       { label: "Settings",      href: "/dashboard/settings", icon: Settings },
     ],
