@@ -124,7 +124,7 @@ def generate_tailored_cv_task(self, user_id: str, job_application_id: str):
         
         # 3. Call Ollama (this takes 40-60 seconds)
         ollama = OllamaClient()
-        model = os.getenv("CV_GENERATION_MODEL", "llama3.1:8b-instruct-q8_0")
+        model = os.getenv("CV_GENERATION_MODEL", "gemma3")
         
         tailored_content = ollama.generate(
             prompt=prompt,

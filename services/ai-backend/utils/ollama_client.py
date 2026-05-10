@@ -16,7 +16,7 @@ class OllamaClient:
     def generate(
         self, 
         prompt: str, 
-        model: str = "llama3.1:8b-instruct-q8_0",
+        model: str = "gemma3",
         system: Optional[str] = None,
         temperature: float = 0.7,
         max_tokens: int = 2048,
@@ -27,7 +27,7 @@ class OllamaClient:
         
         Args:
             prompt: User prompt
-            model: Model name (default: llama3.1:8b-instruct-q8_0)
+            model: Model name (default: gemma3)
             system: System prompt (optional)
             temperature: Sampling temperature
             max_tokens: Maximum tokens to generate
@@ -60,7 +60,7 @@ class OllamaClient:
     def generate_structured(
         self,
         prompt: str,
-        model: str = "llama3.1:8b-instruct-q8_0",
+        model: str = "gemma3",
         system: Optional[str] = None,
         format: str = "json",
         **kwargs

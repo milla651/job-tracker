@@ -41,7 +41,7 @@ def evaluate_job_task(self, user_id: str, job_application_id: str):
         
         # Call Ollama with lighter model for evaluation
         ollama = OllamaClient()
-        model = os.getenv("JOB_EVALUATION_MODEL", "llama3.1:8b-instruct-q4_K_M")
+        model = os.getenv("JOB_EVALUATION_MODEL", "gemma3")
         
         result = ollama.generate_structured(
             prompt=prompt,
@@ -90,7 +90,7 @@ def generate_cover_letter_task(self, user_id: str, job_application_id: str):
         
         # Generate
         ollama = OllamaClient()
-        model = os.getenv("CV_GENERATION_MODEL", "llama3.1:8b-instruct-q8_0")
+        model = os.getenv("CV_GENERATION_MODEL", "gemma3")
         
         cover_letter = ollama.generate(
             prompt=prompt,
