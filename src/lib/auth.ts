@@ -23,7 +23,7 @@ const nextAuthResult = NextAuth({
         // Allow login with verification token
         if (credentials.verificationToken) {
           const token = credentials.verificationToken as string;
-          
+
           const verificationToken = await db.verificationToken.findFirst({
             where: {
               email,
@@ -86,7 +86,7 @@ const nextAuthResult = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id ?? user.sub;
+        token.id = user.id ?? (user as any).sub;
       }
       // Ensure id is always present — fall back to sub (set automatically by NextAuth)
       if (!token.id && token.sub) {

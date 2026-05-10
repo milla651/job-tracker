@@ -1,6 +1,7 @@
 import { listUserCVsByPosition } from "@/app/actions/cv-reuse";
 import { CVLibraryClient } from "./CVLibraryClient";
 import { FileText, Briefcase } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default async function CVLibraryPage() {
   const cvsByPosition = await listUserCVsByPosition();
